@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Copy, Download, ArrowLeft, Check } from "lucide-react";
+import { Copy, Download, ArrowLeft, Check, FolderOpen } from "lucide-react";
 import { toast } from "sonner";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 const PromptResult = () => {
   const location = useLocation();
@@ -50,6 +51,20 @@ const PromptResult = () => {
           </div>
         </div>
 
+        <Alert className="bg-lime/10 border-lime">
+          <Check className="h-4 w-4 text-lime" />
+          <AlertDescription className="text-foreground">
+            Personagem salvo com sucesso! Você pode acessá-lo em{" "}
+            <Button
+              variant="link"
+              className="p-0 h-auto text-lime hover:text-lime/80"
+              onClick={() => navigate("/characters")}
+            >
+              Meus Personagens
+            </Button>
+          </AlertDescription>
+        </Alert>
+
         <div className="flex gap-3">
           <Button
             onClick={handleCopy}
@@ -75,6 +90,14 @@ const PromptResult = () => {
           >
             <Download className="w-4 h-4" />
             Baixar XML
+          </Button>
+          <Button
+            onClick={() => navigate("/characters")}
+            variant="outline"
+            className="gap-2 ml-auto"
+          >
+            <FolderOpen className="w-4 h-4" />
+            Meus Personagens
           </Button>
         </div>
 

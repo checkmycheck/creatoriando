@@ -109,6 +109,11 @@ const CreateCharacter = () => {
         return;
       }
 
+      toast({
+        title: "Personagem salvo!",
+        description: "Seu personagem foi salvo com sucesso.",
+      });
+
       // Generate final prompt
       const prompt = generateVeo3Prompt(characterData);
       navigate("/prompt-result", { state: { prompt } });
