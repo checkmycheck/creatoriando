@@ -1,0 +1,182 @@
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { useToast } from "@/hooks/use-toast";
+import { Trash2, FileText, Plus } from "lucide-react";
+
+interface Character {
+  id: string;
+  name: string;
+  gender: string | null;
+  age: string | null;
+  appearance: string | null;
+  created_at: string;
+}
+
+export default function Characters() {
+  const [characters, setCharacters] = useState<Character[]>([]);
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+  const { toast } = useToast();
+
+  useEffect(() => {
+    fetchCharacters();
+  }, []);
+
+  const fetchCharacters = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (!user) {
+      navigate("/auth");
+      return;
+    }
+
+    const { data, error } = await supabase
+      .from("characters")
+      .select("id, name, gender, age, appearance, created_at")
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      toast({
+        variant: "destructive",
+        title: "Erro ao carregar personagens",
+        description: error.message,
+      });
+    } else {
+      setCharacters(data || []);
+    }
+    
+    setLoading(false);
+  };
+
+  const handleDelete = async (id: string) => {
+    const { error } = await supabase
+      .from("characters")
+      .delete()
+      .eq("id", id);
+
+    if (error) {
+      toast({
+        variant: "destructive",
+        title: "Erro ao deletar",
+        description: error.message,
+      });
+    } else {
+      toast({
+        title: "Personagem deletado",
+        description: "O personagem foi removido com sucesso.",
+      });
+      fetchCharacters();
+    }
+  };
+
+  const handleViewPrompt = async (character: Character) => {
+    // Fetch full character data
+    const { data, error } = await supabase
+      .from("characters")
+      .select("*")
+      .eq("id", character.id)
+      .single();
+
+    if (error) {
+      toast({
+        variant: "destructive",
+        title: "Erro ao carregar personagem",
+        description: error.message,
+      });
+      return;
+    }
+
+    // Navigate to prompt result with character data
+    const { generateVeo3Prompt } = await import("@/lib/promptGenerator");
+    const prompt = generateVeo3Prompt(data);
+    navigate("/prompt-result", { state: { prompt } });
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-pulse text-muted-foreground">Carregando...</div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-background p-6">
+      <div className="max-w-6xl mx-auto">
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h1 className="text-4xl font-bold mb-2">Meus Personagens</h1>
+            <p className="text-muted-foreground">
+              Gerencie seus personagens criados
+            </p>
+          </div>
+          <Button onClick={() => navigate("/create")}>
+            <Plus className="w-4 h-4 mr-2" />
+            Novo Personagem
+          </Button>
+        </div>
+
+        {characters.length === 0 ? (
+          <Card>
+            <CardContent className="flex flex-col items-center justify-center py-12">
+              <p className="text-muted-foreground mb-4">
+                Você ainda não criou nenhum personagem
+              </p>
+              <Button onClick={() => navigate("/create")}>
+                Criar Primeiro Personagem
+              </Button>
+            </CardContent>
+          </Card>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {characters.map((character) => (
+              <Card key={character.id}>
+                <CardHeader>
+                  <CardTitle>{character.name}</CardTitle>
+                  <CardDescription>
+                    {new Date(character.created_at).toLocaleDateString("pt-BR")}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="flex flex-wrap gap-2">
+                    {character.gender && (
+                      <Badge variant="secondary">{character.gender}</Badge>
+                    )}
+                    {character.age && (
+                      <Badge variant="secondary">{character.age}</Badge>
+                    )}
+                    {character.appearance && (
+                      <Badge variant="secondary">{character.appearance}</Badge>
+                    )}
+                  </div>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      className="flex-1"
+                      onClick={() => handleViewPrompt(character)}
+                    >
+                      <FileText className="w-4 h-4 mr-2" />
+                      Ver Prompt
+                    </Button>
+                    <Button
+                      variant="destructive"
+                      size="icon"
+                      onClick={() => handleDelete(character.id)}
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
