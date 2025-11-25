@@ -16,12 +16,15 @@ export type Database = {
     Tables: {
       characters: {
         Row: {
+          action: string | null
           age: string | null
           angle: string | null
+          appearance: string | null
           created_at: string | null
           environment: string | null
           gender: string | null
           id: string
+          lighting: string | null
           mood: string | null
           movement: string | null
           name: string
@@ -33,12 +36,15 @@ export type Database = {
           voice_tone: string | null
         }
         Insert: {
+          action?: string | null
           age?: string | null
           angle?: string | null
+          appearance?: string | null
           created_at?: string | null
           environment?: string | null
           gender?: string | null
           id?: string
+          lighting?: string | null
           mood?: string | null
           movement?: string | null
           name: string
@@ -50,12 +56,15 @@ export type Database = {
           voice_tone?: string | null
         }
         Update: {
+          action?: string | null
           age?: string | null
           angle?: string | null
+          appearance?: string | null
           created_at?: string | null
           environment?: string | null
           gender?: string | null
           id?: string
+          lighting?: string | null
           mood?: string | null
           movement?: string | null
           name?: string

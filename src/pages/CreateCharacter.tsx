@@ -1,7 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { ChevronLeft, ChevronRight, Sparkles } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 import { StepProgress } from "@/components/character/StepProgress";
 import { CharacterSummary } from "@/components/character/CharacterSummary";
 import { GenderStep } from "@/components/character/steps/GenderStep";
@@ -20,6 +24,7 @@ import { ScriptStep } from "@/components/character/steps/ScriptStep";
 import { generateVeo3Prompt } from "@/lib/promptGenerator";
 
 export type CharacterData = {
+  name?: string;
   gender?: string;
   age?: string;
   appearance?: string;
@@ -39,17 +44,71 @@ const TOTAL_STEPS = 13;
 
 const CreateCharacter = () => {
   const navigate = useNavigate();
-  const [currentStep, setCurrentStep] = useState(1);
+  const { toast } = useToast();
+  const [currentStep, setCurrentStep] = useState(0);
   const [characterData, setCharacterData] = useState<CharacterData>({});
+  const [userId, setUserId] = useState<string | null>(null);
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      setUserId(user?.id || null);
+    });
+  }, []);
 
   const updateCharacter = (field: keyof CharacterData, value: string) => {
     setCharacterData((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (currentStep < TOTAL_STEPS) {
       setCurrentStep(currentStep + 1);
     } else {
+      // Save character to database
+      if (!userId) {
+        toast({
+          variant: "destructive",
+          title: "Erro",
+          description: "Você precisa estar logado para salvar o personagem.",
+        });
+        return;
+      }
+
+      if (!characterData.name) {
+        toast({
+          variant: "destructive",
+          title: "Nome obrigatório",
+          description: "Por favor, dê um nome ao seu personagem.",
+        });
+        return;
+      }
+
+      const { error } = await supabase.from("characters").insert({
+        user_id: userId,
+        name: characterData.name,
+        gender: characterData.gender,
+        age: characterData.age,
+        appearance: characterData.appearance,
+        visual: characterData.visual,
+        environment: characterData.environment,
+        posture: characterData.posture,
+        mood: characterData.mood,
+        action: characterData.action,
+        movement: characterData.movement,
+        angle: characterData.angle,
+        lighting: characterData.lighting,
+        voice_tone: characterData.voiceTone,
+        script: characterData.script,
+      });
+
+      if (error) {
+        toast({
+          variant: "destructive",
+          title: "Erro ao salvar",
+          description: error.message,
+        });
+        return;
+      }
+
       // Generate final prompt
       const prompt = generateVeo3Prompt(characterData);
       navigate("/prompt-result", { state: { prompt } });
@@ -57,13 +116,31 @@ const CreateCharacter = () => {
   };
 
   const handlePrevious = () => {
-    if (currentStep > 1) {
+    if (currentStep > 0) {
       setCurrentStep(currentStep - 1);
     }
   };
 
   const renderStep = () => {
     switch (currentStep) {
+      case 0:
+        return (
+          <div className="space-y-6">
+            <div>
+              <h2 className="text-2xl font-bold mb-2">Nome do Personagem</h2>
+              <p className="text-muted-foreground">Como você quer chamar seu personagem?</p>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="character-name">Nome</Label>
+              <Input
+                id="character-name"
+                placeholder="Ex: Ana Silva, João Santos..."
+                value={characterData.name || ""}
+                onChange={(e) => updateCharacter("name", e.target.value)}
+              />
+            </div>
+          </div>
+        );
       case 1:
         return <GenderStep value={characterData.gender} onChange={(v) => updateCharacter("gender", v)} />;
       case 2:
@@ -112,7 +189,7 @@ const CreateCharacter = () => {
               <Button
                 variant="outline"
                 onClick={handlePrevious}
-                disabled={currentStep === 1}
+                disabled={currentStep === 0}
                 className="gap-2"
               >
                 <ChevronLeft className="w-4 h-4" />

@@ -1,9 +1,30 @@
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Sparkles, Video, Zap } from "lucide-react";
+import { Sparkles, Video, Zap, LogOut, User } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { User as SupabaseUser } from "@supabase/supabase-js";
 
 const Index = () => {
   const navigate = useNavigate();
+  const [user, setUser] = useState<SupabaseUser | null>(null);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null);
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    setUser(null);
+  };
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -12,11 +33,26 @@ const Index = () => {
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-2">
               <Video className="w-6 h-6 text-lime" />
-              <span className="text-xl font-bold">CharacterAI</span>
+              <span className="text-xl font-bold">Selfyai</span>
             </div>
-            <Button variant="outline" size="sm">
-              Login
-            </Button>
+            <div className="flex items-center gap-2">
+              {user ? (
+                <>
+                  <Button variant="outline" size="sm" onClick={() => navigate("/characters")}>
+                    <User className="w-4 h-4 mr-2" />
+                    Meus Personagens
+                  </Button>
+                  <Button variant="outline" size="sm" onClick={handleLogout}>
+                    <LogOut className="w-4 h-4 mr-2" />
+                    Sair
+                  </Button>
+                </>
+              ) : (
+                <Button variant="outline" size="sm" onClick={() => navigate("/auth")}>
+                  Login
+                </Button>
+              )}
+            </div>
           </div>
         </div>
       </nav>
