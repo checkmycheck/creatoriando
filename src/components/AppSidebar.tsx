@@ -29,7 +29,7 @@ const menuItems = [
 ];
 
 export function AppSidebar() {
-  const { state } = useSidebar();
+  const { state, isMobile, setOpenMobile } = useSidebar();
   const location = useLocation();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -40,6 +40,12 @@ export function AppSidebar() {
 
   const isActive = (path: string) => currentPath === path;
   const isCollapsed = state === "collapsed";
+
+  const handleNavClick = () => {
+    if (isMobile) {
+      setOpenMobile(false);
+    }
+  };
 
   const handleLogout = async () => {
     const { error } = await supabase.auth.signOut();
@@ -88,6 +94,7 @@ export function AppSidebar() {
                         end 
                         className="hover:bg-muted/50" 
                         activeClassName="bg-muted text-primary font-medium"
+                        onClick={handleNavClick}
                       >
                         <item.icon className="mr-2 h-4 w-4" />
                         {!isCollapsed && <span>{item.title}</span>}
@@ -110,6 +117,7 @@ export function AppSidebar() {
                     end 
                     className="hover:bg-muted/50" 
                     activeClassName="bg-muted text-primary font-medium"
+                    onClick={handleNavClick}
                   >
                     <Shield className="mr-2 h-4 w-4" />
                     {!isCollapsed && <span>Admin</span>}
