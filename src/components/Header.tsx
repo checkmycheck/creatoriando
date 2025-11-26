@@ -6,11 +6,13 @@ import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState } from "react";
 import { useAdmin } from "@/hooks/useAdmin";
 import { useSubscription } from "@/hooks/useSubscription";
+import { AddCreditsModal } from "./credits/AddCreditsModal";
 
 export const Header = () => {
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [user, setUser] = useState<any>(null);
+  const [isCreditsModalOpen, setIsCreditsModalOpen] = useState(false);
   const { isAdmin } = useAdmin();
 
   useEffect(() => {
@@ -51,7 +53,12 @@ export const Header = () => {
             {user ? (
               <>
                 {user && (
-                  <Button variant="secondary" size="sm" className="pointer-events-none">
+                  <Button 
+                    variant="secondary" 
+                    size="sm" 
+                    onClick={() => setIsCreditsModalOpen(true)}
+                    className="cursor-pointer hover:bg-secondary/80"
+                  >
                     <Coins className="w-4 h-4 mr-1.5" />
                     {credits}
                   </Button>
@@ -103,7 +110,15 @@ export const Header = () => {
                 <>
                   {user && (
                     <div className="flex items-center justify-center py-2">
-                      <Button variant="secondary" size="sm" className="pointer-events-none">
+                      <Button 
+                        variant="secondary" 
+                        size="sm" 
+                        onClick={() => {
+                          setIsCreditsModalOpen(true);
+                          setIsMenuOpen(false);
+                        }}
+                        className="cursor-pointer hover:bg-secondary/80"
+                      >
                         <Coins className="w-4 h-4 mr-1.5" />
                         {credits} créditos
                       </Button>
@@ -152,6 +167,11 @@ export const Header = () => {
           </div>
         )}
       </div>
+
+      <AddCreditsModal 
+        open={isCreditsModalOpen} 
+        onOpenChange={setIsCreditsModalOpen} 
+      />
     </nav>
   );
 };
