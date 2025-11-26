@@ -16,6 +16,9 @@ interface ProfileData {
   subscription_expires_at: string | null;
   subscription_status: string | null;
   credits: number;
+  created_at: string | null;
+  full_name: string | null;
+  email: string;
 }
 
 const plans = [
@@ -25,15 +28,16 @@ const plans = [
     icon: Sparkles,
     price: "R$ 0",
     period: "para sempre",
-    description: "Comece a criar seus primeiros personagens",
+    description: "Perfeito para testar",
     features: [
-      "1 personagem incluído",
-      "Acesso a todas as características",
-      "Suporte básico por email",
-      "Exportar prompts XML",
+      "Até 1 personagem",
+      "Todas as 13 configurações",
+      "Prompts Veo3 otimizados",
+      "Suporte por email",
     ],
     limitations: [
-      "Sem personagens favoritos",
+      "Sem personagens ilimitados",
+      "Sem sistema de favoritos",
       "Sem templates exclusivos",
     ],
   },
@@ -41,34 +45,33 @@ const plans = [
     id: "pro",
     name: "Pro",
     icon: Crown,
-    price: "R$ 29,90",
+    price: "R$ 29",
     period: "por mês",
-    description: "Para criadores que querem escalar",
+    description: "Para criadores profissionais",
     popular: true,
     features: [
       "Personagens ilimitados",
       "Sistema de favoritos",
-      "Templates exclusivos",
+      "Editar personagens salvos",
+      "Geração com IA integrada",
       "Suporte prioritário",
-      "Exportar prompts XML",
-      "Acesso antecipado a novos recursos",
+      "Templates exclusivos",
     ],
   },
   {
     id: "enterprise",
-    name: "Enterprise",
+    name: "Empresarial",
     icon: Users,
-    price: "Customizado",
+    price: "Personalizado",
     period: "contato",
-    description: "Para equipes e grandes projetos",
+    description: "Para equipes e agências",
     features: [
       "Tudo do plano Pro",
-      "Suporte dedicado 24/7",
-      "API personalizada",
-      "Treinamento da equipe",
+      "Múltiplos usuários",
+      "API dedicada",
+      "Suporte 24/7",
+      "Treinamento personalizado",
       "SLA garantido",
-      "Gerenciamento de equipe",
-      "Faturamento personalizado",
     ],
   },
 ];
@@ -93,7 +96,7 @@ export default function Subscription() {
 
     const { data, error } = await supabase
       .from("profiles")
-      .select("subscription_plan, subscription_started_at, subscription_expires_at, subscription_status, credits")
+      .select("subscription_plan, subscription_started_at, subscription_expires_at, subscription_status, credits, created_at, full_name, email")
       .eq("id", user.id)
       .single();
 
@@ -129,11 +132,16 @@ export default function Subscription() {
 
   const handleUpgrade = (planId: string) => {
     if (planId === "enterprise") {
-      toast.info("Entre em contato conosco para planos Enterprise");
+      toast.info("Entre em contato: contato@creatorai.com");
       return;
     }
     
-    toast.info("Sistema de pagamento em breve!");
+    if (planId === "pro") {
+      toast.info("Upgrade para plano Pro em breve! Sistema de pagamento em desenvolvimento.");
+      return;
+    }
+    
+    toast.info("Este é o plano gratuito. Faça upgrade para Pro para desbloquear todos os recursos!");
   };
 
   const isCurrentPlan = (planId: string) => planId === plan;
@@ -180,30 +188,38 @@ export default function Subscription() {
               <CardDescription>Informações da sua assinatura atual</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="flex items-center gap-3 p-4 bg-card rounded-lg border">
                   <CreditCard className="w-8 h-8 text-lime" />
                   <div>
-                    <p className="text-sm text-muted-foreground">Créditos</p>
+                    <p className="text-sm text-muted-foreground">Créditos Disponíveis</p>
                     <p className="text-2xl font-bold">{credits}</p>
                   </div>
                 </div>
                 
-                {plan !== "free" && (
+                <div className="flex items-center gap-3 p-4 bg-card rounded-lg border">
+                  <Calendar className="w-8 h-8 text-lime" />
+                  <div>
+                    <p className="text-sm text-muted-foreground">Membro desde</p>
+                    <p className="text-sm font-medium">{formatDate(profileData?.created_at || null)}</p>
+                  </div>
+                </div>
+                
+                {plan !== "free" && profileData?.subscription_started_at && (
                   <>
                     <div className="flex items-center gap-3 p-4 bg-card rounded-lg border">
                       <Calendar className="w-8 h-8 text-lime" />
                       <div>
-                        <p className="text-sm text-muted-foreground">Início</p>
-                        <p className="text-sm font-medium">{formatDate(profileData?.subscription_started_at || null)}</p>
+                        <p className="text-sm text-muted-foreground">Assinatura iniciada em</p>
+                        <p className="text-sm font-medium">{formatDate(profileData.subscription_started_at)}</p>
                       </div>
                     </div>
                     
                     <div className="flex items-center gap-3 p-4 bg-card rounded-lg border">
                       <Calendar className="w-8 h-8 text-lime" />
                       <div>
-                        <p className="text-sm text-muted-foreground">Renovação</p>
-                        <p className="text-sm font-medium">{formatDate(profileData?.subscription_expires_at || null)}</p>
+                        <p className="text-sm text-muted-foreground">Próxima renovação</p>
+                        <p className="text-sm font-medium">{formatDate(profileData.subscription_expires_at || null)}</p>
                       </div>
                     </div>
                   </>
