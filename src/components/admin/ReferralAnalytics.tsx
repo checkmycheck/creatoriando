@@ -3,6 +3,8 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from "recharts";
 import { Users, Gift, TrendingUp } from "lucide-react";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
 
 interface ReferralStats {
   totalSuccessfulReferrals: number;
@@ -11,12 +13,23 @@ interface ReferralStats {
   conversionRate: number;
 }
 
+interface ReferralTransaction {
+  id: string;
+  code: string;
+  referrerEmail: string;
+  referredEmail: string;
+  creditsAwarded: number;
+  createdAt: string;
+}
+
 export function ReferralAnalytics() {
   const [stats, setStats] = useState<ReferralStats | null>(null);
+  const [transactions, setTransactions] = useState<ReferralTransaction[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchReferralStats();
+    fetchReferralTransactions();
   }, []);
 
   const fetchReferralStats = async () => {
@@ -68,6 +81,55 @@ export function ReferralAnalytics() {
       console.error('Error fetching referral stats:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchReferralTransactions = async () => {
+    try {
+      const { data: transactionsData } = await supabase
+        .from('referral_uses')
+        .select(`
+          id,
+          credits_awarded,
+          created_at,
+          referral_code_id,
+          referral_codes!inner (
+            code,
+            user_id
+          ),
+          referred_user_id
+        `)
+        .order('created_at', { ascending: false });
+
+      if (!transactionsData) return;
+
+      // Get unique user IDs to fetch emails
+      const userIds = new Set<string>();
+      transactionsData.forEach(t => {
+        userIds.add((t.referral_codes as any).user_id);
+        userIds.add(t.referred_user_id);
+      });
+
+      // Fetch all profiles at once
+      const { data: profiles } = await supabase
+        .from('profiles')
+        .select('id, email')
+        .in('id', Array.from(userIds));
+
+      const profileMap = new Map(profiles?.map(p => [p.id, p.email]) || []);
+
+      const formattedTransactions: ReferralTransaction[] = transactionsData.map(t => ({
+        id: t.id,
+        code: (t.referral_codes as any).code,
+        referrerEmail: profileMap.get((t.referral_codes as any).user_id) || 'Unknown',
+        referredEmail: profileMap.get(t.referred_user_id) || 'Unknown',
+        creditsAwarded: t.credits_awarded,
+        createdAt: t.created_at
+      }));
+
+      setTransactions(formattedTransactions);
+    } catch (error) {
+      console.error('Error fetching referral transactions:', error);
     }
   };
 
@@ -219,6 +281,59 @@ export function ReferralAnalytics() {
           </CardContent>
         </Card>
       </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Histórico de Transações</CardTitle>
+          <CardDescription>Todas as indicações realizadas na plataforma</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Código</TableHead>
+                <TableHead>Indicador</TableHead>
+                <TableHead>Indicado</TableHead>
+                <TableHead>Créditos</TableHead>
+                <TableHead>Data</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {transactions.length > 0 ? (
+                transactions.map((transaction) => (
+                  <TableRow key={transaction.id}>
+                    <TableCell>
+                      <Badge variant="secondary">{transaction.code}</Badge>
+                    </TableCell>
+                    <TableCell className="text-sm">{transaction.referrerEmail}</TableCell>
+                    <TableCell className="text-sm">{transaction.referredEmail}</TableCell>
+                    <TableCell>
+                      <Badge variant="outline" className="bg-lime/10 text-lime border-lime/20">
+                        +{transaction.creditsAwarded}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-sm text-muted-foreground">
+                      {new Date(transaction.createdAt).toLocaleDateString('pt-BR', {
+                        day: '2-digit',
+                        month: '2-digit',
+                        year: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                      })}
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={5} className="text-center text-muted-foreground py-8">
+                    Nenhuma transação de indicação ainda
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
     </div>
   );
 }
