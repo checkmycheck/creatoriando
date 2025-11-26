@@ -4,9 +4,6 @@ export function LoadingSpinner() {
   return (
     <div className="flex min-h-screen items-center justify-center">
       <div className="loader">
-        <div className="ground">
-          <div></div>
-        </div>
         <div className="box box0">
           <div></div>
         </div>
@@ -29,6 +26,9 @@ export function LoadingSpinner() {
           <div></div>
         </div>
         <div className="box box7">
+          <div></div>
+        </div>
+        <div className="ground">
           <div></div>
         </div>
       </div>
