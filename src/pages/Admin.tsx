@@ -150,20 +150,75 @@ export default function Admin() {
           description: "Cor do texto dentro dos cards",
           category: "Textos"
         },
+        "card-hover": { 
+          label: "Hover dos Cards", 
+          description: "Cor de fundo dos cards ao passar o mouse",
+          category: "Componentes"
+        },
+        "card-selected": { 
+          label: "Card Selecionado (Borda)", 
+          description: "Cor da borda de cards selecionados",
+          category: "Componentes"
+        },
+        "card-selected-bg": { 
+          label: "Card Selecionado (Fundo)", 
+          description: "Cor de fundo de cards selecionados",
+          category: "Componentes"
+        },
         primary: { 
           label: "Botões Primários", 
           description: "Cor principal dos botões e elementos de destaque",
           category: "Botões e Destaques"
         },
         "primary-foreground": { 
-          label: "Texto em Botões", 
+          label: "Texto em Botões Primários", 
           description: "Cor do texto sobre botões primários",
+          category: "Botões e Destaques"
+        },
+        secondary: { 
+          label: "Botões Secundários", 
+          description: "Cor de fundo dos botões secundários",
+          category: "Botões e Destaques"
+        },
+        "secondary-foreground": { 
+          label: "Texto em Botões Secundários", 
+          description: "Cor do texto sobre botões secundários",
+          category: "Botões e Destaques"
+        },
+        accent: { 
+          label: "Cor de Acento (Hover)", 
+          description: "Cor usada em hover de botões outline e elementos interativos",
+          category: "Botões e Destaques"
+        },
+        "accent-foreground": { 
+          label: "Texto em Acento", 
+          description: "Cor do texto sobre áreas com cor de acento",
           category: "Botões e Destaques"
         },
         lime: { 
           label: "Cor de Destaque (Lime)", 
           description: "Cor secundária de destaque e acentos",
           category: "Botões e Destaques"
+        },
+        "lime-foreground": { 
+          label: "Texto em Lime", 
+          description: "Cor do texto sobre elementos lime",
+          category: "Botões e Destaques"
+        },
+        border: { 
+          label: "Bordas", 
+          description: "Cor padrão das bordas de elementos",
+          category: "Componentes"
+        },
+        input: { 
+          label: "Campos de Entrada", 
+          description: "Cor de borda dos inputs e campos de texto",
+          category: "Componentes"
+        },
+        ring: { 
+          label: "Anel de Foco", 
+          description: "Cor do anel de foco ao navegar com teclado",
+          category: "Componentes"
         },
         "progress-bar": { 
           label: "Barra de Progresso", 
@@ -179,6 +234,26 @@ export default function Admin() {
           label: "Texto Secundário", 
           description: "Cor de textos menos importantes e descrições",
           category: "Textos"
+        },
+        popover: { 
+          label: "Fundo de Popover", 
+          description: "Cor de fundo de menus dropdown e popovers",
+          category: "Fundos"
+        },
+        "popover-foreground": { 
+          label: "Texto de Popover", 
+          description: "Cor do texto em popovers",
+          category: "Textos"
+        },
+        destructive: { 
+          label: "Ações Destrutivas", 
+          description: "Cor para botões de deletar e ações perigosas",
+          category: "Botões e Destaques"
+        },
+        "destructive-foreground": { 
+          label: "Texto em Destrutivo", 
+          description: "Cor do texto sobre botões destrutivos",
+          category: "Botões e Destaques"
         },
       };
 
