@@ -32,7 +32,7 @@ export default function Profile() {
       .from("profiles")
       .select("*")
       .eq("id", user.id)
-      .single();
+      .maybeSingle();
 
     setUser({
       ...user,
@@ -41,12 +41,13 @@ export default function Profile() {
     setLoading(false);
   };
 
+  const isPremium = plan === "pro" || plan === "enterprise";
   const creditsUsed = characterCount;
   const creditsAvailable = (user?.credits || 0);
-  const creditsFromPlan = plan === "free" ? characterLimit : "∞";
-  const creditsTotal = plan === "free" ? characterLimit + creditsAvailable : "∞";
-  const creditsRemaining = plan === "free" ? Math.max(0, characterLimit - characterCount + creditsAvailable) : "∞";
-  const usagePercentage = plan === "free" ? ((characterCount - creditsAvailable) / characterLimit) * 100 : 0;
+  const creditsFromPlan = isPremium ? "∞" : characterLimit;
+  const creditsTotal = isPremium ? "∞" : characterLimit + creditsAvailable;
+  const creditsRemaining = isPremium ? "∞" : Math.max(0, characterLimit - characterCount + creditsAvailable);
+  const usagePercentage = isPremium ? 0 : ((characterCount - creditsAvailable) / characterLimit) * 100;
 
   if (loading) {
     return (
@@ -80,13 +81,18 @@ export default function Profile() {
                   </CardDescription>
                 </div>
                 <Badge 
-                  variant={plan === "pro" ? "default" : "secondary"}
-                  className={plan === "pro" ? "bg-lime text-lime-foreground" : ""}
+                  variant={isPremium ? "default" : "secondary"}
+                  className={isPremium ? "bg-lime text-lime-foreground" : ""}
                 >
                   {plan === "pro" ? (
                     <>
                       <Crown className="w-3 h-3 mr-1" />
                       Plano Pro
+                    </>
+                  ) : plan === "enterprise" ? (
+                    <>
+                      <Sparkles className="w-3 h-3 mr-1" />
+                      Plano Enterprise
                     </>
                   ) : (
                     "Plano Free"
@@ -111,7 +117,7 @@ export default function Profile() {
                 </div>
               </div>
 
-              {plan === "free" && (
+              {!isPremium && (
                 <>
                   <div className="space-y-2">
                     <div className="flex justify-between text-sm">
@@ -140,7 +146,7 @@ export default function Profile() {
                 </>
               )}
 
-              {plan === "pro" && (
+              {isPremium && (
                 <Alert className="border-lime/50 bg-lime/5">
                   <Crown className="h-4 w-4 text-lime" />
                   <AlertDescription>
