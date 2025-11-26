@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ProtectedRoute } from "./components/ProtectedRoute";
+import { DashboardLayout } from "./components/DashboardLayout";
 import { useTheme } from "./hooks/useTheme";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
@@ -35,7 +36,9 @@ const App = () => {
               path="/create"
               element={
                 <ProtectedRoute>
-                  <CreateCharacter />
+                  <DashboardLayout>
+                    <CreateCharacter />
+                  </DashboardLayout>
                 </ProtectedRoute>
               }
             />
@@ -43,7 +46,9 @@ const App = () => {
               path="/characters"
               element={
                 <ProtectedRoute>
-                  <Characters />
+                  <DashboardLayout>
+                    <Characters />
+                  </DashboardLayout>
                 </ProtectedRoute>
               }
             />
@@ -51,7 +56,9 @@ const App = () => {
               path="/prompt-result"
               element={
                 <ProtectedRoute>
-                  <PromptResult />
+                  <DashboardLayout>
+                    <PromptResult />
+                  </DashboardLayout>
                 </ProtectedRoute>
                 }
             />
@@ -59,7 +66,9 @@ const App = () => {
               path="/profile"
               element={
                 <ProtectedRoute>
-                  <Profile />
+                  <DashboardLayout>
+                    <Profile />
+                  </DashboardLayout>
                 </ProtectedRoute>
               }
             />
@@ -67,7 +76,9 @@ const App = () => {
               path="/buy-credits"
               element={
                 <ProtectedRoute>
-                  <BuyCredits />
+                  <DashboardLayout>
+                    <BuyCredits />
+                  </DashboardLayout>
                 </ProtectedRoute>
               }
             />

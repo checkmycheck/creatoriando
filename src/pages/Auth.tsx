@@ -182,7 +182,7 @@ export default function Auth() {
         title: "Login realizado!",
         description: "Bem-vindo de volta.",
       });
-      navigate("/");
+      navigate("/characters");
     }
   };
 

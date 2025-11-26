@@ -57,10 +57,8 @@ export default function Profile() {
   }
 
   return (
-    <>
-      <Header />
-      <div className="min-h-screen bg-background p-6">
-        <div className="max-w-4xl mx-auto space-y-6">
+    <div className="min-h-screen bg-background p-6">
+      <div className="max-w-4xl mx-auto space-y-6">
           <div>
             <h1 className="text-4xl font-bold mb-2">Meu Perfil</h1>
             <p className="text-muted-foreground">
@@ -250,6 +248,5 @@ export default function Profile() {
           </div>
         </div>
       </div>
-    </>
   );
 }
