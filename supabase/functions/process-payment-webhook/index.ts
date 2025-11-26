@@ -67,29 +67,42 @@ serve(async (req) => {
       if (status === 'approved') {
         console.log(`Payment approved! Adding ${credits} credits to user ${userId}`);
         
+        // First, get current credits
+        const { data: profile, error: profileError } = await supabaseClient
+          .from('profiles')
+          .select('credits')
+          .eq('id', userId)
+          .single();
+
+        if (profileError) {
+          console.error('Error fetching profile:', profileError);
+          throw new Error('Failed to fetch user profile');
+        }
+
+        if (!profile) {
+          console.error('Profile not found for user:', userId);
+          throw new Error('User profile not found');
+        }
+
+        const currentCredits = profile.credits || 0;
+        const newCredits = currentCredits + credits;
+
+        console.log(`Current credits: ${currentCredits}, Adding: ${credits}, New total: ${newCredits}`);
+
+        // Update credits
         const { error: creditsError } = await supabaseClient
           .from('profiles')
-          .update({ credits: supabaseClient.rpc('increment', { value: credits }) })
+          .update({ credits: newCredits })
           .eq('id', userId);
 
         if (creditsError) {
-          console.error('Error adding credits:', creditsError);
-          // Try alternative approach
-          const { data: profile } = await supabaseClient
-            .from('profiles')
-            .select('credits')
-            .eq('id', userId)
-            .single();
-
-          if (profile) {
-            await supabaseClient
-              .from('profiles')
-              .update({ credits: (profile.credits || 0) + credits })
-              .eq('id', userId);
-          }
+          console.error('Error updating credits:', creditsError);
+          throw new Error('Failed to update user credits');
         }
 
-        console.log('Credits added successfully');
+        console.log(`Credits added successfully! User ${userId} now has ${newCredits} credits`);
+      } else {
+        console.log(`Payment status is "${status}", no credits added`);
       }
     }
 
