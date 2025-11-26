@@ -23,7 +23,7 @@ interface Character {
 
 export default function Characters() {
   const [characters, setCharacters] = useState<Character[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [showOnlyFavorites, setShowOnlyFavorites] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
