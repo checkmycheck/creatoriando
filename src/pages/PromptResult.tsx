@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Copy, Download, ArrowLeft, Check, FolderOpen } from "lucide-react";
+import { Copy, Download, ArrowLeft, Check, FolderOpen, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Header } from "@/components/Header";
@@ -68,7 +68,7 @@ const PromptResult = () => {
           </AlertDescription>
         </Alert>
 
-        <div className="flex gap-3">
+        <div className="flex flex-wrap gap-3">
           <Button
             onClick={handleCopy}
             variant="outline"
@@ -95,6 +95,13 @@ const PromptResult = () => {
             Baixar XML
           </Button>
           <Button
+            onClick={() => window.open("https://labs.google/fx/pt/tools/flow", "_blank")}
+            className="gap-2"
+          >
+            <ExternalLink className="w-4 h-4" />
+            Usar no Google Flow
+          </Button>
+          <Button
             onClick={() => navigate("/characters")}
             variant="outline"
             className="gap-2 ml-auto"
@@ -113,9 +120,8 @@ const PromptResult = () => {
         <div className="bg-card border border-border rounded-lg p-6 space-y-4">
           <h3 className="text-lg font-semibold">Como usar:</h3>
           <ol className="list-decimal list-inside space-y-2 text-muted-foreground">
-            <li>Copie o prompt XML gerado acima</li>
-            <li>Acesse a plataforma Veo3 ou seu gerador de vídeo</li>
-            <li>Cole o prompt no campo apropriado</li>
+            <li>Copie o prompt XML gerado acima ou clique em "Usar no Google Flow"</li>
+            <li>No Google Flow, cole o prompt no campo apropriado</li>
             <li>Faça upload da sua selfie (se necessário)</li>
             <li>Ajuste os parâmetros finais conforme desejado</li>
             <li>Gere seu vídeo!</li>
