@@ -47,11 +47,11 @@ All colors MUST be HSL.
     --card-selected-bg: 75 100% 12%;
     
     --sidebar: 0 0% 10%;
-    --sidebar-foreground: 0 0% 95%;
+    --sidebar-foreground: 0 0% 100%;
     --sidebar-primary: 195 100% 50%;
     --sidebar-primary-foreground: 0 0% 5%;
     --sidebar-accent: 0 0% 15%;
-    --sidebar-accent-foreground: 0 0% 95%;
+    --sidebar-accent-foreground: 0 0% 100%;
     --sidebar-border: 0 0% 20%;
     --sidebar-ring: 195 100% 50%;
     --sidebar-opacity: 100;
