@@ -96,7 +96,7 @@ export function BuyCreditsPricing({ onPurchase, loading }: BuyCreditsPricingProp
               )}
               <div className="text-center space-y-4">
                 <div>
-                  <div className="text-4xl font-bold">{pkg.credits}</div>
+                  <div className="text-4xl font-bold">{pkg.credits.toLocaleString('pt-BR')}</div>
                   <div className="text-sm text-muted-foreground">créditos</div>
                 </div>
                 <div className="text-2xl font-semibold">R$ {pkg.price_brl.toFixed(2)}</div>
