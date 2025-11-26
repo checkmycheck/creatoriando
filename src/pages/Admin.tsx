@@ -8,7 +8,8 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Header } from "@/components/Header";
-import { Users, Video, Activity, TrendingUp, Palette, Loader2, Home, BarChart3 } from "lucide-react";
+import { Users, Video, Activity, TrendingUp, Palette, Loader2, Home, BarChart3, Search } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
 import { AnalyticsDashboard } from "@/components/admin/AnalyticsDashboard";
@@ -43,6 +44,8 @@ export default function Admin() {
   const [loadingStats, setLoadingStats] = useState(true);
   const [users, setUsers] = useState<any[]>([]);
   const [loadingUsers, setLoadingUsers] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [planFilter, setPlanFilter] = useState<string>("all");
   const saveTimeoutRef = useRef<Record<string, NodeJS.Timeout>>({});
 
   useEffect(() => {
@@ -508,13 +511,46 @@ export default function Admin() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                {loadingUsers ? (
-                  <div className="flex items-center justify-center py-8">
-                    <Loader2 className="w-8 h-8 animate-spin text-primary" />
+                <div className="space-y-4">
+                  <div className="flex flex-col sm:flex-row gap-4">
+                    <div className="relative flex-1">
+                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                      <Input
+                        placeholder="Buscar por email ou nome..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="pl-10"
+                      />
+                    </div>
+                    <Select value={planFilter} onValueChange={setPlanFilter}>
+                      <SelectTrigger className="w-full sm:w-[200px]">
+                        <SelectValue placeholder="Filtrar por plano" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">Todos os planos</SelectItem>
+                        <SelectItem value="free">Free</SelectItem>
+                        <SelectItem value="pro">Pro</SelectItem>
+                        <SelectItem value="enterprise">Enterprise</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
-                ) : (
-                  <UsersList users={users} />
-                )}
+
+                  {loadingUsers ? (
+                    <div className="flex items-center justify-center py-8">
+                      <Loader2 className="w-8 h-8 animate-spin text-primary" />
+                    </div>
+                  ) : (
+                    <UsersList 
+                      users={users.filter((user) => {
+                        const matchesSearch = searchTerm === "" || 
+                          user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                          (user.full_name && user.full_name.toLowerCase().includes(searchTerm.toLowerCase()));
+                        const matchesPlan = planFilter === "all" || user.subscription_plan === planFilter;
+                        return matchesSearch && matchesPlan;
+                      })} 
+                    />
+                  )}
+                </div>
               </CardContent>
             </Card>
           </TabsContent>
