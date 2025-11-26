@@ -13,6 +13,7 @@ import { useToast } from "@/hooks/use-toast";
 export default function Auth() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [cpf, setCpf] = useState("");
   const [loading, setLoading] = useState(false);
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -21,6 +22,42 @@ export default function Auth() {
   const [codeValidation, setCodeValidation] = useState<{ valid: boolean; message: string } | null>(null);
 
   const referralCode = searchParams.get('ref');
+
+  const validateCPF = (cpf: string): boolean => {
+    cpf = cpf.replace(/[^\d]/g, '');
+    
+    if (cpf.length !== 11 || /^(\d)\1{10}$/.test(cpf)) {
+      return false;
+    }
+
+    let sum = 0;
+    for (let i = 0; i < 9; i++) {
+      sum += parseInt(cpf.charAt(i)) * (10 - i);
+    }
+    let digit = 11 - (sum % 11);
+    if (digit >= 10) digit = 0;
+    if (digit !== parseInt(cpf.charAt(9))) return false;
+
+    sum = 0;
+    for (let i = 0; i < 10; i++) {
+      sum += parseInt(cpf.charAt(i)) * (11 - i);
+    }
+    digit = 11 - (sum % 11);
+    if (digit >= 10) digit = 0;
+    if (digit !== parseInt(cpf.charAt(10))) return false;
+
+    return true;
+  };
+
+  const formatCPF = (value: string) => {
+    const cleaned = value.replace(/\D/g, '');
+    const limited = cleaned.substring(0, 11);
+    
+    if (limited.length <= 3) return limited;
+    if (limited.length <= 6) return `${limited.slice(0, 3)}.${limited.slice(3)}`;
+    if (limited.length <= 9) return `${limited.slice(0, 3)}.${limited.slice(3, 6)}.${limited.slice(6)}`;
+    return `${limited.slice(0, 3)}.${limited.slice(3, 6)}.${limited.slice(6, 9)}-${limited.slice(9)}`;
+  };
 
   useEffect(() => {
     if (referralCode) {
@@ -64,6 +101,16 @@ export default function Auth() {
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    // Validate CPF
+    if (!validateCPF(cpf)) {
+      toast({
+        variant: "destructive",
+        title: "CPF inválido",
+        description: "Por favor, insira um CPF válido.",
+      });
+      return;
+    }
+
     // Validate referral code if present
     if (referralCode && codeValidation && !codeValidation.valid) {
       toast({
@@ -164,7 +211,11 @@ export default function Auth() {
       <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle>Creator IA</CardTitle>
-          <CardDescription>Entre ou crie sua conta</CardDescription>
+          <CardDescription>
+            Crie sua conta e ganhe <strong>1 geração grátis</strong>!
+            <br />
+            Indique amigos e ganhe <strong>5 gerações</strong> a cada cadastro.
+          </CardDescription>
           {referralCode && (
             <Alert className={`mt-4 ${
               validatingCode 
@@ -235,6 +286,17 @@ export default function Auth() {
                     placeholder="seu@email.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="signup-cpf">CPF</Label>
+                  <Input
+                    id="signup-cpf"
+                    type="text"
+                    placeholder="000.000.000-00"
+                    value={cpf}
+                    onChange={(e) => setCpf(formatCPF(e.target.value))}
                     required
                   />
                 </div>
