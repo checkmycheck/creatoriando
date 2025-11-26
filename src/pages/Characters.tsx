@@ -23,7 +23,7 @@ interface Character {
 
 export default function Characters() {
   const [characters, setCharacters] = useState<Character[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [showOnlyFavorites, setShowOnlyFavorites] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -34,6 +34,7 @@ export default function Characters() {
   }, []);
 
   const fetchCharacters = async () => {
+    setLoading(true);
     const { data: { user } } = await supabase.auth.getUser();
     
     if (!user) {
