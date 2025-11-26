@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { z } from "zod";
 import {
   Dialog,
   DialogContent,
@@ -10,8 +11,17 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { Loader2, User, CreditCard, Video, Calendar, Mail } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Loader2, User, CreditCard, Video, Calendar, Mail, Edit2, X, Save } from "lucide-react";
 import { toast } from "sonner";
+
+const updateProfileSchema = z.object({
+  credits: z.number().int().min(0, "Créditos devem ser positivos").max(10000, "Máximo de 10.000 créditos"),
+  subscription_plan: z.enum(["free", "pro", "enterprise"]),
+});
 
 interface Profile {
   id: string;
@@ -46,6 +56,10 @@ interface CreditTransaction {
 
 export function UserDetailsModal({ user, open, onClose }: UserDetailsModalProps) {
   const [loading, setLoading] = useState(true);
+  const [isEditing, setIsEditing] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [editedCredits, setEditedCredits] = useState(user.credits);
+  const [editedPlan, setEditedPlan] = useState(user.subscription_plan);
   const [characterStats, setCharacterStats] = useState<CharacterStats>({
     total: 0,
     favorites: 0,
@@ -55,6 +69,9 @@ export function UserDetailsModal({ user, open, onClose }: UserDetailsModalProps)
   useEffect(() => {
     if (open) {
       loadUserDetails();
+      setEditedCredits(user.credits);
+      setEditedPlan(user.subscription_plan);
+      setIsEditing(false);
     }
   }, [open, user.id]);
 
@@ -111,6 +128,65 @@ export function UserDetailsModal({ user, open, onClose }: UserDetailsModalProps)
     return labels[type] || type;
   };
 
+  const handleSave = async () => {
+    try {
+      // Validate input
+      const validationResult = updateProfileSchema.safeParse({
+        credits: editedCredits,
+        subscription_plan: editedPlan,
+      });
+
+      if (!validationResult.success) {
+        toast.error(validationResult.error.errors[0].message);
+        return;
+      }
+
+      setSaving(true);
+
+      const { error } = await supabase
+        .from("profiles")
+        .update({
+          credits: editedCredits,
+          subscription_plan: editedPlan,
+        })
+        .eq("id", user.id);
+
+      if (error) throw error;
+
+      // Log transaction if credits changed
+      if (editedCredits !== user.credits) {
+        const creditDiff = editedCredits - user.credits;
+        await supabase.from("credit_transactions").insert({
+          user_id: user.id,
+          amount: creditDiff,
+          type: creditDiff > 0 ? "purchase" : "usage",
+          description: `Ajuste manual pelo admin: ${creditDiff > 0 ? "+" : ""}${creditDiff} créditos`,
+        });
+      }
+
+      toast.success("Perfil atualizado com sucesso!");
+      setIsEditing(false);
+      
+      // Reload user details
+      await loadUserDetails();
+      
+      // Update parent component
+      user.credits = editedCredits;
+      user.subscription_plan = editedPlan;
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      toast.error("Erro ao atualizar perfil");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleCancel = () => {
+    setEditedCredits(user.credits);
+    setEditedPlan(user.subscription_plan);
+    setIsEditing(false);
+  };
+
   const getPlanBadgeVariant = (plan: string) => {
     switch (plan) {
       case "pro":
@@ -122,17 +198,60 @@ export function UserDetailsModal({ user, open, onClose }: UserDetailsModalProps)
     }
   };
 
+  const getPlanLabel = (plan: string) => {
+    return plan.toUpperCase();
+  };
+
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <User className="w-5 h-5" />
-            Detalhes do Usuário
-          </DialogTitle>
-          <DialogDescription>
-            Informações completas sobre o usuário e suas atividades
-          </DialogDescription>
+          <div className="flex items-center justify-between">
+            <div>
+              <DialogTitle className="flex items-center gap-2">
+                <User className="w-5 h-5" />
+                Detalhes do Usuário
+              </DialogTitle>
+              <DialogDescription>
+                Informações completas sobre o usuário e suas atividades
+              </DialogDescription>
+            </div>
+            {!isEditing ? (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setIsEditing(true)}
+                disabled={loading}
+              >
+                <Edit2 className="w-4 h-4 mr-2" />
+                Editar
+              </Button>
+            ) : (
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleCancel}
+                  disabled={saving}
+                >
+                  <X className="w-4 h-4 mr-2" />
+                  Cancelar
+                </Button>
+                <Button
+                  size="sm"
+                  onClick={handleSave}
+                  disabled={saving}
+                >
+                  {saving ? (
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  ) : (
+                    <Save className="w-4 h-4 mr-2" />
+                  )}
+                  Salvar
+                </Button>
+              </div>
+            )}
+          </div>
         </DialogHeader>
 
         {loading ? (
@@ -162,9 +281,26 @@ export function UserDetailsModal({ user, open, onClose }: UserDetailsModalProps)
                 <Separator />
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-muted-foreground">Plano:</span>
-                  <Badge variant={getPlanBadgeVariant(user.subscription_plan)}>
-                    {user.subscription_plan.toUpperCase()}
-                  </Badge>
+                  {isEditing ? (
+                    <Select
+                      value={editedPlan}
+                      onValueChange={(value: any) => setEditedPlan(value)}
+                      disabled={saving}
+                    >
+                      <SelectTrigger className="w-32">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="free">FREE</SelectItem>
+                        <SelectItem value="pro">PRO</SelectItem>
+                        <SelectItem value="enterprise">ENTERPRISE</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  ) : (
+                    <Badge variant={getPlanBadgeVariant(user.subscription_plan)}>
+                      {getPlanLabel(user.subscription_plan)}
+                    </Badge>
+                  )}
                 </div>
                 <Separator />
                 <div className="flex justify-between items-center">
@@ -184,8 +320,34 @@ export function UserDetailsModal({ user, open, onClose }: UserDetailsModalProps)
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-3xl font-bold text-primary">{user.credits}</div>
-                  <p className="text-xs text-muted-foreground mt-1">Créditos disponíveis</p>
+                  {isEditing ? (
+                    <div className="space-y-2">
+                      <Label htmlFor="credits">Quantidade de Créditos</Label>
+                      <Input
+                        id="credits"
+                        type="number"
+                        min="0"
+                        max="10000"
+                        value={editedCredits}
+                        onChange={(e) => setEditedCredits(parseInt(e.target.value) || 0)}
+                        disabled={saving}
+                        className="max-w-32"
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        {editedCredits !== user.credits && (
+                          <span className={editedCredits > user.credits ? "text-green-500" : "text-red-500"}>
+                            {editedCredits > user.credits ? "+" : ""}
+                            {editedCredits - user.credits} créditos
+                          </span>
+                        )}
+                      </p>
+                    </div>
+                  ) : (
+                    <>
+                      <div className="text-3xl font-bold text-primary">{user.credits}</div>
+                      <p className="text-xs text-muted-foreground mt-1">Créditos disponíveis</p>
+                    </>
+                  )}
                 </CardContent>
               </Card>
 
