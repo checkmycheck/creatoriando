@@ -88,10 +88,62 @@ export type Database = {
           },
         ]
       }
+      credit_transactions: {
+        Row: {
+          amount: number
+          character_id: string | null
+          created_at: string
+          description: string | null
+          id: string
+          payment_id: string | null
+          payment_status: string | null
+          type: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          character_id?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          payment_id?: string | null
+          payment_status?: string | null
+          type: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          character_id?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          payment_id?: string | null
+          payment_status?: string | null
+          type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "credit_transactions_character_id_fkey"
+            columns: ["character_id"]
+            isOneToOne: false
+            referencedRelation: "characters"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "credit_transactions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
           created_at: string | null
+          credits: number
           email: string
           full_name: string | null
           id: string
@@ -104,6 +156,7 @@ export type Database = {
         Insert: {
           avatar_url?: string | null
           created_at?: string | null
+          credits?: number
           email: string
           full_name?: string | null
           id: string
@@ -116,6 +169,7 @@ export type Database = {
         Update: {
           avatar_url?: string | null
           created_at?: string | null
+          credits?: number
           email?: string
           full_name?: string | null
           id?: string
@@ -126,6 +180,90 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: []
+      }
+      referral_codes: {
+        Row: {
+          bonus_credits: number
+          code: string
+          created_at: string
+          id: string
+          user_id: string
+          uses: number
+        }
+        Insert: {
+          bonus_credits?: number
+          code: string
+          created_at?: string
+          id?: string
+          user_id: string
+          uses?: number
+        }
+        Update: {
+          bonus_credits?: number
+          code?: string
+          created_at?: string
+          id?: string
+          user_id?: string
+          uses?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "referral_codes_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      referral_uses: {
+        Row: {
+          created_at: string
+          credits_awarded: number
+          id: string
+          referral_code_id: string
+          referred_user_id: string
+          referrer_user_id: string
+        }
+        Insert: {
+          created_at?: string
+          credits_awarded: number
+          id?: string
+          referral_code_id: string
+          referred_user_id: string
+          referrer_user_id: string
+        }
+        Update: {
+          created_at?: string
+          credits_awarded?: number
+          id?: string
+          referral_code_id?: string
+          referred_user_id?: string
+          referrer_user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "referral_uses_referral_code_id_fkey"
+            columns: ["referral_code_id"]
+            isOneToOne: false
+            referencedRelation: "referral_codes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "referral_uses_referred_user_id_fkey"
+            columns: ["referred_user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "referral_uses_referrer_user_id_fkey"
+            columns: ["referrer_user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       theme_settings: {
         Row: {
@@ -177,7 +315,12 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      apply_referral_bonus: {
+        Args: { new_user_id: string; referral_code_param: string }
+        Returns: boolean
+      }
       can_create_character: { Args: { user_id: string }; Returns: boolean }
+      generate_referral_code: { Args: never; Returns: string }
       get_user_character_count: { Args: { user_id: string }; Returns: number }
       has_role: {
         Args: {
