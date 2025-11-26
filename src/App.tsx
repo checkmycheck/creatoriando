@@ -17,6 +17,7 @@ import Admin from "./pages/Admin";
 import Profile from "./pages/Profile";
 import BuyCredits from "./pages/BuyCredits";
 import Subscription from "./pages/Subscription";
+import Referrals from "./pages/Referrals";
 import Terms from "./pages/Terms";
 import NotFound from "./pages/NotFound";
 
@@ -55,6 +56,7 @@ const App = () => {
               <Route path="/profile" element={<Profile />} />
               <Route path="/buy-credits" element={<BuyCredits />} />
               <Route path="/subscription" element={<Subscription />} />
+              <Route path="/referrals" element={<Referrals />} />
               <Route path="/admin" element={<Admin />} />
             </Route>
 
