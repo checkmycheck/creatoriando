@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { User, Mail, Calendar, CreditCard, Crown, Sparkles, Plus } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { LoadingSpinner } from "@/components/ui/loading-spinner";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function Profile() {
   const navigate = useNavigate();
@@ -50,10 +50,6 @@ export default function Profile() {
   const creditsRemaining = isPremium ? "∞" : Math.max(0, characterLimit - characterCount + creditsAvailable);
   const usagePercentage = isPremium ? 0 : ((characterCount - creditsAvailable) / characterLimit) * 100;
 
-  if (loading) {
-    return <LoadingSpinner />;
-  }
-
   return (
     <div className="min-h-screen bg-background p-6">
       <div className="max-w-4xl mx-auto space-y-6">
@@ -66,37 +62,62 @@ export default function Profile() {
 
           {/* Credits Card */}
           <Card className="border-lime/50 bg-gradient-to-br from-lime/5 to-background">
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle className="flex items-center gap-2">
-                    <CreditCard className="w-5 h-5 text-lime" />
-                    Créditos Disponíveis
-                  </CardTitle>
-                  <CardDescription>
-                    1 crédito = 1 personagem criado
-                  </CardDescription>
-                </div>
-                <Badge 
-                  variant={isPremium ? "default" : "secondary"}
-                  className={isPremium ? "bg-lime text-lime-foreground" : ""}
-                >
-                  {plan === "pro" ? (
-                    <>
-                      <Crown className="w-3 h-3 mr-1" />
-                      Plano Pro
-                    </>
-                  ) : plan === "enterprise" ? (
-                    <>
-                      <Sparkles className="w-3 h-3 mr-1" />
-                      Plano Enterprise
-                    </>
-                  ) : (
-                    "Plano Free"
-                  )}
-                </Badge>
-              </div>
-            </CardHeader>
+            {loading ? (
+              <>
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <Skeleton className="h-6 w-48 mb-2" />
+                      <Skeleton className="h-4 w-40" />
+                    </div>
+                    <Skeleton className="h-6 w-24" />
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid grid-cols-3 gap-4">
+                    {[1, 2, 3].map((i) => (
+                      <div key={i} className="text-center">
+                        <Skeleton className="h-4 w-16 mx-auto mb-1" />
+                        <Skeleton className="h-9 w-12 mx-auto" />
+                      </div>
+                    ))}
+                  </div>
+                  <Skeleton className="h-10 w-full" />
+                </CardContent>
+              </>
+            ) : (
+              <>
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <CardTitle className="flex items-center gap-2">
+                        <CreditCard className="w-5 h-5 text-lime" />
+                        Créditos Disponíveis
+                      </CardTitle>
+                      <CardDescription>
+                        1 crédito = 1 personagem criado
+                      </CardDescription>
+                    </div>
+                    <Badge 
+                      variant={isPremium ? "default" : "secondary"}
+                      className={isPremium ? "bg-lime text-lime-foreground" : ""}
+                    >
+                      {plan === "pro" ? (
+                        <>
+                          <Crown className="w-3 h-3 mr-1" />
+                          Plano Pro
+                        </>
+                      ) : plan === "enterprise" ? (
+                        <>
+                          <Sparkles className="w-3 h-3 mr-1" />
+                          Plano Enterprise
+                        </>
+                      ) : (
+                        "Plano Free"
+                      )}
+                    </Badge>
+                  </div>
+                </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-3 gap-4">
                 <div className="text-center">
@@ -152,77 +173,100 @@ export default function Profile() {
                 </Alert>
               )}
             </CardContent>
+            </>
+          )}
           </Card>
 
           {/* User Info Card */}
           <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <User className="w-5 h-5" />
-                Informações da Conta
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
-                <Mail className="w-5 h-5 text-muted-foreground" />
-                <div>
-                  <p className="text-sm text-muted-foreground">Email</p>
-                  <p className="font-medium">{user?.email}</p>
-                </div>
-              </div>
-
-              {user?.full_name && (
-                <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
-                  <User className="w-5 h-5 text-muted-foreground" />
-                  <div>
-                    <p className="text-sm text-muted-foreground">Nome</p>
-                    <p className="font-medium">{user.full_name}</p>
+            {loading ? (
+              <>
+                <CardHeader>
+                  <Skeleton className="h-6 w-48" />
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {[1, 2, 3, 4].map((i) => (
+                    <div key={i} className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
+                      <Skeleton className="h-5 w-5 rounded" />
+                      <div className="flex-1">
+                        <Skeleton className="h-4 w-20 mb-1" />
+                        <Skeleton className="h-5 w-40" />
+                      </div>
+                    </div>
+                  ))}
+                </CardContent>
+              </>
+            ) : (
+              <>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <User className="w-5 h-5" />
+                    Informações da Conta
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
+                    <Mail className="w-5 h-5 text-muted-foreground" />
+                    <div>
+                      <p className="text-sm text-muted-foreground">Email</p>
+                      <p className="font-medium">{user?.email}</p>
+                    </div>
                   </div>
-                </div>
-              )}
 
-              <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
-                <Calendar className="w-5 h-5 text-muted-foreground" />
-                <div className="flex-1">
-                  <p className="text-sm text-muted-foreground">Membro desde</p>
-                  <p className="font-medium">
-                    {new Date(user?.created_at).toLocaleDateString("pt-BR", {
-                      year: "numeric",
-                      month: "long",
-                      day: "numeric"
-                    })}
-                  </p>
-                </div>
-              </div>
+                  {user?.full_name && (
+                    <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
+                      <User className="w-5 h-5 text-muted-foreground" />
+                      <div>
+                        <p className="text-sm text-muted-foreground">Nome</p>
+                        <p className="font-medium">{user.full_name}</p>
+                      </div>
+                    </div>
+                  )}
 
-              <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
-                <Calendar className="w-5 h-5 text-muted-foreground" />
-                <div className="flex-1">
-                  <p className="text-sm text-muted-foreground">Acesso expira em</p>
-                  <p className="font-medium">
-                    {(() => {
-                      const created = new Date(user?.created_at);
-                      const expiration = new Date(created);
-                      expiration.setFullYear(expiration.getFullYear() + 1);
-                      return expiration.toLocaleDateString("pt-BR", {
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric"
-                      });
-                    })()}
-                  </p>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    {(() => {
-                      const created = new Date(user?.created_at);
-                      const expiration = new Date(created);
-                      expiration.setFullYear(expiration.getFullYear() + 1);
-                      const days = Math.ceil((expiration.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
-                      return days > 0 ? `${days} dias restantes` : "Acesso expirado";
-                    })()}
-                  </p>
-                </div>
-              </div>
-            </CardContent>
+                  <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
+                    <Calendar className="w-5 h-5 text-muted-foreground" />
+                    <div className="flex-1">
+                      <p className="text-sm text-muted-foreground">Membro desde</p>
+                      <p className="font-medium">
+                        {new Date(user?.created_at).toLocaleDateString("pt-BR", {
+                          year: "numeric",
+                          month: "long",
+                          day: "numeric"
+                        })}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
+                    <Calendar className="w-5 h-5 text-muted-foreground" />
+                    <div className="flex-1">
+                      <p className="text-sm text-muted-foreground">Acesso expira em</p>
+                      <p className="font-medium">
+                        {(() => {
+                          const created = new Date(user?.created_at);
+                          const expiration = new Date(created);
+                          expiration.setFullYear(expiration.getFullYear() + 1);
+                          return expiration.toLocaleDateString("pt-BR", {
+                            year: "numeric",
+                            month: "long",
+                            day: "numeric"
+                          });
+                        })()}
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {(() => {
+                          const created = new Date(user?.created_at);
+                          const expiration = new Date(created);
+                          expiration.setFullYear(expiration.getFullYear() + 1);
+                          const days = Math.ceil((expiration.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
+                          return days > 0 ? `${days} dias restantes` : "Acesso expirado";
+                        })()}
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </>
+            )}
           </Card>
 
           {/* Quick Actions */}
