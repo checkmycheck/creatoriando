@@ -34,7 +34,7 @@ export default function Subscription() {
   const [loading, setLoading] = useState(true);
   const [isPixModalOpen, setIsPixModalOpen] = useState(false);
   const [pixData, setPixData] = useState<any>(null);
-  const [buyingPackage, setBuyingPackage] = useState(false);
+  const [processingPackageId, setProcessingPackageId] = useState<string | null>(null);
 
   useEffect(() => {
     loadProfileData();
@@ -89,8 +89,15 @@ export default function Subscription() {
     });
   };
 
-  const handleBuyCredits = async (credits: number) => {
-    setBuyingPackage(true);
+  const handleBuyCredits = async (credits: number, packageId: string) => {
+    // Prevent multiple simultaneous purchases
+    if (processingPackageId) {
+      toast.error("Aguarde o processamento do pagamento anterior");
+      return;
+    }
+
+    setProcessingPackageId(packageId);
+    
     try {
       // Verify session is valid and get access token
       const { data: { session }, error: sessionError } = await supabase.auth.getSession();
@@ -122,7 +129,7 @@ export default function Subscription() {
       console.error('Error creating payment:', error);
       toast.error(error.message || "Erro ao gerar PIX. Tente novamente.");
     } finally {
-      setBuyingPackage(false);
+      setProcessingPackageId(null);
     }
   };
 
@@ -251,11 +258,11 @@ export default function Subscription() {
                   <Button
                     className="w-full"
                     variant={pkg.is_popular ? "default" : "outline"}
-                    onClick={() => handleBuyCredits(pkg.credits)}
-                    disabled={buyingPackage}
+                    onClick={() => handleBuyCredits(pkg.credits, pkg.id)}
+                    disabled={processingPackageId !== null}
                   >
                     <Coins className="w-4 h-4 mr-2" />
-                    {buyingPackage ? "Gerando PIX..." : "Comprar"}
+                    {processingPackageId === pkg.id ? "Gerando PIX..." : "Comprar"}
                   </Button>
                 </CardContent>
               </Card>
