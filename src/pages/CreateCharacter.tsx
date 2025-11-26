@@ -172,7 +172,7 @@ const CreateCharacter = () => {
       case 12:
         return <VoiceToneStep value={characterData.voiceTone} onChange={(v) => updateCharacter("voiceTone", v)} />;
       case 13:
-        return <ScriptStep value={characterData.script} onChange={(v) => updateCharacter("script", v)} />;
+        return <ScriptStep value={characterData.script} onChange={(v) => updateCharacter("script", v)} onGeneratePrompt={handleNext} />;
       default:
         return <div className="text-center text-muted-foreground">Etapa em desenvolvimento...</div>;
     }
@@ -204,22 +204,15 @@ const CreateCharacter = () => {
                 Anterior
               </Button>
 
-              <Button
-                onClick={handleNext}
-                className="gap-2 bg-lime text-lime-foreground hover:bg-lime/90"
-              >
-                {currentStep === TOTAL_STEPS ? (
-                  <>
-                    <Sparkles className="w-4 h-4" />
-                    Gerar Prompt Veo3
-                  </>
-                ) : (
-                  <>
-                    Próximo
-                    <ChevronRight className="w-4 h-4" />
-                  </>
-                )}
-              </Button>
+              {currentStep < TOTAL_STEPS && (
+                <Button
+                  onClick={handleNext}
+                  className="gap-2 bg-lime text-lime-foreground hover:bg-lime/90"
+                >
+                  Próximo
+                  <ChevronRight className="w-4 h-4" />
+                </Button>
+              )}
             </div>
           </div>
         </div>

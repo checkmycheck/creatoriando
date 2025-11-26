@@ -5,9 +5,10 @@ import { FileText, Sparkles } from "lucide-react";
 interface ScriptStepProps {
   value?: string;
   onChange: (value: string) => void;
+  onGeneratePrompt?: () => void;
 }
 
-export const ScriptStep = ({ value, onChange }: ScriptStepProps) => {
+export const ScriptStep = ({ value, onChange, onGeneratePrompt }: ScriptStepProps) => {
   const handleGenerateScript = () => {
     const sampleScript = "Já imaginou fazer vídeos incríveis com IA usando apenas a sua selfie? Com o Creator IA, isso é totalmente possível! Vamos explorar essa tecnologia revolucionária juntos, olha...";
     onChange(sampleScript);
@@ -44,6 +45,16 @@ export const ScriptStep = ({ value, onChange }: ScriptStepProps) => {
           <Sparkles className="w-4 h-4 text-lime" />
           Clique para gerar com IA
         </Button>
+
+        {onGeneratePrompt && (
+          <Button
+            onClick={onGeneratePrompt}
+            className="w-full gap-2 bg-lime text-lime-foreground hover:bg-lime/90"
+          >
+            <Sparkles className="w-4 h-4" />
+            Gerar Prompt Veo3
+          </Button>
+        )}
 
         <div className="bg-card border border-border rounded-lg p-4">
           <div className="flex items-start gap-3">

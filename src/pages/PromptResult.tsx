@@ -99,7 +99,7 @@ const PromptResult = () => {
             className="gap-2"
           >
             <ExternalLink className="w-4 h-4" />
-            Usar no Google Flow
+            Usar no Flow
           </Button>
           <Button
             onClick={() => navigate("/characters")}
