@@ -2,9 +2,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from "recharts";
-import { Users, Gift, TrendingUp } from "lucide-react";
+import { Users, Gift, TrendingUp, ChevronLeft, ChevronRight } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 
 interface ReferralStats {
   totalSuccessfulReferrals: number;
@@ -22,15 +23,22 @@ interface ReferralTransaction {
   createdAt: string;
 }
 
+const ITEMS_PER_PAGE = 10;
+
 export function ReferralAnalytics() {
   const [stats, setStats] = useState<ReferralStats | null>(null);
   const [transactions, setTransactions] = useState<ReferralTransaction[]>([]);
   const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalTransactions, setTotalTransactions] = useState(0);
 
   useEffect(() => {
     fetchReferralStats();
-    fetchReferralTransactions();
   }, []);
+
+  useEffect(() => {
+    fetchReferralTransactions();
+  }, [currentPage]);
 
   const fetchReferralStats = async () => {
     try {
@@ -86,6 +94,17 @@ export function ReferralAnalytics() {
 
   const fetchReferralTransactions = async () => {
     try {
+      // Get total count
+      const { count } = await supabase
+        .from('referral_uses')
+        .select('*', { count: 'exact', head: true });
+
+      setTotalTransactions(count || 0);
+
+      // Get paginated data
+      const from = (currentPage - 1) * ITEMS_PER_PAGE;
+      const to = from + ITEMS_PER_PAGE - 1;
+
       const { data: transactionsData } = await supabase
         .from('referral_uses')
         .select(`
@@ -99,7 +118,8 @@ export function ReferralAnalytics() {
           ),
           referred_user_id
         `)
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: false })
+        .range(from, to);
 
       if (!transactionsData) return;
 
@@ -157,6 +177,10 @@ export function ReferralAnalytics() {
   }));
 
   const COLORS = ['hsl(var(--primary))', 'hsl(var(--secondary))', 'hsl(var(--accent))', 'hsl(var(--muted))', 'hsl(var(--lime))'];
+
+  const totalPages = Math.ceil(totalTransactions / ITEMS_PER_PAGE);
+  const startItem = (currentPage - 1) * ITEMS_PER_PAGE + 1;
+  const endItem = Math.min(currentPage * ITEMS_PER_PAGE, totalTransactions);
 
   return (
     <div className="space-y-4">
@@ -332,6 +356,37 @@ export function ReferralAnalytics() {
               )}
             </TableBody>
           </Table>
+
+          {totalTransactions > ITEMS_PER_PAGE && (
+            <div className="flex items-center justify-between mt-4">
+              <div className="text-sm text-muted-foreground">
+                Mostrando {startItem} - {endItem} de {totalTransactions} transações
+              </div>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                  disabled={currentPage === 1}
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                  Anterior
+                </Button>
+                <div className="text-sm text-muted-foreground">
+                  Página {currentPage} de {totalPages}
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                  disabled={currentPage === totalPages}
+                >
+                  Próxima
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>
