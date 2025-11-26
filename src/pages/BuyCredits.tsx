@@ -45,12 +45,20 @@ export default function BuyCredits() {
         }
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Payment creation error:', error);
+        throw error;
+      }
 
       if (data.error) {
         throw new Error(data.error);
       }
 
+      console.log('Payment created successfully:', data);
+      toast({
+        title: "Pagamento PIX gerado!",
+        description: "Escaneie o QR Code para realizar o pagamento",
+      });
       setPixData(data);
       setIsPixModalOpen(true);
       
@@ -63,6 +71,8 @@ export default function BuyCredits() {
         title: "Erro ao gerar PIX",
         description: error.message || "Não foi possível gerar o código PIX. Tente novamente.",
       });
+      setPixData(null);
+      setIsPixModalOpen(false);
     } finally {
       setLoading(false);
     }

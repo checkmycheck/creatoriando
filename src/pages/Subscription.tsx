@@ -9,6 +9,7 @@ import { Separator } from "@/components/ui/separator";
 import { Check, Sparkles, Calendar, CreditCard, Coins } from "lucide-react";
 import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
+import { PixPaymentModal } from "@/components/credits/PixPaymentModal";
 
 interface ProfileData {
   credits: number;
@@ -31,6 +32,9 @@ export default function Subscription() {
   const [profileData, setProfileData] = useState<ProfileData | null>(null);
   const [creditPackages, setCreditPackages] = useState<CreditPackage[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isPixModalOpen, setIsPixModalOpen] = useState(false);
+  const [pixData, setPixData] = useState<any>(null);
+  const [buyingPackage, setBuyingPackage] = useState(false);
 
   useEffect(() => {
     loadProfileData();
@@ -86,6 +90,7 @@ export default function Subscription() {
   };
 
   const handleBuyCredits = async (credits: number) => {
+    setBuyingPackage(true);
     try {
       // Verify session is valid and get access token
       const { data: { session }, error: sessionError } = await supabase.auth.getSession();
@@ -110,11 +115,14 @@ export default function Subscription() {
         throw new Error(data.error);
       }
 
-      toast.success("Pagamento PIX gerado! Redirecionando...");
-      navigate('/buy-credits');
+      toast.success("Pagamento PIX gerado com sucesso!");
+      setPixData(data);
+      setIsPixModalOpen(true);
     } catch (error: any) {
       console.error('Error creating payment:', error);
       toast.error(error.message || "Erro ao gerar PIX. Tente novamente.");
+    } finally {
+      setBuyingPackage(false);
     }
   };
 
@@ -244,9 +252,10 @@ export default function Subscription() {
                     className="w-full"
                     variant={pkg.is_popular ? "default" : "outline"}
                     onClick={() => handleBuyCredits(pkg.credits)}
+                    disabled={buyingPackage}
                   >
                     <Coins className="w-4 h-4 mr-2" />
-                    Comprar
+                    {buyingPackage ? "Gerando PIX..." : "Comprar"}
                   </Button>
                 </CardContent>
               </Card>
@@ -274,6 +283,12 @@ export default function Subscription() {
           </CardContent>
         </Card>
       </div>
+
+      <PixPaymentModal
+        open={isPixModalOpen}
+        onOpenChange={setIsPixModalOpen}
+        pixData={pixData}
+      />
     </div>
   );
 }
