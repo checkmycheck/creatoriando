@@ -357,7 +357,7 @@ export const CreditPackagesManager = () => {
                     <div className="flex items-center gap-4">
                       <div>
                         <div className="flex items-center gap-2">
-                          <p className="text-2xl font-bold">{pkg.credits} créditos</p>
+                          <p className="text-2xl font-bold">{pkg.credits.toLocaleString('pt-BR')} créditos</p>
                           {pkg.is_popular && (
                             <Badge variant="secondary">Popular</Badge>
                           )}

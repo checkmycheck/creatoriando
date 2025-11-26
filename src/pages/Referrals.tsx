@@ -241,7 +241,7 @@ export default function Referrals() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <p className="text-4xl font-bold text-primary">{referralCode.uses}</p>
+              <p className="text-4xl font-bold text-primary">{referralCode.uses.toLocaleString('pt-BR')}</p>
             </CardContent>
           </Card>
 
@@ -253,7 +253,7 @@ export default function Referrals() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <p className="text-4xl font-bold">{totalCreditsEarned}</p>
+              <p className="text-4xl font-bold">{totalCreditsEarned.toLocaleString('pt-BR')}</p>
             </CardContent>
           </Card>
 
@@ -346,7 +346,7 @@ export default function Referrals() {
                     </div>
                   </div>
                   <Badge variant="secondary" className="text-lg">
-                    +{item.credits_awarded} créditos
+                    +{item.credits_awarded.toLocaleString('pt-BR')} créditos
                   </Badge>
                 </div>
               ))}

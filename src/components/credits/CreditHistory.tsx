@@ -129,7 +129,7 @@ export const CreditHistory = () => {
                     <p className={`text-lg font-bold ${
                       transaction.amount > 0 ? 'text-lime' : 'text-muted-foreground'
                     }`}>
-                      {transaction.amount > 0 ? '+' : ''}{transaction.amount}
+                      {transaction.amount > 0 ? '+' : ''}{Math.abs(transaction.amount).toLocaleString('pt-BR')}
                     </p>
                     <p className="text-xs text-muted-foreground">créditos</p>
                   </div>

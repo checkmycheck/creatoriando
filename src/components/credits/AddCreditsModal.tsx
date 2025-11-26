@@ -20,7 +20,7 @@ export function AddCreditsModal({ open, onOpenChange }: AddCreditsModalProps) {
   const [pixData, setPixData] = useState<any>(null);
   const [loading, setLoading] = useState(false);
 
-  const handleCreatePayment = async (credits: number) => {
+  const handleCreatePayment = async (price: number, credits: number) => {
     setLoading(true);
     try {
       // Verify session is valid and get access token
@@ -35,7 +35,8 @@ export function AddCreditsModal({ open, onOpenChange }: AddCreditsModalProps) {
           Authorization: `Bearer ${session.access_token}`
         },
         body: { 
-          amount: credits,
+          price: price,
+          credits: credits,
           description: `${credits} créditos Creator IA`
         }
       });
