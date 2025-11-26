@@ -170,7 +170,15 @@ export default function Subscription() {
               <CardDescription>Seus créditos e informações da conta</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="flex items-center gap-3 p-4 bg-card rounded-lg border">
+                  <Sparkles className="w-8 h-8 text-lime" />
+                  <div>
+                    <p className="text-sm text-muted-foreground">Plano Atual</p>
+                    <p className="text-xl font-bold capitalize">{plan}</p>
+                  </div>
+                </div>
+
                 <div className="flex items-center gap-3 p-4 bg-card rounded-lg border">
                   <CreditCard className="w-8 h-8 text-lime" />
                   <div>
