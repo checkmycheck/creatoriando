@@ -9,10 +9,10 @@ interface BuyCreditsPricingProps {
 }
 
 const CREDIT_PACKAGES = [
-  { credits: 5, price: 5, popular: false },
-  { credits: 10, price: 10, popular: true },
-  { credits: 25, price: 25, popular: false },
-  { credits: 50, price: 50, popular: false },
+  { credits: 10, price: 2, popular: false },
+  { credits: 20, price: 5, popular: false },
+  { credits: 50, price: 10, popular: true },
+  { credits: 200, price: 20, popular: false },
 ];
 
 export function BuyCreditsPricing({ onPurchase, loading }: BuyCreditsPricingProps) {
@@ -28,7 +28,7 @@ export function BuyCreditsPricing({ onPurchase, loading }: BuyCreditsPricingProp
           Escolha seu pacote
         </CardTitle>
         <CardDescription>
-          R$ 1,00 = 1 crédito para gerar vídeos
+          Escolha o pacote ideal para suas necessidades
         </CardDescription>
       </CardHeader>
       <CardContent>
