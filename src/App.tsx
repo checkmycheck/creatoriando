@@ -11,6 +11,7 @@ import CreateCharacter from "./pages/CreateCharacter";
 import Characters from "./pages/Characters";
 import PromptResult from "./pages/PromptResult";
 import Admin from "./pages/Admin";
+import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -50,6 +51,14 @@ const App = () => {
                   <PromptResult />
                 </ProtectedRoute>
                 }
+            />
+            <Route
+              path="/profile"
+              element={
+                <ProtectedRoute>
+                  <Profile />
+                </ProtectedRoute>
+              }
             />
             <Route
               path="/admin"
