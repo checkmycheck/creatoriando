@@ -7,7 +7,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Header } from "@/components/Header";
 import { Users, Video, Activity, TrendingUp, Palette, Loader2, Home, BarChart3, Search } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
@@ -398,10 +397,8 @@ export default function Admin() {
   }
 
   return (
-    <>
-      <Header />
-      <div className="min-h-screen bg-background p-8">
-        <div className="max-w-7xl mx-auto space-y-8">
+    <div className="min-h-screen bg-background p-8">
+      <div className="max-w-7xl mx-auto space-y-8">
         <div className="flex items-start justify-between">
           <div>
             <h1 className="text-4xl font-bold mb-2">Painel Admin</h1>
@@ -614,6 +611,5 @@ export default function Admin() {
         </Tabs>
       </div>
     </div>
-    </>
   );
 }
