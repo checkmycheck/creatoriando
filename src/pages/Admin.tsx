@@ -43,9 +43,9 @@ export default function Admin() {
   const [stats, setStats] = useState<Stats>({ totalUsers: 0, totalCharacters: 0, activeUsers: 0 });
   const [chartData, setChartData] = useState<ChartData[]>([]);
   const [themeColors, setThemeColors] = useState<ThemeColor[]>([]);
-  const [loadingStats, setLoadingStats] = useState(true);
+  const [loadingStats, setLoadingStats] = useState(false);
   const [users, setUsers] = useState<any[]>([]);
-  const [loadingUsers, setLoadingUsers] = useState(true);
+  const [loadingUsers, setLoadingUsers] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [planFilter, setPlanFilter] = useState<string>("all");
   const saveTimeoutRef = useRef<Record<string, NodeJS.Timeout>>({});
@@ -65,9 +65,8 @@ export default function Admin() {
   }, [isAdmin]);
 
   const loadStats = async () => {
+    setLoadingStats(true);
     try {
-      setLoadingStats(true);
-
       const sevenDaysAgo = new Date();
       sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
@@ -122,8 +121,8 @@ export default function Admin() {
   };
 
   const loadUsers = async () => {
+    setLoadingUsers(true);
     try {
-      setLoadingUsers(true);
       const { data, error } = await supabase
         .from("profiles")
         .select("id, email, full_name, subscription_plan, credits, created_at")
