@@ -1,146 +1,106 @@
 import { useState } from "react";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
-import { Coins, Sparkles } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ShoppingCart, History, Gift } from "lucide-react";
+import { BuyCreditsPricing } from "./BuyCreditsPricing";
+import { CreditHistory } from "./CreditHistory";
+import { ReferralProgram } from "./ReferralProgram";
+import { PixPaymentModal } from "./PixPaymentModal";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 interface AddCreditsModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
-const CREDIT_PACKAGES = [
-  { credits: 5, price: 5, popular: false },
-  { credits: 10, price: 10, popular: true },
-  { credits: 25, price: 25, popular: false },
-  { credits: 50, price: 50, popular: false },
-];
-
 export function AddCreditsModal({ open, onOpenChange }: AddCreditsModalProps) {
-  const [selectedPackage, setSelectedPackage] = useState<number | null>(10);
-  const [customValue, setCustomValue] = useState("");
-  const navigate = useNavigate();
+  const { toast } = useToast();
+  const [isPixModalOpen, setIsPixModalOpen] = useState(false);
+  const [pixData, setPixData] = useState<any>(null);
+  const [loading, setLoading] = useState(false);
 
-  const handleCustomValueChange = (value: string) => {
-    const numValue = parseFloat(value);
-    setCustomValue(value);
-    if (numValue >= 5) {
-      setSelectedPackage(null);
-    }
-  };
+  const handleCreatePayment = async (credits: number) => {
+    setLoading(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Usuário não autenticado");
 
-  const getSelectedCredits = () => {
-    if (selectedPackage !== null) {
-      return selectedPackage;
-    }
-    const numValue = parseFloat(customValue);
-    return numValue >= 5 ? numValue : 0;
-  };
+      const { data, error } = await supabase.functions.invoke('create-payment', {
+        body: { 
+          amount: credits,
+          description: `${credits} créditos Creator IA`
+        }
+      });
 
-  const getTotal = () => {
-    return getSelectedCredits();
-  };
+      if (error) throw error;
 
-  const handlePurchase = () => {
-    const credits = getSelectedCredits();
-    if (credits > 0) {
-      navigate(`/buy-credits?amount=${credits}`);
+      if (data.error) {
+        throw new Error(data.error);
+      }
+
+      setPixData(data);
+      setIsPixModalOpen(true);
       onOpenChange(false);
+    } catch (error: any) {
+      console.error('Error creating payment:', error);
+      toast({
+        variant: "destructive",
+        title: "Erro ao gerar PIX",
+        description: error.message || "Não foi possível gerar o código PIX. Tente novamente.",
+      });
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Coins className="h-5 w-5 text-primary" />
-            Adicionar Créditos
-          </DialogTitle>
-          <DialogDescription>
-            R$ 1,00 = 1 crédito para gerar vídeos
-          </DialogDescription>
-        </DialogHeader>
+    <>
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-2xl">Gerenciar Créditos</DialogTitle>
+            <DialogDescription>
+              Compre créditos, veja seu histórico ou indique amigos
+            </DialogDescription>
+          </DialogHeader>
 
-        <div className="space-y-6">
-          {/* Pre-defined packages */}
-          <div className="grid grid-cols-2 gap-3">
-            {CREDIT_PACKAGES.map((pkg) => (
-              <button
-                key={pkg.credits}
-                onClick={() => {
-                  setSelectedPackage(pkg.credits);
-                  setCustomValue("");
-                }}
-                className={`relative p-4 rounded-lg border-2 transition-all hover:scale-105 ${
-                  selectedPackage === pkg.credits
-                    ? "border-primary bg-primary/5"
-                    : "border-border bg-card hover:border-primary/50"
-                }`}
-              >
-                {pkg.popular && (
-                  <Badge className="absolute -top-2 right-2 bg-primary text-primary-foreground">
-                    <Sparkles className="h-3 w-3 mr-1" />
-                    Popular
-                  </Badge>
-                )}
-                <div className="text-center">
-                  <div className="text-3xl font-bold">{pkg.credits}</div>
-                  <div className="text-xs text-muted-foreground mb-2">créditos</div>
-                  <div className="text-lg font-semibold">R$ {pkg.price}</div>
-                </div>
-              </button>
-            ))}
-          </div>
+          <Tabs defaultValue="buy" className="w-full mt-4">
+            <TabsList className="grid w-full grid-cols-3">
+              <TabsTrigger value="buy" className="gap-2">
+                <ShoppingCart className="w-4 h-4" />
+                Comprar
+              </TabsTrigger>
+              <TabsTrigger value="history" className="gap-2">
+                <History className="w-4 h-4" />
+                Histórico
+              </TabsTrigger>
+              <TabsTrigger value="referral" className="gap-2">
+                <Gift className="w-4 h-4" />
+                Indicar
+              </TabsTrigger>
+            </TabsList>
 
-          {/* Custom value */}
-          <div className="space-y-2">
-            <div className="text-center text-sm text-muted-foreground">OU</div>
-            <div className="space-y-2">
-              <Label htmlFor="custom-value">
-                Valor personalizado (mínimo R$ 5,00)
-              </Label>
-              <Input
-                id="custom-value"
-                type="number"
-                min="5"
-                step="0.01"
-                placeholder="R$ 5,00"
-                value={customValue}
-                onChange={(e) => handleCustomValueChange(e.target.value)}
-                className="text-center text-lg"
-              />
-            </div>
-          </div>
+            <TabsContent value="buy" className="mt-6">
+              <BuyCreditsPricing onPurchase={handleCreatePayment} loading={loading} />
+            </TabsContent>
 
-          {/* Summary */}
-          <div className="space-y-2 p-4 rounded-lg bg-muted/50">
-            <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">Créditos:</span>
-              <span className="font-semibold">{getSelectedCredits()}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="font-medium">Total:</span>
-              <span className="text-xl font-bold">
-                R$ {getTotal().toFixed(2)}
-              </span>
-            </div>
-          </div>
+            <TabsContent value="history" className="mt-6">
+              <CreditHistory />
+            </TabsContent>
 
-          {/* Action button */}
-          <Button
-            onClick={handlePurchase}
-            disabled={getSelectedCredits() < 5}
-            className="w-full"
-            size="lg"
-          >
-            Gerar PIX
-          </Button>
-        </div>
-      </DialogContent>
-    </Dialog>
+            <TabsContent value="referral" className="mt-6">
+              <ReferralProgram />
+            </TabsContent>
+          </Tabs>
+        </DialogContent>
+      </Dialog>
+
+      <PixPaymentModal
+        open={isPixModalOpen}
+        onOpenChange={setIsPixModalOpen}
+        pixData={pixData}
+      />
+    </>
   );
 }
