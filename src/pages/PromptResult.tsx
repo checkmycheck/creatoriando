@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Copy, Download, ArrowLeft, Check, FolderOpen } from "lucide-react";
 import { toast } from "sonner";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Header } from "@/components/Header";
 
 const PromptResult = () => {
   const location = useLocation();
@@ -33,7 +34,9 @@ const PromptResult = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground p-4 md:p-8">
+    <>
+      <Header />
+      <div className="min-h-screen bg-background text-foreground p-4 md:p-8">
       <div className="max-w-4xl mx-auto space-y-6">
         <div className="flex items-center gap-4">
           <Button
@@ -118,8 +121,9 @@ const PromptResult = () => {
             <li>Gere seu vídeo!</li>
           </ol>
         </div>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

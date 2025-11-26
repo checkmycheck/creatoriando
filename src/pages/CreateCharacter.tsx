@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { ChevronLeft, ChevronRight, Sparkles } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { Header } from "@/components/Header";
 import { StepProgress } from "@/components/character/StepProgress";
 import { CharacterSummary } from "@/components/character/CharacterSummary";
 import { GenderStep } from "@/components/character/steps/GenderStep";
@@ -178,9 +179,11 @@ const CreateCharacter = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground p-4 md:p-8">
-      <div className="max-w-6xl mx-auto">
-        <StepProgress currentStep={currentStep} totalSteps={TOTAL_STEPS} />
+    <>
+      <Header />
+      <div className="min-h-screen bg-background text-foreground p-4 md:p-8">
+        <div className="max-w-6xl mx-auto">
+          <StepProgress currentStep={currentStep} totalSteps={TOTAL_STEPS} />
         
         <div className="mt-8 mb-24">
           {renderStep()}
@@ -220,8 +223,9 @@ const CreateCharacter = () => {
             </div>
           </div>
         </div>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

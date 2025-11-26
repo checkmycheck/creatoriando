@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
+import { Header } from "@/components/Header";
 import { Trash2, FileText, Plus } from "lucide-react";
 
 interface Character {
@@ -106,8 +107,10 @@ export default function Characters() {
   }
 
   return (
-    <div className="min-h-screen bg-background p-6">
-      <div className="max-w-6xl mx-auto">
+    <>
+      <Header />
+      <div className="min-h-screen bg-background p-6">
+        <div className="max-w-6xl mx-auto">
         <div className="flex items-center justify-between mb-8">
           <div>
             <h1 className="text-4xl font-bold mb-2">Meus Personagens</h1>
@@ -176,7 +179,8 @@ export default function Characters() {
             ))}
           </div>
         )}
+        </div>
       </div>
-    </div>
+    </>
   );
 }
