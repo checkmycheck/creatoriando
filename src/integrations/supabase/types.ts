@@ -24,6 +24,7 @@ export type Database = {
           environment: string | null
           gender: string | null
           id: string
+          is_favorite: boolean
           lighting: string | null
           mood: string | null
           movement: string | null
@@ -44,6 +45,7 @@ export type Database = {
           environment?: string | null
           gender?: string | null
           id?: string
+          is_favorite?: boolean
           lighting?: string | null
           mood?: string | null
           movement?: string | null
@@ -64,6 +66,7 @@ export type Database = {
           environment?: string | null
           gender?: string | null
           id?: string
+          is_favorite?: boolean
           lighting?: string | null
           mood?: string | null
           movement?: string | null
