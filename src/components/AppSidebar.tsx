@@ -40,6 +40,7 @@ export function AppSidebar() {
 
   const isActive = (path: string) => currentPath === path;
   const isCollapsed = state === "collapsed";
+  const shouldShowText = isMobile || !isCollapsed;
 
   const handleMouseEnter = () => {
     if (!isMobile) {
@@ -87,7 +88,7 @@ export function AppSidebar() {
             <SidebarGroupContent>
               <SidebarMenu>
                 <SidebarMenuItem>
-                  <div className={`px-2 py-3 ${isCollapsed ? 'flex justify-center' : ''}`}>
+                  <div className={`px-2 py-3 ${isCollapsed && !isMobile ? 'flex justify-center' : ''}`}>
                     <Button
                       variant="secondary"
                       size="sm"
@@ -95,7 +96,7 @@ export function AppSidebar() {
                       className="w-full cursor-pointer hover:bg-secondary/80"
                     >
                       <Coins className="w-4 h-4" />
-                      {!isCollapsed && <span className="ml-2">{credits} créditos</span>}
+                      {shouldShowText && <span className="ml-2">{credits} créditos</span>}
                     </Button>
                   </div>
                 </SidebarMenuItem>
@@ -111,7 +112,7 @@ export function AppSidebar() {
                         onClick={handleNavClick}
                       >
                         <item.icon className="mr-2 h-4 w-4" />
-                        {!isCollapsed && <span>{item.title}</span>}
+                        {shouldShowText && <span>{item.title}</span>}
                       </NavLink>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
@@ -134,7 +135,7 @@ export function AppSidebar() {
                     onClick={handleNavClick}
                   >
                     <Shield className="mr-2 h-4 w-4" />
-                    {!isCollapsed && <span>Admin</span>}
+                    {shouldShowText && <span>Admin</span>}
                   </NavLink>
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -143,7 +144,7 @@ export function AppSidebar() {
             <SidebarMenuItem>
               <SidebarMenuButton onClick={handleLogout}>
                 <LogOut className="mr-2 h-4 w-4" />
-                {!isCollapsed && <span>Sair</span>}
+                {shouldShowText && <span>Sair</span>}
               </SidebarMenuButton>
             </SidebarMenuItem>
           </SidebarMenu>
