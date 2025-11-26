@@ -145,14 +145,14 @@ export default function Referrals() {
   }
 
   return (
-    <div className="container mx-auto p-6 max-w-6xl space-y-8">
+    <div className="container mx-auto p-4 md:p-6 max-w-6xl space-y-6 md:space-y-8">
       {/* Header */}
       <div className="space-y-2">
-        <h1 className="text-4xl font-bold flex items-center gap-3">
-          <Gift className="w-8 h-8 text-primary" />
+        <h1 className="text-2xl md:text-4xl font-bold flex items-center gap-2 md:gap-3">
+          <Gift className="w-6 h-6 md:w-8 md:h-8 text-primary" />
           Programa de Indicação
         </h1>
-        <p className="text-muted-foreground text-lg">
+        <p className="text-muted-foreground text-sm md:text-lg">
           Indique amigos e ganhe créditos grátis para criar mais personagens
         </p>
       </div>
@@ -197,25 +197,26 @@ export default function Referrals() {
               <Input
                 readOnly
                 value={`${window.location.origin}/auth?ref=${referralCode.code}`}
-                className="font-mono text-sm"
+                className="font-mono text-xs md:text-sm"
               />
               <Button
                 onClick={copyReferralLink}
                 size="icon"
                 variant={copied ? "default" : "outline"}
+                className="shrink-0"
               >
                 {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
               </Button>
             </div>
 
-            <div className="flex gap-2">
+            <div className="flex flex-col md:flex-row gap-2">
               <Button 
                 onClick={shareWhatsApp}
                 variant="outline"
                 className="flex-1"
               >
                 <Share2 className="w-4 h-4 mr-2" />
-                Compartilhar no WhatsApp
+                <span className="truncate">Compartilhar no WhatsApp</span>
               </Button>
               <Button 
                 onClick={copyReferralLink}
@@ -223,7 +224,7 @@ export default function Referrals() {
                 className="flex-1"
               >
                 <Copy className="w-4 h-4 mr-2" />
-                Copiar Link
+                <span className="truncate">Copiar Link</span>
               </Button>
             </div>
           </CardContent>
@@ -232,40 +233,40 @@ export default function Referrals() {
 
       {/* Statistics Cards */}
       {referralCode && (
-        <div className="grid gap-4 md:grid-cols-3">
+        <div className="grid gap-4 grid-cols-1 md:grid-cols-3">
           <Card>
             <CardHeader className="pb-3">
-              <CardDescription className="flex items-center gap-2">
+              <CardDescription className="flex items-center gap-2 text-xs md:text-sm">
                 <Users className="w-4 h-4" />
                 Indicações Bem-Sucedidas
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <p className="text-4xl font-bold text-primary">{referralCode.uses.toLocaleString('pt-BR')}</p>
+              <p className="text-2xl md:text-4xl font-bold text-primary">{referralCode.uses.toLocaleString('pt-BR')}</p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="pb-3">
-              <CardDescription className="flex items-center gap-2">
+              <CardDescription className="flex items-center gap-2 text-xs md:text-sm">
                 <Award className="w-4 h-4" />
                 Créditos Ganhos
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <p className="text-4xl font-bold">{totalCreditsEarned.toLocaleString('pt-BR')}</p>
+              <p className="text-2xl md:text-4xl font-bold">{totalCreditsEarned.toLocaleString('pt-BR')}</p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="pb-3">
-              <CardDescription className="flex items-center gap-2">
+              <CardDescription className="flex items-center gap-2 text-xs md:text-sm">
                 <TrendingUp className="w-4 h-4" />
                 Taxa de Conversão
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <p className="text-4xl font-bold text-primary">{conversionRate}%</p>
+              <p className="text-2xl md:text-4xl font-bold text-primary">{conversionRate}%</p>
             </CardContent>
           </Card>
         </div>
@@ -280,33 +281,33 @@ export default function Referrals() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid gap-6 md:grid-cols-3">
+          <div className="grid gap-6 grid-cols-1 md:grid-cols-3">
             <div className="space-y-2">
-              <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xl">
+              <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-lg md:text-xl">
                 1
               </div>
-              <h3 className="font-semibold">Compartilhe seu link</h3>
-              <p className="text-sm text-muted-foreground">
+              <h3 className="font-semibold text-sm md:text-base">Compartilhe seu link</h3>
+              <p className="text-xs md:text-sm text-muted-foreground">
                 Envie seu link de indicação para amigos e familiares
               </p>
             </div>
 
             <div className="space-y-2">
-              <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xl">
+              <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-lg md:text-xl">
                 2
               </div>
-              <h3 className="font-semibold">Amigo se cadastra</h3>
-              <p className="text-sm text-muted-foreground">
+              <h3 className="font-semibold text-sm md:text-base">Amigo se cadastra</h3>
+              <p className="text-xs md:text-sm text-muted-foreground">
                 Quando alguém usar seu link para se cadastrar
               </p>
             </div>
 
             <div className="space-y-2">
-              <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xl">
+              <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-lg md:text-xl">
                 3
               </div>
-              <h3 className="font-semibold">Vocês ganham créditos</h3>
-              <p className="text-sm text-muted-foreground">
+              <h3 className="font-semibold text-sm md:text-base">Vocês ganham créditos</h3>
+              <p className="text-xs md:text-sm text-muted-foreground">
                 Você e seu amigo recebem 3 créditos cada um
               </p>
             </div>
@@ -328,15 +329,15 @@ export default function Referrals() {
               {referralHistory.map((item) => (
                 <div 
                   key={item.id}
-                  className="flex items-center justify-between p-4 bg-muted/50 rounded-lg"
+                  className="flex flex-col md:flex-row md:items-center justify-between gap-3 p-3 md:p-4 bg-muted/50 rounded-lg"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                      <Users className="w-5 h-5 text-primary" />
+                    <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                      <Users className="w-4 h-4 md:w-5 md:h-5 text-primary" />
                     </div>
-                    <div>
-                      <p className="font-medium">Indicação bem-sucedida</p>
-                      <p className="text-sm text-muted-foreground">
+                    <div className="min-w-0">
+                      <p className="font-medium text-sm md:text-base">Indicação bem-sucedida</p>
+                      <p className="text-xs md:text-sm text-muted-foreground">
                         {new Date(item.created_at).toLocaleDateString('pt-BR', {
                           day: '2-digit',
                           month: 'long',
@@ -345,7 +346,7 @@ export default function Referrals() {
                       </p>
                     </div>
                   </div>
-                  <Badge variant="secondary" className="text-lg">
+                  <Badge variant="secondary" className="text-sm md:text-lg shrink-0 w-fit">
                     +{item.credits_awarded.toLocaleString('pt-BR')} créditos
                   </Badge>
                 </div>
