@@ -27,21 +27,19 @@ serve(async (req) => {
 
     console.log('Authorization header present:', authHeader.substring(0, 20) + '...');
 
+    // Extract the JWT token from Authorization header
+    const token = authHeader.replace('Bearer ', '');
+
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
-      {
-        global: {
-          headers: { Authorization: authHeader },
-        },
-      }
+      Deno.env.get('SUPABASE_ANON_KEY') ?? ''
     );
 
-    // Get authenticated user
+    // Get authenticated user by passing the token directly
     const {
       data: { user },
       error: userError,
-    } = await supabaseClient.auth.getUser();
+    } = await supabaseClient.auth.getUser(token);
 
     console.log('User auth check:', { hasUser: !!user, error: userError });
 
