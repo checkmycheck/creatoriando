@@ -27,8 +27,9 @@ export const useOnboarding = () => {
     const completed = localStorage.getItem(key);
     if (!completed) {
       setHasCompletedOnboarding(false);
-      // Small delay to ensure DOM is ready
-      setTimeout(() => setIsActive(true), 1000);
+      // Longer delay to ensure DOM is ready after navigation
+      const timeoutId = setTimeout(() => setIsActive(true), 2000);
+      return () => clearTimeout(timeoutId);
     } else {
       setHasCompletedOnboarding(true);
       setIsActive(false);

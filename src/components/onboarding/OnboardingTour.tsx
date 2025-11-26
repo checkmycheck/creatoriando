@@ -30,6 +30,12 @@ export const OnboardingTour = ({
       const step = steps[currentStep];
       const element = document.querySelector(step.target);
 
+      if (!element) {
+        // If element not found, retry after a short delay
+        const retryTimeout = setTimeout(updatePosition, 200);
+        return () => clearTimeout(retryTimeout);
+      }
+
       if (element) {
         const rect = element.getBoundingClientRect();
         setTargetRect(rect);
