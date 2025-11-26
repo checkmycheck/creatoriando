@@ -64,6 +64,7 @@ serve(async (req) => {
       .single();
 
     // Create payment in Mercado Pago
+    const idempotencyKey = `${user.id}_${Date.now()}`;
     const paymentData = {
       transaction_amount: amount,
       description: description || `Creator IA - ${amount} créditos`,
@@ -71,7 +72,7 @@ serve(async (req) => {
       payer: {
         email: profile?.email || user.email,
       },
-      external_reference: `${user.id}_${Date.now()}`,
+      external_reference: idempotencyKey,
       notification_url: `${Deno.env.get('SUPABASE_URL')}/functions/v1/process-payment-webhook`,
       metadata: {
         user_id: user.id,
@@ -84,6 +85,7 @@ serve(async (req) => {
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${mercadoPagoAccessToken}`,
+        'X-Idempotency-Key': idempotencyKey,
       },
       body: JSON.stringify(paymentData),
     });
