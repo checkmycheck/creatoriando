@@ -61,7 +61,7 @@ export default function Terms() {
               </p>
               <ul className="list-disc pl-6 text-muted-foreground mt-2 space-y-1">
                 <li>Novos usuários recebem 1 crédito gratuito ao se cadastrar</li>
-                <li>Cada indicação bem-sucedida concede 5 créditos para o indicador e 5 para o indicado</li>
+                <li>Cada indicação bem-sucedida concede 3 créditos para o indicador e 3 para o indicado</li>
                 <li>Créditos podem ser adquiridos através de pacotes pagos</li>
                 <li>Créditos não são reembolsáveis</li>
                 <li>Créditos não possuem data de validade</li>

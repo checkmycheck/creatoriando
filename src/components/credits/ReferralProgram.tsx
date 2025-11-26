@@ -53,7 +53,7 @@ export const ReferralProgram = () => {
         .insert({
           user_id: user.id,
           code: codeData,
-          bonus_credits: 5,
+          bonus_credits: 3,
         })
         .select()
         .single();
@@ -108,7 +108,7 @@ export const ReferralProgram = () => {
             </CardDescription>
           </div>
           <Badge className="bg-lime text-lime-foreground">
-            +5 créditos por indicação
+            +3 créditos por indicação
           </Badge>
         </div>
       </CardHeader>
@@ -120,7 +120,7 @@ export const ReferralProgram = () => {
           </div>
           <ol className="text-sm text-muted-foreground space-y-1 list-decimal list-inside">
             <li>Compartilhe seu link de indicação com amigos</li>
-            <li>Quando um amigo se cadastrar usando seu link, vocês dois ganham 5 créditos</li>
+            <li>Quando um amigo se cadastrar usando seu link, vocês dois ganham 3 créditos</li>
             <li>Sem limite de indicações!</li>
           </ol>
         </div>

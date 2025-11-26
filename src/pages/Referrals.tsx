@@ -82,7 +82,7 @@ export default function Referrals() {
         .insert({
           user_id: user.id,
           code: codeData,
-          bonus_credits: 5,
+          bonus_credits: 3,
         })
         .select()
         .single();
@@ -123,7 +123,7 @@ export default function Referrals() {
   const shareWhatsApp = () => {
     if (!referralCode) return;
     const link = `${window.location.origin}/auth?ref=${referralCode.code}`;
-    const message = `Junte-se ao Creator IA e ganhe 5 créditos grátis! Use meu link: ${link}`;
+    const message = `Junte-se ao Creator IA e ganhe 3 créditos grátis! Use meu link: ${link}`;
     window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank');
   };
 
@@ -188,7 +188,7 @@ export default function Referrals() {
                 </CardDescription>
               </div>
               <Badge variant="secondary" className="text-lg px-4 py-2">
-                +5 créditos
+                +3 créditos
               </Badge>
             </div>
           </CardHeader>
@@ -307,7 +307,7 @@ export default function Referrals() {
               </div>
               <h3 className="font-semibold">Vocês ganham créditos</h3>
               <p className="text-sm text-muted-foreground">
-                Você e seu amigo recebem 5 créditos cada um
+                Você e seu amigo recebem 3 créditos cada um
               </p>
             </div>
           </div>
