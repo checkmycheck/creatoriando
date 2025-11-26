@@ -29,7 +29,7 @@ export const OnboardingTour = ({
 
     // Add transition effect
     setIsTransitioning(true);
-    const transitionTimeout = setTimeout(() => setIsTransitioning(false), 300);
+    const transitionTimeout = setTimeout(() => setIsTransitioning(false), 400);
 
     const updatePosition = () => {
       const step = steps[currentStep];
@@ -103,12 +103,12 @@ export const OnboardingTour = ({
   return (
     <>
       {/* Overlay */}
-      <div className="fixed inset-0 bg-background/80 z-[9998] animate-fade-in transition-opacity duration-300" />
+      <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-[9998] animate-fade-in transition-all duration-500" />
 
       {/* Highlight spotlight */}
       {targetRect && (
         <div
-          className={`fixed z-[9999] pointer-events-none transition-all duration-500 ease-in-out ${
+          className={`fixed z-[9999] pointer-events-none transition-all duration-700 ease-out ${
             isTransitioning ? "opacity-0 scale-95" : "opacity-100 scale-100"
           }`}
           style={{
@@ -124,8 +124,8 @@ export const OnboardingTour = ({
 
       {/* Tooltip */}
       <div
-        className={`fixed z-[10000] bg-card border-2 border-lime rounded-xl shadow-2xl p-6 transition-all duration-500 ease-in-out ${
-          isTransitioning ? "opacity-0 scale-95 translate-y-2" : "opacity-100 scale-100 translate-y-0"
+        className={`fixed z-[10000] bg-card border-2 border-lime rounded-xl shadow-2xl p-6 transition-all duration-700 ease-out ${
+          isTransitioning ? "opacity-0 scale-95 translate-y-4" : "opacity-100 scale-100 translate-y-0"
         }`}
         style={{
           top: tooltipPosition.top,
@@ -143,17 +143,17 @@ export const OnboardingTour = ({
 
         <div className="flex items-center gap-2 mb-3">
           <Sparkles className="w-5 h-5 text-lime animate-pulse" />
-          <h3 className="text-lg font-bold text-foreground transition-all duration-300">{step.title}</h3>
+          <h3 className="text-lg font-bold text-foreground transition-all duration-500">{step.title}</h3>
         </div>
 
-        <p className="text-muted-foreground mb-6 leading-relaxed transition-all duration-300">{step.description}</p>
+        <p className="text-muted-foreground mb-6 leading-relaxed transition-all duration-500">{step.description}</p>
 
         <div className="flex items-center justify-between">
           <div className="flex gap-1">
             {steps.map((_, index) => (
               <div
                 key={index}
-                className={`h-1.5 rounded-full transition-all duration-500 ease-in-out ${
+                className={`h-1.5 rounded-full transition-all duration-700 ease-out ${
                   index === currentStep
                     ? "w-8 bg-lime scale-110"
                     : index < currentStep
@@ -170,7 +170,7 @@ export const OnboardingTour = ({
                 variant="outline"
                 size="sm"
                 onClick={onPrevious}
-                className="gap-1 transition-all duration-200 hover:scale-105"
+                className="gap-1 transition-all duration-300 ease-out hover:scale-105 hover:-translate-x-1"
               >
                 <ChevronLeft className="w-4 h-4" />
                 Anterior
@@ -179,7 +179,7 @@ export const OnboardingTour = ({
             <Button
               size="sm"
               onClick={onNext}
-              className="gap-1 bg-lime text-lime-foreground hover:bg-lime/90 transition-all duration-200 hover:scale-105"
+              className="gap-1 bg-lime text-lime-foreground hover:bg-lime/90 transition-all duration-300 ease-out hover:scale-105 hover:translate-x-1"
             >
               {isLastStep ? "Finalizar" : "Próximo"}
               {!isLastStep && <ChevronRight className="w-4 h-4" />}
