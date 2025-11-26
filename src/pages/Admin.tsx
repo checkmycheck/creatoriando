@@ -8,9 +8,10 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Header } from "@/components/Header";
-import { Users, Video, Activity, TrendingUp, Palette, Loader2, Home } from "lucide-react";
+import { Users, Video, Activity, TrendingUp, Palette, Loader2, Home, BarChart3 } from "lucide-react";
 import { toast } from "sonner";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
+import { AnalyticsDashboard } from "@/components/admin/AnalyticsDashboard";
 
 interface Stats {
   totalUsers: number;
@@ -379,7 +380,7 @@ export default function Admin() {
         <div className="flex items-start justify-between">
           <div>
             <h1 className="text-4xl font-bold mb-2">Painel Admin</h1>
-            <p className="text-muted-foreground">Gerencie métricas e personalize o tema</p>
+            <p className="text-muted-foreground">Gerencie métricas, analytics e personalize o tema</p>
           </div>
           <Button onClick={() => navigate("/")} variant="outline">
             <Home className="w-4 h-4 mr-2" />
@@ -388,10 +389,14 @@ export default function Admin() {
         </div>
 
         <Tabs defaultValue="metrics" className="w-full">
-          <TabsList className="grid w-full max-w-md grid-cols-2">
+          <TabsList className="grid w-full max-w-2xl grid-cols-3">
             <TabsTrigger value="metrics">
               <Activity className="w-4 h-4 mr-2" />
               Métricas
+            </TabsTrigger>
+            <TabsTrigger value="analytics">
+              <BarChart3 className="w-4 h-4 mr-2" />
+              Analytics
             </TabsTrigger>
             <TabsTrigger value="theme">
               <Palette className="w-4 h-4 mr-2" />
@@ -466,6 +471,10 @@ export default function Admin() {
                 </ResponsiveContainer>
               </CardContent>
             </Card>
+          </TabsContent>
+
+          <TabsContent value="analytics" className="space-y-6 mt-6">
+            <AnalyticsDashboard />
           </TabsContent>
 
           <TabsContent value="theme" className="space-y-6 mt-6">
