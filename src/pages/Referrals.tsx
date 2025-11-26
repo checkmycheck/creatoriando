@@ -152,7 +152,7 @@ export default function Referrals() {
           <Gift className="w-6 h-6 md:w-8 md:h-8 text-primary" />
           Programa de Indicação
         </h1>
-        <p className="text-muted-foreground text-sm md:text-lg">
+        <p className="text-muted-foreground text-sm md:text-lg font-light">
           Indique amigos e ganhe créditos grátis para criar mais personagens
         </p>
       </div>
@@ -161,8 +161,8 @@ export default function Referrals() {
       {!referralCode ? (
         <Card className="border-primary/50 bg-gradient-to-br from-primary/5 to-background">
           <CardHeader>
-            <CardTitle>Comece a Indicar Agora</CardTitle>
-            <CardDescription>
+            <CardTitle className="font-bold">Comece a Indicar Agora</CardTitle>
+            <CardDescription className="font-light">
               Crie seu código de indicação e comece a ganhar créditos
             </CardDescription>
           </CardHeader>
@@ -182,8 +182,8 @@ export default function Referrals() {
           <CardHeader>
             <div className="flex items-start justify-between">
               <div>
-                <CardTitle className="text-2xl">Seu Link de Indicação</CardTitle>
-                <CardDescription>
+                <CardTitle className="text-2xl font-bold">Seu Link de Indicação</CardTitle>
+                <CardDescription className="font-light">
                   Compartilhe este link com amigos e ganhe créditos
                 </CardDescription>
               </div>
@@ -287,7 +287,7 @@ export default function Referrals() {
                 1
               </div>
               <h3 className="font-semibold text-sm md:text-base">Compartilhe seu link</h3>
-              <p className="text-xs md:text-sm text-muted-foreground">
+              <p className="text-xs md:text-sm text-muted-foreground font-light">
                 Envie seu link de indicação para amigos e familiares
               </p>
             </div>
@@ -297,7 +297,7 @@ export default function Referrals() {
                 2
               </div>
               <h3 className="font-semibold text-sm md:text-base">Amigo se cadastra</h3>
-              <p className="text-xs md:text-sm text-muted-foreground">
+              <p className="text-xs md:text-sm text-muted-foreground font-light">
                 Quando alguém usar seu link para se cadastrar
               </p>
             </div>
@@ -307,7 +307,7 @@ export default function Referrals() {
                 3
               </div>
               <h3 className="font-semibold text-sm md:text-base">Vocês ganham créditos</h3>
-              <p className="text-xs md:text-sm text-muted-foreground">
+              <p className="text-xs md:text-sm text-muted-foreground font-light">
                 Você e seu amigo recebem 3 créditos cada um
               </p>
             </div>
@@ -319,8 +319,8 @@ export default function Referrals() {
       {referralCode && referralHistory.length > 0 && (
         <Card>
           <CardHeader>
-            <CardTitle>Histórico de Indicações</CardTitle>
-            <CardDescription>
+            <CardTitle className="font-bold">Histórico de Indicações</CardTitle>
+            <CardDescription className="font-light">
               Suas indicações bem-sucedidas
             </CardDescription>
           </CardHeader>

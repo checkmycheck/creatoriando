@@ -285,7 +285,7 @@ const CreateCharacter = () => {
           <div className="space-y-6">
             <div>
               <h2 className="text-2xl font-bold mb-2">Nome do Personagem</h2>
-              <p className="text-muted-foreground">Como você quer chamar seu personagem?</p>
+              <p className="text-muted-foreground font-light">Como você quer chamar seu personagem?</p>
             </div>
             <div className="space-y-2">
               <Label htmlFor="character-name">Nome</Label>
