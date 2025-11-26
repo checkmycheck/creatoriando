@@ -1,147 +1,85 @@
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Check, Loader2 } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
-import { PixPaymentModal } from "./PixPaymentModal";
+import { Coins, Sparkles, Check } from "lucide-react";
 
-interface CreditPackage {
-  id: string;
-  credits: number;
-  price: number;
-  description: string;
-  popular?: boolean;
-  bonus?: string;
+interface BuyCreditsPricingProps {
+  onPurchase: (credits: number) => void;
+  loading: boolean;
 }
 
-const PACKAGES: CreditPackage[] = [
-  { id: 'pack_5', credits: 5, price: 19.90, description: '5 créditos' },
-  { id: 'pack_10', credits: 10, price: 34.90, description: '10 créditos', popular: true, bonus: 'Economize 12%' },
-  { id: 'pack_20', credits: 20, price: 59.90, description: '20 créditos', bonus: 'Economize 25%' },
-  { id: 'pack_50', credits: 50, price: 129.90, description: '50 créditos', bonus: 'Economize 35%' },
+const CREDIT_PACKAGES = [
+  { credits: 5, price: 5, popular: false },
+  { credits: 10, price: 10, popular: true },
+  { credits: 25, price: 25, popular: false },
+  { credits: 50, price: 50, popular: false },
 ];
 
-export const BuyCreditsPricing = () => {
-  const [loading, setLoading] = useState<string | null>(null);
-  const [pixModalOpen, setPixModalOpen] = useState(false);
-  const [paymentData, setPaymentData] = useState<any>(null);
-  const { toast } = useToast();
-
-  const handleBuyCredits = async (packageId: string) => {
-    try {
-      setLoading(packageId);
-
-      const { data, error } = await supabase.functions.invoke('create-payment', {
-        body: { packageId, paymentMethodId: 'pix' }
-      });
-
-      if (error) throw error;
-
-      // Show PIX payment modal
-      if (data.qr_code || data.qr_code_base64) {
-        setPaymentData(data);
-        setPixModalOpen(true);
-        
-        toast({
-          title: "Pagamento PIX gerado!",
-          description: "Escaneie o QR code ou copie o código para pagar",
-        });
-      } else if (data.ticket_url) {
-        window.open(data.ticket_url, '_blank');
-        toast({
-          title: "Redirecionando para pagamento",
-          description: "Complete o pagamento na janela do Mercado Pago",
-        });
-      }
-
-    } catch (error) {
-      console.error('Error buying credits:', error);
-      toast({
-        variant: "destructive",
-        title: "Erro ao processar pagamento",
-        description: error instanceof Error ? error.message : "Tente novamente",
-      });
-    } finally {
-      setLoading(null);
-    }
+export function BuyCreditsPricing({ onPurchase, loading }: BuyCreditsPricingProps) {
+  const handleBuyCredits = (credits: number) => {
+    onPurchase(credits);
   };
 
   return (
-    <>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-      {PACKAGES.map((pkg) => (
-        <Card
-          key={pkg.id}
-          className={pkg.popular ? "border-lime relative" : "relative"}
-        >
-          {pkg.popular && (
-            <Badge className="absolute -top-2 left-1/2 -translate-x-1/2 bg-lime text-lime-foreground">
-              Mais Popular
-            </Badge>
-          )}
-          
-          <CardHeader className="text-center">
-            <CardTitle className="text-3xl font-bold">{pkg.credits}</CardTitle>
-            <CardDescription>créditos</CardDescription>
-          </CardHeader>
-
-          <CardContent className="space-y-4">
-            <div className="text-center">
-              <p className="text-2xl font-bold">
-                R$ {pkg.price.toFixed(2)}
-              </p>
-              {pkg.bonus && (
-                <Badge variant="secondary" className="mt-2">
-                  {pkg.bonus}
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Coins className="h-5 w-5 text-primary" />
+          Escolha seu pacote
+        </CardTitle>
+        <CardDescription>
+          R$ 1,00 = 1 crédito para gerar vídeos
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {CREDIT_PACKAGES.map((pkg) => (
+            <div
+              key={pkg.credits}
+              className={`relative p-6 rounded-lg border-2 transition-all ${
+                pkg.popular
+                  ? "border-primary bg-primary/5"
+                  : "border-border hover:border-primary/50"
+              }`}
+            >
+              {pkg.popular && (
+                <Badge className="absolute -top-2 right-2 bg-primary text-primary-foreground">
+                  <Sparkles className="h-3 w-3 mr-1" />
+                  Popular
                 </Badge>
               )}
+              <div className="text-center space-y-4">
+                <div>
+                  <div className="text-4xl font-bold">{pkg.credits}</div>
+                  <div className="text-sm text-muted-foreground">créditos</div>
+                </div>
+                <div className="text-2xl font-semibold">R$ {pkg.price}</div>
+                
+                <ul className="space-y-2 text-left">
+                  <li className="flex items-center gap-2 text-sm">
+                    <Check className="w-4 h-4 text-primary" />
+                    <span>{pkg.credits} personagens</span>
+                  </li>
+                  <li className="flex items-center gap-2 text-sm">
+                    <Check className="w-4 h-4 text-primary" />
+                    <span>Sem vencimento</span>
+                  </li>
+                </ul>
+
+                <Button 
+                  className="w-full" 
+                  onClick={() => handleBuyCredits(pkg.credits)}
+                  disabled={loading}
+                  variant={pkg.popular ? "default" : "outline"}
+                >
+                  <Coins className="mr-2 h-4 w-4" />
+                  {loading ? "Gerando PIX..." : `Comprar`}
+                </Button>
+              </div>
             </div>
-
-            <ul className="space-y-2">
-              <li className="flex items-center gap-2 text-sm">
-                <Check className="w-4 h-4 text-lime" />
-                <span>{pkg.credits} personagens</span>
-              </li>
-              <li className="flex items-center gap-2 text-sm">
-                <Check className="w-4 h-4 text-lime" />
-                <span>Sem vencimento</span>
-              </li>
-              <li className="flex items-center gap-2 text-sm">
-                <Check className="w-4 h-4 text-lime" />
-                <span>Suporte prioritário</span>
-              </li>
-            </ul>
-
-            <Button
-              onClick={() => handleBuyCredits(pkg.id)}
-              disabled={loading !== null}
-              className="w-full"
-              variant={pkg.popular ? "default" : "outline"}
-            >
-              {loading === pkg.id ? (
-                <>
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  Processando...
-                </>
-              ) : (
-                "Comprar Agora"
-              )}
-            </Button>
-          </CardContent>
-        </Card>
-      ))}
-    </div>
-
-    <PixPaymentModal
-      open={pixModalOpen}
-      onOpenChange={setPixModalOpen}
-      qrCode={paymentData?.qr_code}
-      qrCodeBase64={paymentData?.qr_code_base64}
-      ticketUrl={paymentData?.ticket_url}
-      paymentId={paymentData?.payment_id}
-    />
-  </>
+          ))}
+        </div>
+      </CardContent>
+    </Card>
   );
-};
+}
