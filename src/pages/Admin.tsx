@@ -12,6 +12,7 @@ import { Users, Video, Activity, TrendingUp, Palette, Loader2, Home, BarChart3 }
 import { toast } from "sonner";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
 import { AnalyticsDashboard } from "@/components/admin/AnalyticsDashboard";
+import { UsersList } from "@/components/admin/UsersList";
 
 interface Stats {
   totalUsers: number;
@@ -40,6 +41,8 @@ export default function Admin() {
   const [chartData, setChartData] = useState<ChartData[]>([]);
   const [themeColors, setThemeColors] = useState<ThemeColor[]>([]);
   const [loadingStats, setLoadingStats] = useState(true);
+  const [users, setUsers] = useState<any[]>([]);
+  const [loadingUsers, setLoadingUsers] = useState(true);
   const saveTimeoutRef = useRef<Record<string, NodeJS.Timeout>>({});
 
   useEffect(() => {
@@ -52,6 +55,7 @@ export default function Admin() {
     if (isAdmin) {
       loadStats();
       loadThemeColors();
+      loadUsers();
     }
   }, [isAdmin]);
 
@@ -118,6 +122,24 @@ export default function Admin() {
       toast.error("Erro ao carregar estatísticas");
     } finally {
       setLoadingStats(false);
+    }
+  };
+
+  const loadUsers = async () => {
+    try {
+      setLoadingUsers(true);
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("id, email, full_name, subscription_plan, credits, created_at")
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+      setUsers(data || []);
+    } catch (error) {
+      console.error("Error loading users:", error);
+      toast.error("Erro ao carregar usuários");
+    } finally {
+      setLoadingUsers(false);
     }
   };
 
@@ -389,10 +411,14 @@ export default function Admin() {
         </div>
 
         <Tabs defaultValue="metrics" className="w-full">
-          <TabsList className="grid w-full max-w-2xl grid-cols-3">
+          <TabsList className="grid w-full max-w-3xl grid-cols-4">
             <TabsTrigger value="metrics">
               <Activity className="w-4 h-4 mr-2" />
               Métricas
+            </TabsTrigger>
+            <TabsTrigger value="users">
+              <Users className="w-4 h-4 mr-2" />
+              Usuários
             </TabsTrigger>
             <TabsTrigger value="analytics">
               <BarChart3 className="w-4 h-4 mr-2" />
@@ -469,6 +495,26 @@ export default function Admin() {
                     />
                   </LineChart>
                 </ResponsiveContainer>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="users" className="space-y-6 mt-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Usuários Cadastrados</CardTitle>
+                <CardDescription>
+                  Lista de todos os usuários da plataforma. Clique em um usuário para ver detalhes.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {loadingUsers ? (
+                  <div className="flex items-center justify-center py-8">
+                    <Loader2 className="w-8 h-8 animate-spin text-primary" />
+                  </div>
+                ) : (
+                  <UsersList users={users} />
+                )}
               </CardContent>
             </Card>
           </TabsContent>
