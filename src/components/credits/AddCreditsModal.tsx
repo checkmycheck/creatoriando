@@ -23,14 +23,17 @@ export function AddCreditsModal({ open, onOpenChange }: AddCreditsModalProps) {
   const handleCreatePayment = async (credits: number) => {
     setLoading(true);
     try {
-      // Verify session is valid
+      // Verify session is valid and get access token
       const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-      if (sessionError || !session) {
+      if (sessionError || !session?.access_token) {
         throw new Error("Sessão inválida. Por favor, faça login novamente.");
       }
 
-      console.log('Calling create-payment with session');
+      console.log('Calling create-payment with auth token');
       const { data, error } = await supabase.functions.invoke('create-payment', {
+        headers: {
+          Authorization: `Bearer ${session.access_token}`
+        },
         body: { 
           amount: credits,
           description: `${credits} créditos Creator IA`
