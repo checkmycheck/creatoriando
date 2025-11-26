@@ -69,27 +69,39 @@ const CreateCharacter = () => {
   const onboardingSteps = [
     {
       target: '[data-onboarding="step-progress"]',
-      title: "Acompanhe seu progresso 📊",
-      description: "Aqui você vê em qual etapa está. São 13 passos para criar seu personagem perfeito!",
+      title: "Bem-vindo ao Creator IA! 👋",
+      description: "Acompanhe seu progresso aqui. São 13 etapas para criar seu personagem de vídeo perfeito. Cada detalhe conta para o resultado final!",
+      position: "bottom" as const,
+    },
+    {
+      target: '[data-onboarding="help-button"]',
+      title: "Precisa de ajuda? 🆘",
+      description: "Clique neste botão a qualquer momento para ver este tour novamente. Estamos aqui para ajudar!",
       position: "bottom" as const,
     },
     {
       target: '[data-onboarding="step-content"]',
-      title: "Configure cada detalhe ⚙️",
-      description: "Em cada etapa, escolha as opções que melhor descrevem seu personagem. Você pode usar sugestões ou criar do zero.",
+      title: "Escolha suas opções 🎯",
+      description: "Selecione entre as opções pré-definidas que melhor descrevem seu personagem. Cada escolha influencia o vídeo final!",
       position: "bottom" as const,
     },
     {
       target: '[data-onboarding="character-summary"]',
-      title: "Resumo do personagem 📝",
-      description: "Aqui você vê todas as escolhas que já fez. Seu personagem vai tomando forma conforme você avança!",
+      title: "Resumo em tempo real 📝",
+      description: "Todas as suas escolhas aparecem aqui. Veja seu personagem ganhar vida conforme você avança nas etapas!",
       position: "top" as const,
     },
     {
       target: '[data-onboarding="navigation-buttons"]',
-      title: "Navegue entre as etapas ◀️▶️",
-      description: "Use os botões Anterior e Próximo para navegar. Na última etapa, você poderá gerar o prompt final!",
+      title: "Navegue entre etapas ⬅️➡️",
+      description: "Use Anterior e Próximo para navegar. Na última etapa, você gerará o prompt XML completo para criar seu vídeo!",
       position: "top" as const,
+    },
+    {
+      target: '[data-onboarding="step-progress"]',
+      title: "Dica final! 💡",
+      description: "Lembre-se: você pode editar seus personagens depois de criá-los. Experimente diferentes combinações para resultados únicos!",
+      position: "bottom" as const,
     },
   ];
 
@@ -341,6 +353,7 @@ const CreateCharacter = () => {
               onClick={resetOnboarding}
               title="Ver tour novamente"
               className="ml-4"
+              data-onboarding="help-button"
             >
               <HelpCircle className="w-5 h-5" />
             </Button>
