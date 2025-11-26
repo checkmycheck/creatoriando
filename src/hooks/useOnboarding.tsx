@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
-
-const ONBOARDING_KEY = "creator-ia-onboarding-completed";
+import { useLocation } from "react-router-dom";
 
 export interface OnboardingStep {
   target: string;
@@ -10,18 +9,31 @@ export interface OnboardingStep {
 }
 
 export const useOnboarding = () => {
+  const location = useLocation();
   const [isActive, setIsActive] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
   const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState(true);
 
+  // Diferentes chaves para diferentes páginas
+  const getOnboardingKey = () => {
+    if (location.pathname === "/create") {
+      return "creator-ia-onboarding-create-completed";
+    }
+    return "creator-ia-onboarding-completed";
+  };
+
   useEffect(() => {
-    const completed = localStorage.getItem(ONBOARDING_KEY);
+    const key = getOnboardingKey();
+    const completed = localStorage.getItem(key);
     if (!completed) {
       setHasCompletedOnboarding(false);
       // Small delay to ensure DOM is ready
       setTimeout(() => setIsActive(true), 1000);
+    } else {
+      setHasCompletedOnboarding(true);
+      setIsActive(false);
     }
-  }, []);
+  }, [location.pathname]);
 
   const startOnboarding = () => {
     setCurrentStep(0);
@@ -47,14 +59,16 @@ export const useOnboarding = () => {
   };
 
   const completeOnboarding = () => {
-    localStorage.setItem(ONBOARDING_KEY, "true");
+    const key = getOnboardingKey();
+    localStorage.setItem(key, "true");
     setIsActive(false);
     setHasCompletedOnboarding(true);
     setCurrentStep(0);
   };
 
   const resetOnboarding = () => {
-    localStorage.removeItem(ONBOARDING_KEY);
+    const key = getOnboardingKey();
+    localStorage.removeItem(key);
     setHasCompletedOnboarding(false);
     startOnboarding();
   };

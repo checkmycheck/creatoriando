@@ -3,9 +3,11 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ChevronLeft, ChevronRight, Sparkles } from "lucide-react";
+import { ChevronLeft, ChevronRight, Sparkles, HelpCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useOnboarding } from "@/hooks/useOnboarding";
+import { OnboardingTour } from "@/components/onboarding/OnboardingTour";
 import { Header } from "@/components/Header";
 import { StepProgress } from "@/components/character/StepProgress";
 import { CharacterSummary } from "@/components/character/CharacterSummary";
@@ -49,6 +51,42 @@ const CreateCharacter = () => {
   const [currentStep, setCurrentStep] = useState(0);
   const [characterData, setCharacterData] = useState<CharacterData>({});
   const [userId, setUserId] = useState<string | null>(null);
+  
+  const {
+    isActive,
+    currentStep: onboardingStep,
+    nextStep,
+    previousStep,
+    skipOnboarding,
+    resetOnboarding,
+  } = useOnboarding();
+
+  const onboardingSteps = [
+    {
+      target: '[data-onboarding="step-progress"]',
+      title: "Acompanhe seu progresso 📊",
+      description: "Aqui você vê em qual etapa está. São 13 passos para criar seu personagem perfeito!",
+      position: "bottom" as const,
+    },
+    {
+      target: '[data-onboarding="step-content"]',
+      title: "Configure cada detalhe ⚙️",
+      description: "Em cada etapa, escolha as opções que melhor descrevem seu personagem. Você pode usar sugestões ou criar do zero.",
+      position: "bottom" as const,
+    },
+    {
+      target: '[data-onboarding="character-summary"]',
+      title: "Resumo do personagem 📝",
+      description: "Aqui você vê todas as escolhas que já fez. Seu personagem vai tomando forma conforme você avança!",
+      position: "top" as const,
+    },
+    {
+      target: '[data-onboarding="navigation-buttons"]',
+      title: "Navegue entre as etapas ◀️▶️",
+      description: "Use os botões Anterior e Próximo para navegar. Na última etapa, você poderá gerar o prompt final!",
+      position: "top" as const,
+    },
+  ];
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data: { user } }) => {
@@ -180,20 +218,44 @@ const CreateCharacter = () => {
 
   return (
     <>
+      <OnboardingTour
+        steps={onboardingSteps}
+        currentStep={onboardingStep}
+        onNext={() => nextStep(onboardingSteps.length)}
+        onPrevious={previousStep}
+        onSkip={skipOnboarding}
+        isActive={isActive}
+      />
+      
       <Header />
       <div className="min-h-screen bg-background text-foreground p-4 md:p-8">
         <div className="max-w-6xl mx-auto">
-          <StepProgress currentStep={currentStep} totalSteps={TOTAL_STEPS} />
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex-1" data-onboarding="step-progress">
+              <StepProgress currentStep={currentStep} totalSteps={TOTAL_STEPS} />
+            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={resetOnboarding}
+              title="Ver tour novamente"
+              className="ml-4"
+            >
+              <HelpCircle className="w-5 h-5" />
+            </Button>
+          </div>
         
-        <div className="mt-8 mb-24">
+        <div className="mt-8 mb-24" data-onboarding="step-content">
           {renderStep()}
         </div>
 
         <div className="fixed bottom-0 left-0 right-0 bg-background/95 backdrop-blur-sm border-t border-border p-4">
           <div className="max-w-6xl mx-auto">
-            <CharacterSummary data={characterData} />
+            <div data-onboarding="character-summary">
+              <CharacterSummary data={characterData} />
+            </div>
             
-            <div className="flex justify-between items-center mt-4">
+            <div className="flex justify-between items-center mt-4" data-onboarding="navigation-buttons">
               <Button
                 variant="outline"
                 onClick={handlePrevious}
