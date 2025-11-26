@@ -14,7 +14,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 export default function Profile() {
   const navigate = useNavigate();
   const [user, setUser] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const { plan, characterCount, characterLimit, canCreateMore } = useSubscription();
 
   useEffect(() => {
@@ -22,6 +22,7 @@ export default function Profile() {
   }, []);
 
   const loadUserData = async () => {
+    setLoading(true);
     const { data: { user } } = await supabase.auth.getUser();
     
     if (!user) {
