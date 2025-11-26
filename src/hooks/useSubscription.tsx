@@ -11,13 +11,22 @@ interface SubscriptionData {
   credits: number;
 }
 
+const getCachedCredits = (): number => {
+  try {
+    const cached = localStorage.getItem('user_credits');
+    return cached ? parseInt(cached, 10) : 0;
+  } catch {
+    return 0;
+  }
+};
+
 export const useSubscription = () => {
   const [subscription, setSubscription] = useState<SubscriptionData>({
     plan: "free",
     characterCount: 0,
     canCreateMore: false,
     isLoading: true,
-    credits: 0,
+    credits: getCachedCredits(), // Initialize with cached value for instant display
   });
   const [userId, setUserId] = useState<string | null>(null);
 
@@ -94,12 +103,21 @@ export const useSubscription = () => {
     const { data: canCreate } = await supabase
       .rpc("can_create_character", { user_id: user.id });
 
+    const credits = profile?.credits || 0;
+    
+    // Update localStorage cache for instant display on next load
+    try {
+      localStorage.setItem('user_credits', String(credits));
+    } catch (error) {
+      console.error('Failed to cache credits:', error);
+    }
+
     setSubscription({
       plan: profile?.subscription_plan || "free",
       characterCount: characterCountData || 0,
       canCreateMore: canCreate || false,
       isLoading: false,
-      credits: profile?.credits || 0,
+      credits,
     });
   };
 

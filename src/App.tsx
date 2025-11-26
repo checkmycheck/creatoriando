@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Outlet } from "react-router-dom";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { DashboardLayout } from "./components/DashboardLayout";
 import { ScrollToTop } from "./components/ScrollToTop";
@@ -35,78 +35,27 @@ const App = () => {
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/terms" element={<Terms />} />
+            
+            {/* Protected routes with shared DashboardLayout and RouteTransition */}
             <Route
-              path="/create"
               element={
                 <ProtectedRoute>
                   <DashboardLayout>
                     <RouteTransition>
-                      <CreateCharacter />
+                      <Outlet />
                     </RouteTransition>
                   </DashboardLayout>
                 </ProtectedRoute>
               }
-            />
-            <Route
-              path="/characters"
-              element={
-                <ProtectedRoute>
-                  <DashboardLayout>
-                    <RouteTransition>
-                      <Characters />
-                    </RouteTransition>
-                  </DashboardLayout>
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/prompt-result"
-              element={
-                <ProtectedRoute>
-                  <DashboardLayout>
-                    <RouteTransition>
-                      <PromptResult />
-                    </RouteTransition>
-                  </DashboardLayout>
-                </ProtectedRoute>
-                }
-            />
-            <Route
-              path="/profile"
-              element={
-                <ProtectedRoute>
-                  <DashboardLayout>
-                    <RouteTransition>
-                      <Profile />
-                    </RouteTransition>
-                  </DashboardLayout>
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/buy-credits"
-              element={
-                <ProtectedRoute>
-                  <DashboardLayout>
-                    <RouteTransition>
-                      <BuyCredits />
-                    </RouteTransition>
-                  </DashboardLayout>
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/admin"
-              element={
-                <ProtectedRoute>
-                  <DashboardLayout>
-                    <RouteTransition>
-                      <Admin />
-                    </RouteTransition>
-                  </DashboardLayout>
-                </ProtectedRoute>
-              }
-            />
+            >
+              <Route path="/create" element={<CreateCharacter />} />
+              <Route path="/characters" element={<Characters />} />
+              <Route path="/prompt-result" element={<PromptResult />} />
+              <Route path="/profile" element={<Profile />} />
+              <Route path="/buy-credits" element={<BuyCredits />} />
+              <Route path="/admin" element={<Admin />} />
+            </Route>
+
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
