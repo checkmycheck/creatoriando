@@ -49,6 +49,7 @@ All colors MUST be HSL.
     --sidebar: 0 0% 10%;
     --sidebar-foreground: 0 0% 95%;
     --sidebar-border: 0 0% 20%;
+    --sidebar-opacity: 100;
   }
 }
 
