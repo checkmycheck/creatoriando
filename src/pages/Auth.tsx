@@ -129,6 +129,9 @@ export default function Auth() {
         password,
         options: {
           emailRedirectTo: `${window.location.origin}/`,
+          data: {
+            cpf: cpf.replace(/\D/g, '')
+          }
         },
       });
 
