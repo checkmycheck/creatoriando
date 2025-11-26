@@ -29,7 +29,7 @@ const menuItems = [
 ];
 
 export function AppSidebar() {
-  const { state, isMobile, setOpenMobile } = useSidebar();
+  const { state, isMobile, setOpenMobile, setOpen } = useSidebar();
   const location = useLocation();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -40,6 +40,18 @@ export function AppSidebar() {
 
   const isActive = (path: string) => currentPath === path;
   const isCollapsed = state === "collapsed";
+
+  const handleMouseEnter = () => {
+    if (!isMobile) {
+      setOpen(true);
+    }
+  };
+
+  const handleMouseLeave = () => {
+    if (!isMobile) {
+      setOpen(false);
+    }
+  };
 
   const handleNavClick = () => {
     if (isMobile) {
@@ -65,6 +77,8 @@ export function AppSidebar() {
       <Sidebar
         className={isCollapsed ? "w-14" : "w-60"}
         collapsible="icon"
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
       >
         <SidebarContent>
           <SidebarGroup>
