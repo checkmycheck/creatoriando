@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { Header } from "@/components/Header";
-import { Trash2, FileText, Plus } from "lucide-react";
+import { Trash2, FileText, Plus, Star } from "lucide-react";
 
 interface Character {
   id: string;
@@ -15,11 +15,13 @@ interface Character {
   age: string | null;
   appearance: string | null;
   created_at: string;
+  is_favorite: boolean;
 }
 
 export default function Characters() {
   const [characters, setCharacters] = useState<Character[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showOnlyFavorites, setShowOnlyFavorites] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -35,11 +37,16 @@ export default function Characters() {
       return;
     }
 
-    const { data, error } = await supabase
+    let query = supabase
       .from("characters")
-      .select("id, name, gender, age, appearance, created_at")
-      .eq("user_id", user.id)
-      .order("created_at", { ascending: false });
+      .select("id, name, gender, age, appearance, created_at, is_favorite")
+      .eq("user_id", user.id);
+
+    if (showOnlyFavorites) {
+      query = query.eq("is_favorite", true);
+    }
+
+    const { data, error } = await query.order("created_at", { ascending: false });
 
     if (error) {
       toast({
@@ -53,6 +60,10 @@ export default function Characters() {
     
     setLoading(false);
   };
+
+  useEffect(() => {
+    fetchCharacters();
+  }, [showOnlyFavorites]);
 
   const handleDelete = async (id: string) => {
     const { error } = await supabase
@@ -70,6 +81,29 @@ export default function Characters() {
       toast({
         title: "Personagem deletado",
         description: "O personagem foi removido com sucesso.",
+      });
+      fetchCharacters();
+    }
+  };
+
+  const toggleFavorite = async (id: string, currentFavorite: boolean) => {
+    const { error } = await supabase
+      .from("characters")
+      .update({ is_favorite: !currentFavorite })
+      .eq("id", id);
+
+    if (error) {
+      toast({
+        variant: "destructive",
+        title: "Erro ao atualizar favorito",
+        description: error.message,
+      });
+    } else {
+      toast({
+        title: currentFavorite ? "Removido dos favoritos" : "Adicionado aos favoritos",
+        description: currentFavorite 
+          ? "O personagem foi removido dos favoritos." 
+          : "O personagem foi marcado como favorito.",
       });
       fetchCharacters();
     }
@@ -118,10 +152,20 @@ export default function Characters() {
               Gerencie seus personagens criados
             </p>
           </div>
-          <Button onClick={() => navigate("/create")}>
-            <Plus className="w-4 h-4 mr-2" />
-            Novo Personagem
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              variant={showOnlyFavorites ? "default" : "outline"}
+              onClick={() => setShowOnlyFavorites(!showOnlyFavorites)}
+              className="gap-2"
+            >
+              <Star className={`w-4 h-4 ${showOnlyFavorites ? "fill-current" : ""}`} />
+              {showOnlyFavorites ? "Todos" : "Favoritos"}
+            </Button>
+            <Button onClick={() => navigate("/create")}>
+              <Plus className="w-4 h-4 mr-2" />
+              Novo Personagem
+            </Button>
+          </div>
         </div>
 
         {characters.length === 0 ? (
@@ -138,7 +182,20 @@ export default function Characters() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {characters.map((character) => (
-              <Card key={character.id}>
+              <Card key={character.id} className="relative">
+                <button
+                  onClick={() => toggleFavorite(character.id, character.is_favorite)}
+                  className="absolute top-4 right-4 z-10 hover:scale-110 transition-transform"
+                  title={character.is_favorite ? "Remover dos favoritos" : "Adicionar aos favoritos"}
+                >
+                  <Star
+                    className={`w-6 h-6 ${
+                      character.is_favorite
+                        ? "fill-lime text-lime"
+                        : "text-muted-foreground hover:text-lime"
+                    }`}
+                  />
+                </button>
                 <CardHeader>
                   <CardTitle>{character.name}</CardTitle>
                   <CardDescription>

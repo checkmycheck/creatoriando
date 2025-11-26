@@ -7,6 +7,10 @@ import { User as SupabaseUser } from "@supabase/supabase-js";
 import { useAdmin } from "@/hooks/useAdmin";
 import { useOnboarding } from "@/hooks/useOnboarding";
 import { OnboardingTour } from "@/components/onboarding/OnboardingTour";
+import { Testimonials } from "@/components/landing/Testimonials";
+import { FAQ } from "@/components/landing/FAQ";
+import { VideoDemo } from "@/components/landing/VideoDemo";
+import { Pricing } from "@/components/landing/Pricing";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -202,6 +206,11 @@ const Index = () => {
           </div>
         </div>
       </main>
+
+      <Testimonials />
+      <VideoDemo />
+      <Pricing />
+      <FAQ />
     </div>
   );
 };
