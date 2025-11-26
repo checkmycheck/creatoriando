@@ -50,7 +50,7 @@ export const Header = () => {
           <div className="hidden md:flex items-center gap-2">
             {user ? (
               <>
-                {credits > 0 && (
+                {user && (
                   <Button variant="secondary" size="sm" className="pointer-events-none">
                     <Coins className="w-4 h-4 mr-1.5" />
                     {credits}
@@ -101,7 +101,7 @@ export const Header = () => {
             <div className="flex flex-col gap-2 p-4">
               {user ? (
                 <>
-                  {credits > 0 && (
+                  {user && (
                     <div className="flex items-center justify-center py-2">
                       <Button variant="secondary" size="sm" className="pointer-events-none">
                         <Coins className="w-4 h-4 mr-1.5" />
