@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Users, Video, Activity, TrendingUp, Palette, Loader2, Home, BarChart3, Search } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Slider } from "@/components/ui/slider";
 import { toast } from "sonner";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
 import { AnalyticsDashboard } from "@/components/admin/AnalyticsDashboard";
@@ -293,6 +294,11 @@ export default function Admin() {
         "sidebar-border": { 
           label: "Borda do Menu Lateral", 
           description: "Cor da borda do sidebar",
+          category: "Menu Lateral (Sidebar)"
+        },
+        "sidebar-opacity": { 
+          label: "Opacidade do Menu Lateral", 
+          description: "Transparência do sidebar (0-100%)",
           category: "Menu Lateral (Sidebar)"
         },
       };
@@ -589,33 +595,73 @@ export default function Admin() {
                     <div key={category} className="space-y-4">
                       <h3 className="text-lg font-semibold border-b pb-2">{category}</h3>
                       <div className="grid gap-4 md:grid-cols-2">
-                        {categoryColors.map((color) => (
-                          <div key={color.key} className="space-y-2">
-                            <div className="flex items-start justify-between">
-                              <div className="space-y-1">
-                                <Label htmlFor={color.key} className="text-sm font-medium">
-                                  {color.label}
-                                </Label>
-                                <p className="text-xs text-muted-foreground">{color.description}</p>
+                        {categoryColors.map((color) => {
+                          // Special handling for opacity
+                          if (color.key === 'sidebar-opacity') {
+                            return (
+                              <div key={color.key} className="space-y-3 md:col-span-2">
+                                <div className="space-y-1">
+                                  <Label htmlFor={color.key} className="text-sm font-medium">
+                                    {color.label}
+                                  </Label>
+                                  <p className="text-xs text-muted-foreground">{color.description}</p>
+                                </div>
+                                <div className="flex gap-4 items-center">
+                                  <Slider
+                                    id={color.key}
+                                    value={[parseInt(color.value) || 100]}
+                                    onValueChange={(values) => handleColorChange(color.key, values[0].toString())}
+                                    min={0}
+                                    max={100}
+                                    step={1}
+                                    className="flex-1"
+                                  />
+                                  <Input
+                                    value={color.value}
+                                    onChange={(e) => {
+                                      const val = Math.max(0, Math.min(100, parseInt(e.target.value) || 0));
+                                      handleColorChange(color.key, val.toString());
+                                    }}
+                                    type="number"
+                                    min={0}
+                                    max={100}
+                                    className="w-20 text-sm"
+                                  />
+                                  <span className="text-sm text-muted-foreground shrink-0">%</span>
+                                </div>
+                              </div>
+                            );
+                          }
+
+                          // Regular color inputs
+                          return (
+                            <div key={color.key} className="space-y-2">
+                              <div className="flex items-start justify-between">
+                                <div className="space-y-1">
+                                  <Label htmlFor={color.key} className="text-sm font-medium">
+                                    {color.label}
+                                  </Label>
+                                  <p className="text-xs text-muted-foreground">{color.description}</p>
+                                </div>
+                              </div>
+                              <div className="flex gap-2 items-center">
+                                <Input
+                                  id={color.key}
+                                  value={hslToHex(color.value)}
+                                  onChange={(e) => handleColorPickerChange(color.key, e.target.value)}
+                                  placeholder="#000000"
+                                  className="font-mono text-sm"
+                                />
+                                <input
+                                  type="color"
+                                  value={hslToHex(color.value)}
+                                  onChange={(e) => handleColorPickerChange(color.key, e.target.value)}
+                                  className="w-12 h-10 rounded border cursor-pointer shrink-0"
+                                />
                               </div>
                             </div>
-                            <div className="flex gap-2 items-center">
-                              <Input
-                                id={color.key}
-                                value={hslToHex(color.value)}
-                                onChange={(e) => handleColorPickerChange(color.key, e.target.value)}
-                                placeholder="#000000"
-                                className="font-mono text-sm"
-                              />
-                              <input
-                                type="color"
-                                value={hslToHex(color.value)}
-                                onChange={(e) => handleColorPickerChange(color.key, e.target.value)}
-                                className="w-12 h-10 rounded border cursor-pointer shrink-0"
-                              />
-                            </div>
-                          </div>
-                        ))}
+                          );
+                        })}
                       </div>
                     </div>
                   );

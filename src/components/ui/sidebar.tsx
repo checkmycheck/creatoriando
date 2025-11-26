@@ -156,15 +156,16 @@ const Sidebar = React.forwardRef<
         <SheetContent
           data-sidebar="sidebar"
           data-mobile="true"
-          className="w-[--sidebar-width] bg-sidebar p-0 text-sidebar-foreground [&>button]:hidden border-r"
+          className="w-[--sidebar-width] p-0 text-sidebar-foreground [&>button]:hidden border-r"
           style={
             {
               "--sidebar-width": SIDEBAR_WIDTH_MOBILE,
+              backgroundColor: `hsl(var(--sidebar) / calc(var(--sidebar-opacity, 100) / 100))`,
             } as React.CSSProperties
           }
           side={side}
         >
-          <div className="flex h-full w-full flex-col bg-sidebar">{children}</div>
+          <div className="flex h-full w-full flex-col">{children}</div>
         </SheetContent>
       </Sheet>
     );
@@ -206,7 +207,10 @@ const Sidebar = React.forwardRef<
       >
         <div
           data-sidebar="sidebar"
-          className="flex h-full w-full flex-col bg-sidebar group-data-[variant=floating]:rounded-lg group-data-[variant=floating]:border group-data-[variant=floating]:border-sidebar-border group-data-[variant=floating]:shadow"
+          className="flex h-full w-full flex-col group-data-[variant=floating]:rounded-lg group-data-[variant=floating]:border group-data-[variant=floating]:border-sidebar-border group-data-[variant=floating]:shadow"
+          style={{
+            backgroundColor: `hsl(var(--sidebar) / calc(var(--sidebar-opacity, 100) / 100))`,
+          }}
         >
           {children}
         </div>
