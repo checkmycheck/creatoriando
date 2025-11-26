@@ -1,10 +1,7 @@
-import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Sparkles, Video, Zap, LogOut, User, Shield } from "lucide-react";
+import { Sparkles, Video, Zap } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
-import { User as SupabaseUser } from "@supabase/supabase-js";
-import { useAdmin } from "@/hooks/useAdmin";
+import { Header } from "@/components/Header";
 import { Testimonials } from "@/components/landing/Testimonials";
 import { FAQ } from "@/components/landing/FAQ";
 import { VideoDemo } from "@/components/landing/VideoDemo";
@@ -12,62 +9,10 @@ import { Pricing } from "@/components/landing/Pricing";
 
 const Index = () => {
   const navigate = useNavigate();
-  const [user, setUser] = useState<SupabaseUser | null>(null);
-  const { isAdmin } = useAdmin();
-
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null);
-    });
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
-
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-    setUser(null);
-  };
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <nav className="border-b border-border">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center gap-2">
-              <Video className="w-6 h-6 text-lime" />
-              <span className="text-xl font-bold">Creator IA</span>
-            </div>
-            <div className="flex items-center gap-2">
-              {user ? (
-                <>
-                  {isAdmin && (
-                    <Button variant="secondary" size="sm" onClick={() => navigate("/admin")}>
-                      <Shield className="w-4 h-4 mr-2" />
-                      Admin
-                    </Button>
-                  )}
-                  <Button variant="outline" size="sm" onClick={() => navigate("/characters")}>
-                    <User className="w-4 h-4 mr-2" />
-                    Meus Personagens
-                  </Button>
-                  <Button variant="outline" size="sm" onClick={handleLogout}>
-                    <LogOut className="w-4 h-4 mr-2" />
-                    Sair
-                  </Button>
-                </>
-              ) : (
-                <Button variant="outline" size="sm" onClick={() => navigate("/auth")}>
-                  Login
-                </Button>
-              )}
-            </div>
-          </div>
-        </div>
-      </nav>
+      <Header />
 
       <main className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-lime/5 via-background to-background" />
