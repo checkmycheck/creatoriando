@@ -98,7 +98,7 @@ export function AppSidebar() {
                       className="w-full cursor-pointer hover:bg-secondary/80"
                     >
                       <Coins className="w-4 h-4" />
-                      {shouldShowText && <span className="ml-2">{credits} créditos</span>}
+                      {shouldShowText && <span className="ml-2">{credits.toLocaleString('pt-BR')} créditos</span>}
                     </Button>
                   </div>
                 </SidebarMenuItem>

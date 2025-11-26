@@ -412,14 +412,14 @@ export function UserDetailsModal({ user, open, onClose, onUserDeleted }: UserDet
                         {editedCredits !== user.credits && (
                           <span className={editedCredits > user.credits ? "text-green-500" : "text-red-500"}>
                             {editedCredits > user.credits ? "+" : ""}
-                            {editedCredits - user.credits} créditos
+                            {Math.abs(editedCredits - user.credits).toLocaleString('pt-BR')} créditos
                           </span>
                         )}
                       </p>
                     </div>
                   ) : (
                     <>
-                      <div className="text-3xl font-bold text-primary">{user.credits}</div>
+                      <div className="text-3xl font-bold text-primary">{user.credits.toLocaleString('pt-BR')}</div>
                       <p className="text-xs text-muted-foreground mt-1">Créditos disponíveis</p>
                     </>
                   )}
@@ -434,9 +434,9 @@ export function UserDetailsModal({ user, open, onClose, onUserDeleted }: UserDet
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-3xl font-bold text-primary">{characterStats.total}</div>
+                  <div className="text-3xl font-bold text-primary">{characterStats.total.toLocaleString('pt-BR')}</div>
                   <p className="text-xs text-muted-foreground mt-1">
-                    {characterStats.favorites} favoritos
+                    {characterStats.favorites.toLocaleString('pt-BR')} favoritos
                   </p>
                 </CardContent>
               </Card>
@@ -475,7 +475,7 @@ export function UserDetailsModal({ user, open, onClose, onUserDeleted }: UserDet
                           className="font-mono"
                         >
                           {transaction.amount > 0 ? "+" : ""}
-                          {transaction.amount}
+                          {Math.abs(transaction.amount).toLocaleString('pt-BR')}
                         </Badge>
                       </div>
                     ))}

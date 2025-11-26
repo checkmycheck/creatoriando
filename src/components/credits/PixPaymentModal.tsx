@@ -115,7 +115,7 @@ export function PixPaymentModal({ open, onOpenChange, pixData }: PixPaymentModal
               Pagamento aprovado!
             </p>
             <p className="text-sm text-muted-foreground text-center">
-              Seus {pixData.credits} créditos já estão disponíveis.
+              Seus {pixData.credits.toLocaleString('pt-BR')} créditos já estão disponíveis.
             </p>
           </div>
         ) : (

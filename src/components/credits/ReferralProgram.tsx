@@ -153,11 +153,11 @@ export const ReferralProgram = () => {
             <div className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
               <div>
                 <p className="text-sm text-muted-foreground">Indicações bem-sucedidas</p>
-                <p className="text-2xl font-bold text-lime">{referralCode.uses}</p>
+                <p className="text-2xl font-bold text-lime">{referralCode.uses.toLocaleString('pt-BR')}</p>
               </div>
               <div className="text-right">
                 <p className="text-sm text-muted-foreground">Créditos ganhos</p>
-                <p className="text-2xl font-bold">{referralCode.uses * referralCode.bonus_credits}</p>
+                <p className="text-2xl font-bold">{(referralCode.uses * referralCode.bonus_credits).toLocaleString('pt-BR')}</p>
               </div>
             </div>
           </div>

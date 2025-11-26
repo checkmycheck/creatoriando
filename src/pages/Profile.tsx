@@ -123,11 +123,11 @@ export default function Profile() {
               <div className="grid grid-cols-3 gap-4">
                 <div className="text-center">
                   <p className="text-sm text-muted-foreground mb-1">Usados</p>
-                  <p className="text-3xl font-bold text-lime">{creditsUsed}</p>
+                  <p className="text-3xl font-bold text-lime">{typeof creditsUsed === 'number' ? creditsUsed.toLocaleString('pt-BR') : creditsUsed}</p>
                 </div>
                 <div className="text-center">
                   <p className="text-sm text-muted-foreground mb-1">Extras</p>
-                  <p className="text-3xl font-bold">{creditsAvailable}</p>
+                  <p className="text-3xl font-bold">{typeof creditsAvailable === 'number' ? creditsAvailable.toLocaleString('pt-BR') : creditsAvailable}</p>
                   <p className="text-xs text-muted-foreground mt-1">+ {creditsFromPlan} do plano</p>
                 </div>
                 <div className="text-center">
