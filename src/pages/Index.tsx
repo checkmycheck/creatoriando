@@ -29,7 +29,7 @@ const Index = () => {
               <span className="block text-lime mt-2">personagens de vídeo</span>
             </h1>
 
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto font-light">
               Configure cada detalhe: gênero, idade, visual, ambiente, postura e muito mais. 
               Gere prompts profissionais em minutos.
             </p>

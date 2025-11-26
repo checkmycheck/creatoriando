@@ -164,7 +164,7 @@ export default function Characters() {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 md:mb-8">
           <div>
             <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-1 md:mb-2">Meus Personagens</h1>
-            <p className="text-sm md:text-base text-muted-foreground">
+            <p className="text-sm md:text-base text-muted-foreground font-light">
               Gerencie seus personagens criados
             </p>
           </div>
