@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { User, Mail, Calendar, CreditCard, Crown, Sparkles } from "lucide-react";
+import { User, Mail, Calendar, CreditCard, Crown, Sparkles, Plus } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
 export default function Profile() {
@@ -42,9 +42,11 @@ export default function Profile() {
   };
 
   const creditsUsed = characterCount;
-  const creditsTotal = plan === "free" ? characterLimit : "∞";
-  const creditsRemaining = plan === "free" ? Math.max(0, characterLimit - characterCount) : "∞";
-  const usagePercentage = plan === "free" ? (characterCount / characterLimit) * 100 : 0;
+  const creditsAvailable = (user?.credits || 0);
+  const creditsFromPlan = plan === "free" ? characterLimit : "∞";
+  const creditsTotal = plan === "free" ? characterLimit + creditsAvailable : "∞";
+  const creditsRemaining = plan === "free" ? Math.max(0, characterLimit - characterCount + creditsAvailable) : "∞";
+  const usagePercentage = plan === "free" ? ((characterCount - creditsAvailable) / characterLimit) * 100 : 0;
 
   if (loading) {
     return (
@@ -101,8 +103,9 @@ export default function Profile() {
                   <p className="text-3xl font-bold text-lime">{creditsUsed}</p>
                 </div>
                 <div className="text-center">
-                  <p className="text-sm text-muted-foreground mb-1">Restantes</p>
-                  <p className="text-3xl font-bold">{creditsRemaining}</p>
+                  <p className="text-sm text-muted-foreground mb-1">Extras</p>
+                  <p className="text-3xl font-bold">{creditsAvailable}</p>
+                  <p className="text-xs text-muted-foreground mt-1">+ {creditsFromPlan} do plano</p>
                 </div>
                 <div className="text-center">
                   <p className="text-sm text-muted-foreground mb-1">Total</p>
@@ -130,11 +133,11 @@ export default function Profile() {
                   )}
 
                   <Button 
-                    onClick={() => navigate("/")} 
+                    onClick={() => navigate("/buy-credits")} 
                     className="w-full bg-lime text-lime-foreground hover:bg-lime/90"
                   >
-                    <Crown className="w-4 h-4 mr-2" />
-                    Fazer Upgrade para Pro
+                    <Plus className="w-4 h-4 mr-2" />
+                    Comprar Mais Créditos
                   </Button>
                 </>
               )}

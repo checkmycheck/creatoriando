@@ -1,19 +1,24 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Gift } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 export default function Auth() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { toast } = useToast();
+
+  const referralCode = searchParams.get('ref');
 
   useEffect(() => {
     // Check if user is already logged in
@@ -28,27 +33,49 @@ export default function Auth() {
     e.preventDefault();
     setLoading(true);
 
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        emailRedirectTo: `${window.location.origin}/`,
-      },
-    });
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: `${window.location.origin}/`,
+        },
+      });
 
-    setLoading(false);
+      if (error) throw error;
 
-    if (error) {
+      // If signup successful and there's a referral code, apply bonus
+      if (data.user && referralCode) {
+        const { data: bonusApplied, error: bonusError } = await supabase
+          .rpc('apply_referral_bonus', {
+            referral_code_param: referralCode,
+            new_user_id: data.user.id
+          });
+
+        if (bonusError) {
+          console.error('Error applying referral bonus:', bonusError);
+        } else if (bonusApplied) {
+          toast({
+            title: "Cadastro realizado com bônus! 🎉",
+            description: "Você ganhou 5 créditos grátis pela indicação!",
+          });
+        }
+      }
+
+      if (!referralCode) {
+        toast({
+          title: "Cadastro realizado!",
+          description: "Você já pode fazer login.",
+        });
+      }
+    } catch (error: any) {
       toast({
         variant: "destructive",
         title: "Erro ao cadastrar",
         description: error.message,
       });
-    } else {
-      toast({
-        title: "Cadastro realizado!",
-        description: "Você já pode fazer login.",
-      });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -84,6 +111,14 @@ export default function Auth() {
         <CardHeader>
           <CardTitle>Creator IA</CardTitle>
           <CardDescription>Entre ou crie sua conta</CardDescription>
+          {referralCode && (
+            <Alert className="mt-4 border-lime/50 bg-lime/5">
+              <Gift className="h-4 w-4 text-lime" />
+              <AlertDescription className="text-foreground">
+                Você foi indicado! Ganhe <strong>5 créditos grátis</strong> ao criar sua conta.
+              </AlertDescription>
+            </Alert>
+          )}
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="login" className="w-full">
