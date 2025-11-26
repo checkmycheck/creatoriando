@@ -340,7 +340,6 @@ const CreateCharacter = () => {
         isActive={isActive}
       />
       
-      <Header />
       <div className="min-h-screen bg-background text-foreground p-4 md:p-8">
         <div className="max-w-6xl mx-auto">
           <div className="flex items-center justify-between mb-4">
