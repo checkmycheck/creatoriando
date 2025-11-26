@@ -8,7 +8,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 
 interface BuyCreditsPricingProps {
-  onPurchase: (credits: number) => void;
+  onPurchase: (price: number, credits: number) => void;
   loading: boolean;
 }
 
@@ -44,8 +44,8 @@ export function BuyCreditsPricing({ onPurchase, loading }: BuyCreditsPricingProp
     setLoadingPackages(false);
   };
 
-  const handleBuyCredits = (credits: number) => {
-    onPurchase(credits);
+  const handleBuyCredits = (price: number, credits: number) => {
+    onPurchase(price, credits);
   };
 
   if (loadingPackages) {
@@ -114,7 +114,7 @@ export function BuyCreditsPricing({ onPurchase, loading }: BuyCreditsPricingProp
 
                 <Button 
                   className="w-full" 
-                  onClick={() => handleBuyCredits(pkg.credits)}
+                  onClick={() => handleBuyCredits(pkg.price_brl, pkg.credits)}
                   disabled={loading}
                   variant={pkg.is_popular ? "default" : "outline"}
                 >

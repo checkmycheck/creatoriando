@@ -89,14 +89,14 @@ export default function Subscription() {
     });
   };
 
-  const handleBuyCredits = async (credits: number, packageId: string) => {
+  const handleBuyCredits = async (pkg: CreditPackage) => {
     // Prevent multiple simultaneous purchases
     if (processingPackageId) {
       toast.error("Aguarde o processamento do pagamento anterior");
       return;
     }
 
-    setProcessingPackageId(packageId);
+    setProcessingPackageId(pkg.id);
     
     try {
       // Verify session is valid and get access token
@@ -111,8 +111,9 @@ export default function Subscription() {
           Authorization: `Bearer ${session.access_token}`
         },
         body: { 
-          amount: credits,
-          description: `${credits} créditos Creator IA`
+          price: pkg.price_brl,
+          credits: pkg.credits,
+          description: `${pkg.credits} créditos Creator IA`
         }
       });
 
@@ -266,7 +267,7 @@ export default function Subscription() {
                   <Button
                     className="w-full"
                     variant={pkg.is_popular ? "default" : "outline"}
-                    onClick={() => handleBuyCredits(pkg.credits, pkg.id)}
+                    onClick={() => handleBuyCredits(pkg)}
                     disabled={processingPackageId !== null}
                   >
                     <Coins className="w-4 h-4 mr-2" />
