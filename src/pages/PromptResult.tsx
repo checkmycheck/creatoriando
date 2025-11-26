@@ -42,7 +42,7 @@ const PromptResult = () => {
           <Button
             variant="outline"
             size="icon"
-            onClick={() => navigate("/create")}
+            onClick={() => navigate(-1)}
           >
             <ArrowLeft className="w-4 h-4" />
           </Button>
