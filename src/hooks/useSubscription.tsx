@@ -20,9 +20,18 @@ const getCachedCredits = (): number => {
   }
 };
 
+const getCachedPlan = (): SubscriptionPlan => {
+  try {
+    const cached = localStorage.getItem('user_plan');
+    return (cached as SubscriptionPlan) || "free";
+  } catch {
+    return "free";
+  }
+};
+
 export const useSubscription = () => {
   const [subscription, setSubscription] = useState<SubscriptionData>({
-    plan: "free",
+    plan: getCachedPlan(),
     characterCount: 0,
     canCreateMore: false,
     isLoading: true,
@@ -104,16 +113,18 @@ export const useSubscription = () => {
       .rpc("can_create_character", { user_id: user.id });
 
     const credits = profile?.credits || 0;
+    const plan = profile?.subscription_plan || "free";
     
     // Update localStorage cache for instant display on next load
     try {
       localStorage.setItem('user_credits', String(credits));
+      localStorage.setItem('user_plan', plan);
     } catch (error) {
-      console.error('Failed to cache credits:', error);
+      console.error('Failed to cache user data:', error);
     }
 
     setSubscription({
-      plan: profile?.subscription_plan || "free",
+      plan,
       characterCount: characterCountData || 0,
       canCreateMore: canCreate || false,
       isLoading: false,

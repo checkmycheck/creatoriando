@@ -36,7 +36,7 @@ export default function Characters() {
   const [showOnlyFavorites, setShowOnlyFavorites] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { plan, characterCount, characterLimit, canCreateMore } = useSubscription();
+  const { plan, characterCount, characterLimit, canCreateMore, isLoading: planLoading } = useSubscription();
 
   useEffect(() => {
     fetchCharacters();
@@ -190,7 +190,7 @@ export default function Characters() {
           </div>
         </div>
 
-        {plan === "free" && (
+        {!planLoading && plan === "free" && (
           <Alert className="mb-6 border-lime/50 bg-lime/5">
             <Sparkles className="h-4 w-4 text-lime" />
             <AlertDescription className="text-foreground">
