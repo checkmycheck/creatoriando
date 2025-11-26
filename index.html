@@ -20,6 +20,22 @@
   </head>
 
   <body>
+    <script>
+      (function() {
+        const cached = localStorage.getItem('theme-colors');
+        if (cached) {
+          try {
+            const colors = JSON.parse(cached);
+            const root = document.documentElement;
+            Object.entries(colors).forEach(([key, value]) => {
+              root.style.setProperty('--' + key, value);
+            });
+          } catch (e) {
+            console.error('Error applying cached theme:', e);
+          }
+        }
+      })();
+    </script>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
