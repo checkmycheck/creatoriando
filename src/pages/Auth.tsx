@@ -44,7 +44,7 @@ export default function Auth() {
       if (error) throw error;
 
       if (data) {
-        setCodeValidation({ valid: true, message: 'Código válido! Você receberá 5 créditos grátis.' });
+        setCodeValidation({ valid: true, message: 'Código válido! Você receberá 3 créditos grátis.' });
       } else {
         setCodeValidation({ valid: false, message: 'Código de indicação inválido.' });
       }
@@ -135,7 +135,7 @@ export default function Auth() {
         } else if (bonusApplied) {
           toast({
             title: "Cadastro realizado com bônus! 🎉",
-            description: "Você ganhou 5 créditos grátis pela indicação!",
+            description: "Você ganhou 3 créditos grátis pela indicação!",
           });
         } else {
           toast({
@@ -194,7 +194,7 @@ export default function Auth() {
           <CardDescription>
             Crie sua conta e ganhe <strong>1 geração grátis</strong>!
             <br />
-            Indique amigos e ganhe <strong>5 gerações</strong> a cada cadastro.
+            Indique amigos e ganhe <strong>3 gerações</strong> a cada cadastro.
           </CardDescription>
           {referralCode && (
             <Alert className={`mt-4 ${
