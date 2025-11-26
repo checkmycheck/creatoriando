@@ -153,10 +153,67 @@ export default function Admin() {
     }
   };
 
+  const hslToHex = (hsl: string): string => {
+    try {
+      const [h, s, l] = hsl.split(" ").map((v) => parseFloat(v.replace("%", "")));
+      const lightness = l / 100;
+      const a = (s * Math.min(lightness, 1 - lightness)) / 100;
+      const f = (n: number) => {
+        const k = (n + h / 30) % 12;
+        const color = lightness - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
+        return Math.round(255 * color)
+          .toString(16)
+          .padStart(2, "0");
+      };
+      return `#${f(0)}${f(8)}${f(4)}`;
+    } catch {
+      return "#000000";
+    }
+  };
+
+  const hexToHsl = (hex: string): string => {
+    try {
+      const r = parseInt(hex.slice(1, 3), 16) / 255;
+      const g = parseInt(hex.slice(3, 5), 16) / 255;
+      const b = parseInt(hex.slice(5, 7), 16) / 255;
+
+      const max = Math.max(r, g, b);
+      const min = Math.min(r, g, b);
+      let h = 0,
+        s = 0;
+      const l = (max + min) / 2;
+
+      if (max !== min) {
+        const d = max - min;
+        s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+        switch (max) {
+          case r:
+            h = ((g - b) / d + (g < b ? 6 : 0)) / 6;
+            break;
+          case g:
+            h = ((b - r) / d + 2) / 6;
+            break;
+          case b:
+            h = ((r - g) / d + 4) / 6;
+            break;
+        }
+      }
+
+      return `${Math.round(h * 360)} ${Math.round(s * 100)}% ${Math.round(l * 100)}%`;
+    } catch {
+      return "0 0% 0%";
+    }
+  };
+
   const handleColorChange = (key: string, value: string) => {
     setThemeColors((prev) =>
       prev.map((color) => (color.key === key ? { ...color, value } : color))
     );
+  };
+
+  const handleColorPickerChange = (key: string, hexValue: string) => {
+    const hslValue = hexToHsl(hexValue);
+    handleColorChange(key, hslValue);
   };
 
   const handleSaveTheme = async () => {
@@ -290,7 +347,7 @@ export default function Admin() {
                 <CardTitle>Configurações de Cores</CardTitle>
                 <CardDescription>
                   Personalize as cores do tema. Todas as mudanças serão aplicadas globalmente para todos os usuários.
-                  Use formato HSL (ex: 75 100% 50%)
+                  Clique na cor para usar o seletor visual.
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -301,13 +358,16 @@ export default function Admin() {
                       <div className="flex gap-2 items-center">
                         <Input
                           id={color.key}
-                          value={color.value}
-                          onChange={(e) => handleColorChange(color.key, e.target.value)}
-                          placeholder="ex: 75 100% 50%"
+                          value={hslToHex(color.value)}
+                          onChange={(e) => handleColorPickerChange(color.key, e.target.value)}
+                          placeholder="#000000"
+                          className="font-mono"
                         />
-                        <div
-                          className="w-10 h-10 rounded border shrink-0"
-                          style={{ backgroundColor: `hsl(${color.value})` }}
+                        <input
+                          type="color"
+                          value={hslToHex(color.value)}
+                          onChange={(e) => handleColorPickerChange(color.key, e.target.value)}
+                          className="w-12 h-10 rounded border cursor-pointer"
                         />
                       </div>
                     </div>
