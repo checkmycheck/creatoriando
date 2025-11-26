@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Header } from "@/components/Header";
-import { Users, Video, Activity, TrendingUp, Palette, Loader2 } from "lucide-react";
+import { Users, Video, Activity, TrendingUp, Palette, Loader2, Home } from "lucide-react";
 import { toast } from "sonner";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
 
@@ -299,9 +299,15 @@ export default function Admin() {
       <Header />
       <div className="min-h-screen bg-background p-8">
         <div className="max-w-7xl mx-auto space-y-8">
-        <div>
-          <h1 className="text-4xl font-bold mb-2">Painel Admin</h1>
-          <p className="text-muted-foreground">Gerencie métricas e personalize o tema</p>
+        <div className="flex items-start justify-between">
+          <div>
+            <h1 className="text-4xl font-bold mb-2">Painel Admin</h1>
+            <p className="text-muted-foreground">Gerencie métricas e personalize o tema</p>
+          </div>
+          <Button onClick={() => navigate("/")} variant="outline">
+            <Home className="w-4 h-4 mr-2" />
+            Dashboard
+          </Button>
         </div>
 
         <Tabs defaultValue="metrics" className="w-full">
