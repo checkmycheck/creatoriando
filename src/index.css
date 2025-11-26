@@ -45,6 +45,10 @@ All colors MUST be HSL.
     --card-hover: 0 0% 15%;
     --card-selected: 195 100% 50%;
     --card-selected-bg: 75 100% 12%;
+    
+    --sidebar: 0 0% 10%;
+    --sidebar-foreground: 0 0% 95%;
+    --sidebar-border: 0 0% 20%;
   }
 }
 
