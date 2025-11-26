@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAdmin } from "@/hooks/useAdmin";
@@ -38,8 +38,8 @@ export default function Admin() {
   const [stats, setStats] = useState<Stats>({ totalUsers: 0, totalCharacters: 0, activeUsers: 0 });
   const [chartData, setChartData] = useState<ChartData[]>([]);
   const [themeColors, setThemeColors] = useState<ThemeColor[]>([]);
-  const [saving, setSaving] = useState(false);
   const [loadingStats, setLoadingStats] = useState(true);
+  const saveTimeoutRef = useRef<Record<string, NodeJS.Timeout>>({});
 
   useEffect(() => {
     if (!adminLoading && !isAdmin) {
@@ -324,37 +324,39 @@ export default function Admin() {
     }
   };
 
-  const handleColorChange = (key: string, value: string) => {
+  const handleColorChange = async (key: string, value: string) => {
+    // Update UI immediately
     setThemeColors((prev) =>
       prev.map((color) => (color.key === key ? { ...color, value } : color))
     );
+
+    // Apply color immediately to document
+    document.documentElement.style.setProperty(`--${key}`, value);
+
+    // Clear existing timeout for this key
+    if (saveTimeoutRef.current[key]) {
+      clearTimeout(saveTimeoutRef.current[key]);
+    }
+
+    // Debounce the database save
+    saveTimeoutRef.current[key] = setTimeout(async () => {
+      try {
+        const { error } = await supabase
+          .from("theme_settings")
+          .update({ setting_value: value })
+          .eq("setting_key", key);
+
+        if (error) throw error;
+      } catch (error) {
+        console.error("Error auto-saving theme:", error);
+        toast.error("Erro ao salvar cor automaticamente");
+      }
+    }, 500); // Wait 500ms after user stops typing
   };
 
   const handleColorPickerChange = (key: string, hexValue: string) => {
     const hslValue = hexToHsl(hexValue);
     handleColorChange(key, hslValue);
-  };
-
-  const handleSaveTheme = async () => {
-    try {
-      setSaving(true);
-
-      for (const color of themeColors) {
-        const { error } = await supabase
-          .from("theme_settings")
-          .update({ setting_value: color.value })
-          .eq("setting_key", color.key);
-
-        if (error) throw error;
-      }
-
-      toast.success("Tema atualizado com sucesso!");
-    } catch (error) {
-      console.error("Error saving theme:", error);
-      toast.error("Erro ao salvar tema");
-    } finally {
-      setSaving(false);
-    }
   };
 
   if (adminLoading || loadingStats) {
@@ -471,7 +473,7 @@ export default function Admin() {
               <CardHeader>
                 <CardTitle>Configurações de Cores</CardTitle>
                 <CardDescription>
-                  Personalize as cores do tema. Todas as mudanças serão aplicadas globalmente para todos os usuários.
+                  Personalize as cores do tema. As mudanças são aplicadas automaticamente.
                   Clique na cor para usar o seletor visual.
                 </CardDescription>
               </CardHeader>
@@ -515,11 +517,6 @@ export default function Admin() {
                     </div>
                   );
                 })}
-
-                <Button onClick={handleSaveTheme} disabled={saving} className="w-full">
-                  {saving && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-                  Salvar Alterações
-                </Button>
               </CardContent>
             </Card>
           </TabsContent>
