@@ -1,9 +1,13 @@
-import { LayoutDashboard, Plus, User, LogOut, Shield } from "lucide-react";
+import { LayoutDashboard, Plus, User, LogOut, Shield, Coins } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useAdmin } from "@/hooks/useAdmin";
+import { useSubscription } from "@/hooks/useSubscription";
+import { useState } from "react";
+import { AddCreditsModal } from "./credits/AddCreditsModal";
+import { Button } from "./ui/button";
 
 import {
   Sidebar,
@@ -29,6 +33,8 @@ export function AppSidebar() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { isAdmin } = useAdmin();
+  const { credits } = useSubscription();
+  const [isCreditsModalOpen, setIsCreditsModalOpen] = useState(false);
   const currentPath = location.pathname;
 
   const isActive = (path: string) => currentPath === path;
@@ -48,58 +54,79 @@ export function AppSidebar() {
   };
 
   return (
-    <Sidebar
-      className={isCollapsed ? "w-14" : "w-60"}
-      collapsible="icon"
-    >
-      <SidebarContent>
-        <SidebarGroup>
-          <SidebarGroupLabel>Menu</SidebarGroupLabel>
+    <>
+      <Sidebar
+        className={isCollapsed ? "w-14" : "w-60"}
+        collapsible="icon"
+      >
+        <SidebarContent>
+          <SidebarGroup>
+            <SidebarGroupLabel>Menu</SidebarGroupLabel>
 
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {menuItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <NavLink 
-                      to={item.url} 
-                      end 
-                      className="hover:bg-muted/50" 
-                      activeClassName="bg-muted text-primary font-medium"
-                    >
-                      <item.icon className="mr-2 h-4 w-4" />
-                      {!isCollapsed && <span>{item.title}</span>}
-                    </NavLink>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-
-              {isAdmin && (
+            <SidebarGroupContent>
+              <SidebarMenu>
                 <SidebarMenuItem>
-                  <SidebarMenuButton asChild>
-                    <NavLink 
-                      to="/admin" 
-                      end 
-                      className="hover:bg-muted/50" 
-                      activeClassName="bg-muted text-primary font-medium"
+                  <div className={`px-2 py-3 ${isCollapsed ? 'flex justify-center' : ''}`}>
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      onClick={() => setIsCreditsModalOpen(true)}
+                      className="w-full cursor-pointer hover:bg-secondary/80"
                     >
-                      <Shield className="mr-2 h-4 w-4" />
-                      {!isCollapsed && <span>Admin</span>}
-                    </NavLink>
+                      <Coins className="w-4 h-4" />
+                      {!isCollapsed && <span className="ml-2">{credits} créditos</span>}
+                    </Button>
+                  </div>
+                </SidebarMenuItem>
+
+                {menuItems.map((item) => (
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton asChild>
+                      <NavLink 
+                        to={item.url} 
+                        end 
+                        className="hover:bg-muted/50" 
+                        activeClassName="bg-muted text-primary font-medium"
+                      >
+                        <item.icon className="mr-2 h-4 w-4" />
+                        {!isCollapsed && <span>{item.title}</span>}
+                      </NavLink>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+
+                {isAdmin && (
+                  <SidebarMenuItem>
+                    <SidebarMenuButton asChild>
+                      <NavLink 
+                        to="/admin" 
+                        end 
+                        className="hover:bg-muted/50" 
+                        activeClassName="bg-muted text-primary font-medium"
+                      >
+                        <Shield className="mr-2 h-4 w-4" />
+                        {!isCollapsed && <span>Admin</span>}
+                      </NavLink>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                )}
+
+                <SidebarMenuItem>
+                  <SidebarMenuButton onClick={handleLogout}>
+                    <LogOut className="mr-2 h-4 w-4" />
+                    {!isCollapsed && <span>Sair</span>}
                   </SidebarMenuButton>
                 </SidebarMenuItem>
-              )}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        </SidebarContent>
+      </Sidebar>
 
-              <SidebarMenuItem>
-                <SidebarMenuButton onClick={handleLogout}>
-                  <LogOut className="mr-2 h-4 w-4" />
-                  {!isCollapsed && <span>Sair</span>}
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-      </SidebarContent>
-    </Sidebar>
+      <AddCreditsModal 
+        open={isCreditsModalOpen} 
+        onOpenChange={setIsCreditsModalOpen} 
+      />
+    </>
   );
 }
