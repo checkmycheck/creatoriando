@@ -16,7 +16,6 @@ export default function Auth() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
-  const [cpf, setCpf] = useState("");
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [loading, setLoading] = useState(false);
   const [searchParams] = useSearchParams();
@@ -26,42 +25,6 @@ export default function Auth() {
   const [codeValidation, setCodeValidation] = useState<{ valid: boolean; message: string } | null>(null);
 
   const referralCode = searchParams.get('ref');
-
-  const validateCPF = (cpf: string): boolean => {
-    cpf = cpf.replace(/[^\d]/g, '');
-    
-    if (cpf.length !== 11 || /^(\d)\1{10}$/.test(cpf)) {
-      return false;
-    }
-
-    let sum = 0;
-    for (let i = 0; i < 9; i++) {
-      sum += parseInt(cpf.charAt(i)) * (10 - i);
-    }
-    let digit = 11 - (sum % 11);
-    if (digit >= 10) digit = 0;
-    if (digit !== parseInt(cpf.charAt(9))) return false;
-
-    sum = 0;
-    for (let i = 0; i < 10; i++) {
-      sum += parseInt(cpf.charAt(i)) * (11 - i);
-    }
-    digit = 11 - (sum % 11);
-    if (digit >= 10) digit = 0;
-    if (digit !== parseInt(cpf.charAt(10))) return false;
-
-    return true;
-  };
-
-  const formatCPF = (value: string) => {
-    const cleaned = value.replace(/\D/g, '');
-    const limited = cleaned.substring(0, 11);
-    
-    if (limited.length <= 3) return limited;
-    if (limited.length <= 6) return `${limited.slice(0, 3)}.${limited.slice(3)}`;
-    if (limited.length <= 9) return `${limited.slice(0, 3)}.${limited.slice(3, 6)}.${limited.slice(6)}`;
-    return `${limited.slice(0, 3)}.${limited.slice(3, 6)}.${limited.slice(6, 9)}-${limited.slice(9)}`;
-  };
 
   useEffect(() => {
     if (referralCode) {
@@ -115,16 +78,6 @@ export default function Auth() {
       return;
     }
 
-    // Validate CPF
-    if (!validateCPF(cpf)) {
-      toast({
-        variant: "destructive",
-        title: "CPF inválido",
-        description: "Por favor, insira um CPF válido.",
-      });
-      return;
-    }
-
     // Validate terms acceptance
     if (!acceptedTerms) {
       toast({
@@ -154,8 +107,7 @@ export default function Auth() {
         options: {
           emailRedirectTo: `${window.location.origin}/`,
           data: {
-            full_name: fullName,
-            cpf: cpf.replace(/\D/g, '')
+            full_name: fullName
           }
         },
       });
@@ -325,17 +277,6 @@ export default function Auth() {
                     placeholder="seu@email.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="signup-cpf">CPF</Label>
-                  <Input
-                    id="signup-cpf"
-                    type="text"
-                    placeholder="000.000.000-00"
-                    value={cpf}
-                    onChange={(e) => setCpf(formatCPF(e.target.value))}
                     required
                   />
                 </div>
