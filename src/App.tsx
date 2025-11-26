@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { DashboardLayout } from "./components/DashboardLayout";
 import { ScrollToTop } from "./components/ScrollToTop";
+import { RouteTransition } from "./components/RouteTransition";
 import { useTheme } from "./hooks/useTheme";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
@@ -39,7 +40,9 @@ const App = () => {
               element={
                 <ProtectedRoute>
                   <DashboardLayout>
-                    <CreateCharacter />
+                    <RouteTransition>
+                      <CreateCharacter />
+                    </RouteTransition>
                   </DashboardLayout>
                 </ProtectedRoute>
               }
@@ -49,7 +52,9 @@ const App = () => {
               element={
                 <ProtectedRoute>
                   <DashboardLayout>
-                    <Characters />
+                    <RouteTransition>
+                      <Characters />
+                    </RouteTransition>
                   </DashboardLayout>
                 </ProtectedRoute>
               }
@@ -59,7 +64,9 @@ const App = () => {
               element={
                 <ProtectedRoute>
                   <DashboardLayout>
-                    <PromptResult />
+                    <RouteTransition>
+                      <PromptResult />
+                    </RouteTransition>
                   </DashboardLayout>
                 </ProtectedRoute>
                 }
@@ -69,7 +76,9 @@ const App = () => {
               element={
                 <ProtectedRoute>
                   <DashboardLayout>
-                    <Profile />
+                    <RouteTransition>
+                      <Profile />
+                    </RouteTransition>
                   </DashboardLayout>
                 </ProtectedRoute>
               }
@@ -79,7 +88,9 @@ const App = () => {
               element={
                 <ProtectedRoute>
                   <DashboardLayout>
-                    <BuyCredits />
+                    <RouteTransition>
+                      <BuyCredits />
+                    </RouteTransition>
                   </DashboardLayout>
                 </ProtectedRoute>
               }
@@ -89,7 +100,9 @@ const App = () => {
               element={
                 <ProtectedRoute>
                   <DashboardLayout>
-                    <Admin />
+                    <RouteTransition>
+                      <Admin />
+                    </RouteTransition>
                   </DashboardLayout>
                 </ProtectedRoute>
               }
