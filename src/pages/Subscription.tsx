@@ -17,38 +17,40 @@ interface ProfileData {
   email: string;
 }
 
-const creditPackages = [
-  {
-    credits: 10,
-    price: 2,
-    popular: false,
-  },
-  {
-    credits: 20,
-    price: 5,
-    popular: false,
-  },
-  {
-    credits: 50,
-    price: 10,
-    popular: true,
-  },
-  {
-    credits: 200,
-    price: 20,
-    popular: false,
-  },
-];
+interface CreditPackage {
+  id: string;
+  credits: number;
+  price_brl: number;
+  is_popular: boolean;
+  display_order: number;
+}
 
 export default function Subscription() {
   const navigate = useNavigate();
   const { plan, credits, isLoading: subscriptionLoading } = useSubscription();
   const [profileData, setProfileData] = useState<ProfileData | null>(null);
+  const [creditPackages, setCreditPackages] = useState<CreditPackage[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     loadProfileData();
+    loadCreditPackages();
   }, []);
+
+  const loadCreditPackages = async () => {
+    const { data, error } = await supabase
+      .from('credit_packages')
+      .select('*')
+      .eq('is_active', true)
+      .order('display_order', { ascending: true });
+
+    if (error) {
+      console.error('Error loading credit packages:', error);
+      toast.error('Erro ao carregar pacotes');
+    } else {
+      setCreditPackages(data || []);
+    }
+  };
 
   const loadProfileData = async () => {
     const { data: { user } } = await supabase.auth.getUser();
@@ -194,14 +196,14 @@ export default function Subscription() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {creditPackages.map((pkg) => (
               <Card
-                key={pkg.credits}
+                key={pkg.id}
                 className={`relative ${
-                  pkg.popular
+                  pkg.is_popular
                     ? "border-2 border-lime shadow-lg bg-lime/5"
                     : ""
                 }`}
               >
-                {pkg.popular && (
+                {pkg.is_popular && (
                   <div className="absolute -top-3 left-1/2 -translate-x-1/2">
                     <Badge className="bg-lime text-lime-foreground">
                       <Sparkles className="w-3 h-3 mr-1" />
@@ -217,7 +219,7 @@ export default function Subscription() {
 
                 <CardContent className="space-y-6">
                   <div className="text-center">
-                    <div className="text-3xl font-bold">R$ {pkg.price}</div>
+                    <div className="text-3xl font-bold">R$ {pkg.price_brl.toFixed(2)}</div>
                   </div>
 
                   <ul className="space-y-3">
@@ -233,7 +235,7 @@ export default function Subscription() {
 
                   <Button
                     className="w-full"
-                    variant={pkg.popular ? "default" : "outline"}
+                    variant={pkg.is_popular ? "default" : "outline"}
                     onClick={() => handleBuyCredits(pkg.credits)}
                   >
                     <Coins className="w-4 h-4 mr-2" />
