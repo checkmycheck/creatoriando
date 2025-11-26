@@ -359,7 +359,7 @@ const CreateCharacter = () => {
             </Button>
           </div>
         
-        <div className="mt-8 mb-24" data-onboarding="step-content">
+        <div className="mt-8 mb-40 pb-8" data-onboarding="step-content">
           {renderStep()}
         </div>
 
