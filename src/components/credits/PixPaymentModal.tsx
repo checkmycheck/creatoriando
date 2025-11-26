@@ -120,6 +120,19 @@ export function PixPaymentModal({ open, onOpenChange, pixData }: PixPaymentModal
           </div>
         ) : (
           <div className="space-y-4">
+            {/* Automatic Recognition Alert */}
+            <div className="flex items-start gap-3 p-4 bg-lime/10 border border-lime/20 rounded-lg">
+              <CheckCircle2 className="w-5 h-5 text-lime flex-shrink-0 mt-0.5" />
+              <div className="space-y-1">
+                <p className="text-sm font-semibold text-foreground">
+                  Reconhecimento Automático
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  Assim que você confirmar o pagamento, o sistema reconhece automaticamente e seus créditos são inseridos na conta em poucos segundos. Você não precisa fazer nada!
+                </p>
+              </div>
+            </div>
+
             {/* QR Code */}
             <div className="flex justify-center p-4 bg-white rounded-lg">
               {pixData?.qr_code_base64 ? (
