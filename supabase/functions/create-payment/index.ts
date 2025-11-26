@@ -18,12 +18,21 @@ serve(async (req) => {
       throw new Error('MERCADOPAGO_ACCESS_TOKEN not configured');
     }
 
+    // Get the Authorization header
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      console.error('Missing Authorization header');
+      throw new Error('Unauthorized: Missing authorization header');
+    }
+
+    console.log('Authorization header present:', authHeader.substring(0, 20) + '...');
+
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_ANON_KEY') ?? '',
       {
         global: {
-          headers: { Authorization: req.headers.get('Authorization')! },
+          headers: { Authorization: authHeader },
         },
       }
     );
@@ -34,8 +43,11 @@ serve(async (req) => {
       error: userError,
     } = await supabaseClient.auth.getUser();
 
+    console.log('User auth check:', { hasUser: !!user, error: userError });
+
     if (userError || !user) {
-      throw new Error('Unauthorized');
+      console.error('Authentication failed:', userError);
+      throw new Error('Unauthorized: Failed to authenticate user');
     }
 
     const { amount, description } = await req.json();

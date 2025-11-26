@@ -28,9 +28,13 @@ export default function BuyCredits() {
   const handleCreatePayment = async (credits: number) => {
     setLoading(true);
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("Usuário não autenticado");
+      // Verify session is valid
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      if (sessionError || !session) {
+        throw new Error("Sessão inválida. Por favor, faça login novamente.");
+      }
 
+      console.log('Calling create-payment with session');
       const { data, error } = await supabase.functions.invoke('create-payment', {
         body: { 
           amount: credits,
