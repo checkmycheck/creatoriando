@@ -8,6 +8,16 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
@@ -15,7 +25,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Loader2, User, CreditCard, Video, Calendar, Mail, Edit2, X, Save } from "lucide-react";
+import { Loader2, User, CreditCard, Video, Calendar, Mail, Edit2, X, Save, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
 const updateProfileSchema = z.object({
@@ -39,6 +49,7 @@ interface UserDetailsModalProps {
   user: Profile;
   open: boolean;
   onClose: () => void;
+  onUserDeleted?: () => void;
 }
 
 interface CharacterStats {
@@ -54,10 +65,12 @@ interface CreditTransaction {
   created_at: string;
 }
 
-export function UserDetailsModal({ user, open, onClose }: UserDetailsModalProps) {
+export function UserDetailsModal({ user, open, onClose, onUserDeleted }: UserDetailsModalProps) {
   const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [editedCredits, setEditedCredits] = useState(user.credits);
   const [editedPlan, setEditedPlan] = useState(user.subscription_plan);
   const [characterStats, setCharacterStats] = useState<CharacterStats>({
@@ -187,6 +200,42 @@ export function UserDetailsModal({ user, open, onClose }: UserDetailsModalProps)
     setIsEditing(false);
   };
 
+  const handleDeleteUser = async () => {
+    try {
+      setDeleting(true);
+
+      // Delete user from auth (will cascade to profiles, characters, etc via foreign keys)
+      const { error } = await supabase.auth.admin.deleteUser(user.id);
+
+      if (error) throw error;
+
+      toast.success("Usuário deletado com sucesso");
+      setShowDeleteDialog(false);
+      onUserDeleted?.();
+      onClose();
+    } catch (error: any) {
+      console.error("Error deleting user:", error);
+      toast.error("Erro ao deletar usuário: " + error.message);
+    } finally {
+      setDeleting(false);
+    }
+  };
+
+  const calculateExpirationDate = (createdAt: string) => {
+    const created = new Date(createdAt);
+    const expiration = new Date(created);
+    expiration.setFullYear(expiration.getFullYear() + 1);
+    return expiration;
+  };
+
+  const isExpired = () => {
+    const expirationDate = calculateExpirationDate(user.created_at);
+    return new Date() > expirationDate;
+  };
+
+  const expirationDate = calculateExpirationDate(user.created_at);
+  const daysUntilExpiration = Math.ceil((expirationDate.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
+
   const getPlanBadgeVariant = (plan: string) => {
     switch (plan) {
       case "pro":
@@ -203,56 +252,68 @@ export function UserDetailsModal({ user, open, onClose }: UserDetailsModalProps)
   };
 
   return (
-    <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <DialogTitle className="flex items-center gap-2">
-                <User className="w-5 h-5" />
-                Detalhes do Usuário
-              </DialogTitle>
-              <DialogDescription>
-                Informações completas sobre o usuário e suas atividades
-              </DialogDescription>
-            </div>
-            {!isEditing ? (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setIsEditing(true)}
-                disabled={loading}
-              >
-                <Edit2 className="w-4 h-4 mr-2" />
-                Editar
-              </Button>
-            ) : (
+    <>
+      <Dialog open={open} onOpenChange={onClose}>
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <div className="flex items-center justify-between">
+              <div>
+                <DialogTitle className="flex items-center gap-2">
+                  <User className="w-5 h-5" />
+                  Detalhes do Usuário
+                </DialogTitle>
+                <DialogDescription>
+                  Informações completas sobre o usuário e suas atividades
+                </DialogDescription>
+              </div>
               <div className="flex gap-2">
                 <Button
-                  variant="outline"
+                  variant="destructive"
                   size="sm"
-                  onClick={handleCancel}
-                  disabled={saving}
+                  onClick={() => setShowDeleteDialog(true)}
+                  disabled={loading || deleting}
                 >
-                  <X className="w-4 h-4 mr-2" />
-                  Cancelar
+                  <Trash2 className="w-4 h-4 mr-2" />
+                  Deletar
                 </Button>
-                <Button
-                  size="sm"
-                  onClick={handleSave}
-                  disabled={saving}
-                >
-                  {saving ? (
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  ) : (
-                    <Save className="w-4 h-4 mr-2" />
-                  )}
-                  Salvar
-                </Button>
+                {!isEditing ? (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setIsEditing(true)}
+                    disabled={loading}
+                  >
+                    <Edit2 className="w-4 h-4 mr-2" />
+                    Editar
+                  </Button>
+                ) : (
+                  <>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleCancel}
+                      disabled={saving}
+                    >
+                      <X className="w-4 h-4 mr-2" />
+                      Cancelar
+                    </Button>
+                    <Button
+                      size="sm"
+                      onClick={handleSave}
+                      disabled={saving}
+                    >
+                      {saving ? (
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      ) : (
+                        <Save className="w-4 h-4 mr-2" />
+                      )}
+                      Salvar
+                    </Button>
+                  </>
+                )}
               </div>
-            )}
-          </div>
-        </DialogHeader>
+            </div>
+          </DialogHeader>
 
         {loading ? (
           <div className="flex items-center justify-center py-8">
@@ -306,6 +367,20 @@ export function UserDetailsModal({ user, open, onClose }: UserDetailsModalProps)
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-muted-foreground">Data de Cadastro:</span>
                   <span className="font-medium">{formatDate(user.created_at)}</span>
+                </div>
+                <Separator />
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-muted-foreground">Acesso Expira em:</span>
+                  <div className="text-right">
+                    <p className="font-medium">{formatDate(expirationDate.toISOString())}</p>
+                    {isExpired() ? (
+                      <Badge variant="destructive" className="text-xs mt-1">Expirado</Badge>
+                    ) : daysUntilExpiration <= 30 ? (
+                      <Badge variant="outline" className="text-xs mt-1">{daysUntilExpiration} dias restantes</Badge>
+                    ) : (
+                      <Badge variant="secondary" className="text-xs mt-1">{daysUntilExpiration} dias restantes</Badge>
+                    )}
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -412,5 +487,35 @@ export function UserDetailsModal({ user, open, onClose }: UserDetailsModalProps)
         )}
       </DialogContent>
     </Dialog>
+
+    <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Confirmar Deleção</AlertDialogTitle>
+          <AlertDialogDescription>
+            Tem certeza que deseja deletar o usuário <strong>{user.email}</strong>?
+            Esta ação é irreversível e irá deletar todos os dados associados (personagens, transações, etc).
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel disabled={deleting}>Cancelar</AlertDialogCancel>
+          <AlertDialogAction
+            onClick={handleDeleteUser}
+            disabled={deleting}
+            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+          >
+            {deleting ? (
+              <>
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                Deletando...
+              </>
+            ) : (
+              "Deletar Usuário"
+            )}
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  </>
   );
 }

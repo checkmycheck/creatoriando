@@ -18,6 +18,7 @@ interface UsersListProps {
 
 export function UsersList({ users }: UsersListProps) {
   const [selectedUser, setSelectedUser] = useState<Profile | null>(null);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   const getPlanBadgeVariant = (plan: string) => {
     switch (plan) {
@@ -88,6 +89,10 @@ export function UsersList({ users }: UsersListProps) {
           user={selectedUser}
           open={!!selectedUser}
           onClose={() => setSelectedUser(null)}
+          onUserDeleted={() => {
+            setSelectedUser(null);
+            setRefreshTrigger(prev => prev + 1); // Trigger parent refresh
+          }}
         />
       )}
     </>
