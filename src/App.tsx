@@ -16,6 +16,7 @@ import PromptResult from "./pages/PromptResult";
 import Admin from "./pages/Admin";
 import Profile from "./pages/Profile";
 import BuyCredits from "./pages/BuyCredits";
+import Subscription from "./pages/Subscription";
 import Terms from "./pages/Terms";
 import NotFound from "./pages/NotFound";
 
@@ -53,6 +54,7 @@ const App = () => {
               <Route path="/prompt-result" element={<PromptResult />} />
               <Route path="/profile" element={<Profile />} />
               <Route path="/buy-credits" element={<BuyCredits />} />
+              <Route path="/subscription" element={<Subscription />} />
               <Route path="/admin" element={<Admin />} />
             </Route>
 
