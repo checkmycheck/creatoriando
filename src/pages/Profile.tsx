@@ -182,7 +182,7 @@ export default function Profile() {
 
               <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
                 <Calendar className="w-5 h-5 text-muted-foreground" />
-                <div>
+                <div className="flex-1">
                   <p className="text-sm text-muted-foreground">Membro desde</p>
                   <p className="font-medium">
                     {new Date(user?.created_at).toLocaleDateString("pt-BR", {
@@ -190,6 +190,34 @@ export default function Profile() {
                       month: "long",
                       day: "numeric"
                     })}
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
+                <Calendar className="w-5 h-5 text-muted-foreground" />
+                <div className="flex-1">
+                  <p className="text-sm text-muted-foreground">Acesso expira em</p>
+                  <p className="font-medium">
+                    {(() => {
+                      const created = new Date(user?.created_at);
+                      const expiration = new Date(created);
+                      expiration.setFullYear(expiration.getFullYear() + 1);
+                      return expiration.toLocaleDateString("pt-BR", {
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric"
+                      });
+                    })()}
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {(() => {
+                      const created = new Date(user?.created_at);
+                      const expiration = new Date(created);
+                      expiration.setFullYear(expiration.getFullYear() + 1);
+                      const days = Math.ceil((expiration.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
+                      return days > 0 ? `${days} dias restantes` : "Acesso expirado";
+                    })()}
                   </p>
                 </div>
               </div>
