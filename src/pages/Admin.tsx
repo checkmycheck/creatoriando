@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Users, Video, Activity, TrendingUp, Palette, Home, BarChart3, Search } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
 import { toast } from "sonner";
@@ -67,28 +68,21 @@ export default function Admin() {
     try {
       setLoadingStats(true);
 
-      // Total users
-      const { count: usersCount } = await supabase
-        .from("profiles")
-        .select("*", { count: "exact", head: true });
-
-      // Total characters
-      const { count: charactersCount } = await supabase
-        .from("characters")
-        .select("*", { count: "exact", head: true });
-
-      // Active users (created characters in last 7 days)
       const sevenDaysAgo = new Date();
       sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-      
-      const { data: activeUsersData } = await supabase
-        .from("characters")
-        .select("user_id")
-        .gte("created_at", sevenDaysAgo.toISOString());
 
-      const uniqueActiveUsers = new Set(activeUsersData?.map((c) => c.user_id) || []);
+      // Paralelizar todas as queries principais
+      const [usersResult, charactersResult, activeUsersResult, allProfilesResult, allCharactersResult] = await Promise.all([
+        supabase.from("profiles").select("*", { count: "exact", head: true }),
+        supabase.from("characters").select("*", { count: "exact", head: true }),
+        supabase.from("characters").select("user_id").gte("created_at", sevenDaysAgo.toISOString()),
+        supabase.from("profiles").select("created_at"),
+        supabase.from("characters").select("created_at"),
+      ]);
 
-      // Growth chart data (last 7 days)
+      const uniqueActiveUsers = new Set(activeUsersResult.data?.map((c) => c.user_id) || []);
+
+      // Processar dados do gráfico localmente
       const chartDataTemp: ChartData[] = [];
       for (let i = 6; i >= 0; i--) {
         const date = new Date();
@@ -98,26 +92,24 @@ export default function Admin() {
         const nextDate = new Date(date);
         nextDate.setDate(nextDate.getDate() + 1);
 
-        const { count: dailyUsers } = await supabase
-          .from("profiles")
-          .select("*", { count: "exact", head: true })
-          .lte("created_at", nextDate.toISOString());
+        const dailyUsers = allProfilesResult.data?.filter(
+          (p) => new Date(p.created_at!) <= nextDate
+        ).length || 0;
 
-        const { count: dailyCharacters } = await supabase
-          .from("characters")
-          .select("*", { count: "exact", head: true })
-          .lte("created_at", nextDate.toISOString());
+        const dailyCharacters = allCharactersResult.data?.filter(
+          (c) => new Date(c.created_at!) <= nextDate
+        ).length || 0;
 
         chartDataTemp.push({
           date: date.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" }),
-          usuarios: dailyUsers || 0,
-          personagens: dailyCharacters || 0,
+          usuarios: dailyUsers,
+          personagens: dailyCharacters,
         });
       }
 
       setStats({
-        totalUsers: usersCount || 0,
-        totalCharacters: charactersCount || 0,
+        totalUsers: usersResult.count || 0,
+        totalCharacters: charactersResult.count || 0,
         activeUsers: uniqueActiveUsers.size,
       });
       setChartData(chartDataTemp);
@@ -406,7 +398,7 @@ export default function Admin() {
     handleColorChange(key, hslValue);
   };
 
-  if (adminLoading || loadingStats) {
+  if (adminLoading) {
     return <LoadingSpinner />;
   }
 
@@ -449,49 +441,77 @@ export default function Admin() {
           </TabsList>
 
           <TabsContent value="metrics" className="space-y-6 mt-6">
-            <div className="grid gap-6 md:grid-cols-3">
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Total de Usuários</CardTitle>
-                  <Users className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-3xl font-bold">{stats.totalUsers}</div>
-                  <p className="text-xs text-muted-foreground mt-1">Todos os cadastrados</p>
-                </CardContent>
-              </Card>
+            {loadingStats ? (
+              <>
+                <div className="grid gap-6 md:grid-cols-3">
+                  {[1, 2, 3].map((i) => (
+                    <Card key={i}>
+                      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                        <Skeleton className="h-4 w-32" />
+                        <Skeleton className="h-4 w-4 rounded" />
+                      </CardHeader>
+                      <CardContent>
+                        <Skeleton className="h-9 w-20 mb-1" />
+                        <Skeleton className="h-3 w-28" />
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+                <Card>
+                  <CardHeader>
+                    <Skeleton className="h-6 w-32 mb-2" />
+                    <Skeleton className="h-4 w-64" />
+                  </CardHeader>
+                  <CardContent className="h-[400px]">
+                    <Skeleton className="w-full h-full" />
+                  </CardContent>
+                </Card>
+              </>
+            ) : (
+              <>
+                <div className="grid gap-6 md:grid-cols-3">
+                  <Card>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                      <CardTitle className="text-sm font-medium">Total de Usuários</CardTitle>
+                      <Users className="h-4 w-4 text-muted-foreground" />
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-3xl font-bold">{stats.totalUsers}</div>
+                      <p className="text-xs text-muted-foreground mt-1">Todos os cadastrados</p>
+                    </CardContent>
+                  </Card>
 
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Personagens Criados</CardTitle>
-                  <Video className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-3xl font-bold">{stats.totalCharacters}</div>
-                  <p className="text-xs text-muted-foreground mt-1">Total de personagens</p>
-                </CardContent>
-              </Card>
+                  <Card>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                      <CardTitle className="text-sm font-medium">Personagens Criados</CardTitle>
+                      <Video className="h-4 w-4 text-muted-foreground" />
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-3xl font-bold">{stats.totalCharacters}</div>
+                      <p className="text-xs text-muted-foreground mt-1">Total de personagens</p>
+                    </CardContent>
+                  </Card>
 
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Usuários Ativos</CardTitle>
-                  <TrendingUp className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-3xl font-bold">{stats.activeUsers}</div>
-                  <p className="text-xs text-muted-foreground mt-1">Últimos 7 dias</p>
-                </CardContent>
-              </Card>
-            </div>
+                  <Card>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                      <CardTitle className="text-sm font-medium">Usuários Ativos</CardTitle>
+                      <TrendingUp className="h-4 w-4 text-muted-foreground" />
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-3xl font-bold">{stats.activeUsers}</div>
+                      <p className="text-xs text-muted-foreground mt-1">Últimos 7 dias</p>
+                    </CardContent>
+                  </Card>
+                </div>
 
-            <Card>
-              <CardHeader>
-                <CardTitle>Crescimento</CardTitle>
-                <CardDescription>Evolução de usuários e personagens nos últimos 7 dias</CardDescription>
-              </CardHeader>
-              <CardContent className="h-[400px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={chartData}>
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Crescimento</CardTitle>
+                    <CardDescription>Evolução de usuários e personagens nos últimos 7 dias</CardDescription>
+                  </CardHeader>
+                  <CardContent className="h-[400px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <LineChart data={chartData}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="date" />
                     <YAxis />
@@ -511,10 +531,12 @@ export default function Admin() {
                       strokeWidth={2}
                       name="Personagens"
                     />
-                  </LineChart>
-                </ResponsiveContainer>
-              </CardContent>
-            </Card>
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </CardContent>
+                </Card>
+              </>
+            )}
           </TabsContent>
 
           <TabsContent value="users" className="space-y-6 mt-6">
