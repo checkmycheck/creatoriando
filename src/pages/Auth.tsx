@@ -60,7 +60,7 @@ export default function Auth() {
     // Check if user is already logged in
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) {
-        navigate("/");
+        navigate("/create");
       }
     });
   }, [navigate]);
@@ -182,7 +182,7 @@ export default function Auth() {
         title: "Login realizado!",
         description: "Bem-vindo de volta.",
       });
-      navigate("/characters");
+      navigate("/create");
     }
   };
 
