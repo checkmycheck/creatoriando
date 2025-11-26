@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -7,6 +7,7 @@ import { ChevronLeft, ChevronRight, Sparkles, HelpCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useOnboarding } from "@/hooks/useOnboarding";
+import { useSubscription } from "@/hooks/useSubscription";
 import { OnboardingTour } from "@/components/onboarding/OnboardingTour";
 import { Header } from "@/components/Header";
 import { StepProgress } from "@/components/character/StepProgress";
@@ -47,10 +48,14 @@ const TOTAL_STEPS = 13;
 
 const CreateCharacter = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { toast } = useToast();
   const [currentStep, setCurrentStep] = useState(0);
   const [characterData, setCharacterData] = useState<CharacterData>({});
   const [userId, setUserId] = useState<string | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [isEditMode, setIsEditMode] = useState(false);
+  const { canCreateMore, characterCount, characterLimit, refresh: refreshSubscription } = useSubscription();
   
   const {
     isActive,
@@ -92,7 +97,52 @@ const CreateCharacter = () => {
     supabase.auth.getUser().then(({ data: { user } }) => {
       setUserId(user?.id || null);
     });
-  }, []);
+
+    // Check if we're editing an existing character
+    const editId = new URLSearchParams(location.search).get("edit");
+    if (editId) {
+      setEditingId(editId);
+      setIsEditMode(true);
+      loadCharacterForEdit(editId);
+    }
+  }, [location.search]);
+
+  const loadCharacterForEdit = async (characterId: string) => {
+    const { data, error } = await supabase
+      .from("characters")
+      .select("*")
+      .eq("id", characterId)
+      .single();
+
+    if (error) {
+      toast({
+        variant: "destructive",
+        title: "Erro ao carregar personagem",
+        description: error.message,
+      });
+      navigate("/characters");
+      return;
+    }
+
+    if (data) {
+      setCharacterData({
+        name: data.name,
+        gender: data.gender,
+        age: data.age,
+        appearance: data.appearance,
+        visual: data.visual,
+        environment: data.environment,
+        posture: data.posture,
+        mood: data.mood,
+        action: data.action,
+        movement: data.movement,
+        angle: data.angle,
+        lighting: data.lighting,
+        voiceTone: data.voice_tone,
+        script: data.script,
+      });
+    }
+  };
 
   const updateCharacter = (field: keyof CharacterData, value: string) => {
     setCharacterData((prev) => ({ ...prev, [field]: value }));
@@ -102,7 +152,7 @@ const CreateCharacter = () => {
     if (currentStep < TOTAL_STEPS) {
       setCurrentStep(currentStep + 1);
     } else {
-      // Save character to database
+      // Save or update character to database
       if (!userId) {
         toast({
           variant: "destructive",
@@ -121,37 +171,88 @@ const CreateCharacter = () => {
         return;
       }
 
-      const { error } = await supabase.from("characters").insert({
-        user_id: userId,
-        name: characterData.name,
-        gender: characterData.gender,
-        age: characterData.age,
-        appearance: characterData.appearance,
-        visual: characterData.visual,
-        environment: characterData.environment,
-        posture: characterData.posture,
-        mood: characterData.mood,
-        action: characterData.action,
-        movement: characterData.movement,
-        angle: characterData.angle,
-        lighting: characterData.lighting,
-        voice_tone: characterData.voiceTone,
-        script: characterData.script,
-      });
-
-      if (error) {
+      // Check if user can create more characters (only for new characters)
+      if (!isEditMode && !canCreateMore) {
         toast({
           variant: "destructive",
-          title: "Erro ao salvar",
-          description: error.message,
+          title: "Limite atingido",
+          description: `Você atingiu o limite de ${characterLimit} personagem${characterLimit > 1 ? 's' : ''} do plano gratuito. Faça upgrade para o plano Pro para criar personagens ilimitados!`,
         });
+        navigate("/");
         return;
       }
 
-      toast({
-        title: "Personagem salvo!",
-        description: "Seu personagem foi salvo com sucesso.",
-      });
+      if (isEditMode && editingId) {
+        // Update existing character
+        const { error } = await supabase
+          .from("characters")
+          .update({
+            name: characterData.name,
+            gender: characterData.gender,
+            age: characterData.age,
+            appearance: characterData.appearance,
+            visual: characterData.visual,
+            environment: characterData.environment,
+            posture: characterData.posture,
+            mood: characterData.mood,
+            action: characterData.action,
+            movement: characterData.movement,
+            angle: characterData.angle,
+            lighting: characterData.lighting,
+            voice_tone: characterData.voiceTone,
+            script: characterData.script,
+          })
+          .eq("id", editingId);
+
+        if (error) {
+          toast({
+            variant: "destructive",
+            title: "Erro ao atualizar",
+            description: error.message,
+          });
+          return;
+        }
+
+        toast({
+          title: "Personagem atualizado!",
+          description: "Suas alterações foram salvas com sucesso.",
+        });
+      } else {
+        // Insert new character
+        const { error } = await supabase.from("characters").insert({
+          user_id: userId,
+          name: characterData.name,
+          gender: characterData.gender,
+          age: characterData.age,
+          appearance: characterData.appearance,
+          visual: characterData.visual,
+          environment: characterData.environment,
+          posture: characterData.posture,
+          mood: characterData.mood,
+          action: characterData.action,
+          movement: characterData.movement,
+          angle: characterData.angle,
+          lighting: characterData.lighting,
+          voice_tone: characterData.voiceTone,
+          script: characterData.script,
+        });
+
+        if (error) {
+          toast({
+            variant: "destructive",
+            title: "Erro ao salvar",
+            description: error.message,
+          });
+          return;
+        }
+
+        toast({
+          title: "Personagem salvo!",
+          description: "Seu personagem foi criado com sucesso.",
+        });
+        
+        refreshSubscription();
+      }
 
       // Generate final prompt
       const prompt = generateVeo3Prompt(characterData);

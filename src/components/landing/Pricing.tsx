@@ -8,9 +8,9 @@ const plans = [
     name: "Gratuito",
     price: "R$ 0",
     period: "/mês",
-    description: "Perfeito para começar",
+    description: "Perfeito para testar",
     features: [
-      "Até 5 personagens salvos",
+      "Até 1 personagem",
       "Todas as 13 configurações",
       "Prompts Veo3 otimizados",
       "Suporte por email",
@@ -26,9 +26,9 @@ const plans = [
     features: [
       "Personagens ilimitados",
       "Sistema de favoritos",
+      "Editar personagens salvos",
       "Geração com IA integrada",
       "Suporte prioritário",
-      "Acesso antecipado a novidades",
       "Templates exclusivos",
     ],
     cta: "Começar Teste Grátis",

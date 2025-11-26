@@ -5,8 +5,10 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
+import { useSubscription } from "@/hooks/useSubscription";
 import { Header } from "@/components/Header";
-import { Trash2, FileText, Plus, Star } from "lucide-react";
+import { Trash2, FileText, Plus, Star, Pencil, Sparkles } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 interface Character {
   id: string;
@@ -24,6 +26,7 @@ export default function Characters() {
   const [showOnlyFavorites, setShowOnlyFavorites] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { plan, characterCount, characterLimit, canCreateMore } = useSubscription();
 
   useEffect(() => {
     fetchCharacters();
@@ -161,12 +164,37 @@ export default function Characters() {
               <Star className={`w-4 h-4 ${showOnlyFavorites ? "fill-current" : ""}`} />
               {showOnlyFavorites ? "Todos" : "Favoritos"}
             </Button>
-            <Button onClick={() => navigate("/create")}>
+            <Button 
+              onClick={() => navigate("/create")}
+              disabled={!canCreateMore}
+              className={canCreateMore ? "" : "opacity-50 cursor-not-allowed"}
+            >
               <Plus className="w-4 h-4 mr-2" />
               Novo Personagem
             </Button>
           </div>
         </div>
+
+        {plan === "free" && (
+          <Alert className="mb-6 border-lime/50 bg-lime/5">
+            <Sparkles className="h-4 w-4 text-lime" />
+            <AlertDescription className="text-foreground">
+              <strong>Plano Gratuito:</strong> Você está usando {characterCount} de {characterLimit} personagem.
+              {!canCreateMore && (
+                <span className="block mt-1">
+                  Faça upgrade para o <strong className="text-lime">Plano Pro</strong> para criar personagens ilimitados! 
+                  <Button 
+                    variant="link" 
+                    className="text-lime p-0 ml-1 h-auto"
+                    onClick={() => navigate("/")}
+                  >
+                    Ver planos →
+                  </Button>
+                </span>
+              )}
+            </AlertDescription>
+          </Alert>
+        )}
 
         {characters.length === 0 ? (
           <Card>
@@ -215,6 +243,14 @@ export default function Characters() {
                     )}
                   </div>
                   <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      className="flex-1"
+                      onClick={() => navigate(`/create?edit=${character.id}`)}
+                    >
+                      <Pencil className="w-4 h-4 mr-2" />
+                      Editar
+                    </Button>
                     <Button
                       variant="outline"
                       className="flex-1"
