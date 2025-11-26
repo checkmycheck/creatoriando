@@ -9,11 +9,15 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Gift, CheckCircle, XCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Link } from "react-router-dom";
 
 export default function Auth() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [fullName, setFullName] = useState("");
   const [cpf, setCpf] = useState("");
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [loading, setLoading] = useState(false);
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -101,12 +105,32 @@ export default function Auth() {
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    // Validate full name
+    if (!fullName.trim()) {
+      toast({
+        variant: "destructive",
+        title: "Nome obrigatório",
+        description: "Por favor, insira seu nome completo.",
+      });
+      return;
+    }
+
     // Validate CPF
     if (!validateCPF(cpf)) {
       toast({
         variant: "destructive",
         title: "CPF inválido",
         description: "Por favor, insira um CPF válido.",
+      });
+      return;
+    }
+
+    // Validate terms acceptance
+    if (!acceptedTerms) {
+      toast({
+        variant: "destructive",
+        title: "Termos não aceitos",
+        description: "Você precisa aceitar os Termos de Uso e Política de Privacidade.",
       });
       return;
     }
@@ -130,6 +154,7 @@ export default function Auth() {
         options: {
           emailRedirectTo: `${window.location.origin}/`,
           data: {
+            full_name: fullName,
             cpf: cpf.replace(/\D/g, '')
           }
         },
@@ -282,6 +307,17 @@ export default function Auth() {
             <TabsContent value="signup">
               <form onSubmit={handleSignUp} className="space-y-4">
                 <div className="space-y-2">
+                  <Label htmlFor="signup-name">Nome Completo</Label>
+                  <Input
+                    id="signup-name"
+                    type="text"
+                    placeholder="Seu nome completo"
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
                   <Label htmlFor="signup-email">Email</Label>
                   <Input
                     id="signup-email"
@@ -313,6 +349,22 @@ export default function Auth() {
                     onChange={(e) => setPassword(e.target.value)}
                     required
                   />
+                </div>
+                <div className="flex items-start space-x-2">
+                  <Checkbox
+                    id="terms"
+                    checked={acceptedTerms}
+                    onCheckedChange={(checked) => setAcceptedTerms(checked as boolean)}
+                  />
+                  <label
+                    htmlFor="terms"
+                    className="text-sm text-muted-foreground leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                  >
+                    Aceito os{" "}
+                    <Link to="/terms" target="_blank" className="text-primary hover:underline">
+                      Termos de Uso e Política de Privacidade
+                    </Link>
+                  </label>
                 </div>
                 <Button type="submit" className="w-full" disabled={loading}>
                   {loading ? "Cadastrando..." : "Cadastrar"}
