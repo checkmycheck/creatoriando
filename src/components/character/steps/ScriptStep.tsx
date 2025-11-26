@@ -9,11 +9,6 @@ interface ScriptStepProps {
 }
 
 export const ScriptStep = ({ value, onChange, onGeneratePrompt }: ScriptStepProps) => {
-  const handleGenerateScript = () => {
-    const sampleScript = "Já imaginou fazer vídeos incríveis com IA usando apenas a sua selfie? Com o Creator IA, isso é totalmente possível! Vamos explorar essa tecnologia revolucionária juntos, olha...";
-    onChange(sampleScript);
-  };
-
   return (
     <div className="space-y-6 max-w-3xl mx-auto">
       <div className="flex items-center gap-3">
@@ -29,22 +24,13 @@ export const ScriptStep = ({ value, onChange, onGeneratePrompt }: ScriptStepProp
           <Textarea
             value={value || ""}
             onChange={(e) => onChange(e.target.value)}
-            placeholder="Digite o que o apresentador vai falar... Ou clique em 'Gerar Roteiro de 8s' para criar com IA"
+            placeholder="Digite o que o apresentador vai falar no vídeo..."
             className="min-h-[200px] bg-card border-border text-foreground resize-none"
           />
           <div className="absolute bottom-4 right-4 text-xs text-muted-foreground">
             {value?.length || 0} palavras
           </div>
         </div>
-
-        <Button
-          onClick={handleGenerateScript}
-          variant="outline"
-          className="w-full gap-2 border-lime/30 hover:bg-lime/10"
-        >
-          <Sparkles className="w-4 h-4 text-lime" />
-          Clique para gerar com IA
-        </Button>
 
         {onGeneratePrompt && (
           <Button
