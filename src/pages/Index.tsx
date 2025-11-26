@@ -33,7 +33,7 @@ const Index = () => {
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-2">
               <Video className="w-6 h-6 text-lime" />
-              <span className="text-xl font-bold">Selfyai</span>
+              <span className="text-xl font-bold">Creator IA</span>
             </div>
             <div className="flex items-center gap-2">
               {user ? (

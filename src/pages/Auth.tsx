@@ -82,7 +82,7 @@ export default function Auth() {
     <div className="min-h-screen flex items-center justify-center p-4 bg-background">
       <Card className="w-full max-w-md">
         <CardHeader>
-          <CardTitle>Selfyai</CardTitle>
+          <CardTitle>Creator IA</CardTitle>
           <CardDescription>Entre ou crie sua conta</CardDescription>
         </CardHeader>
         <CardContent>
