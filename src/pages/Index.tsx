@@ -1,13 +1,15 @@
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Sparkles, Video, Zap, LogOut, User } from "lucide-react";
+import { Sparkles, Video, Zap, LogOut, User, Shield } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { User as SupabaseUser } from "@supabase/supabase-js";
+import { useAdmin } from "@/hooks/useAdmin";
 
 const Index = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState<SupabaseUser | null>(null);
+  const { isAdmin } = useAdmin();
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -38,6 +40,12 @@ const Index = () => {
             <div className="flex items-center gap-2">
               {user ? (
                 <>
+                  {isAdmin && (
+                    <Button variant="secondary" size="sm" onClick={() => navigate("/admin")}>
+                      <Shield className="w-4 h-4 mr-2" />
+                      Admin
+                    </Button>
+                  )}
                   <Button variant="outline" size="sm" onClick={() => navigate("/characters")}>
                     <User className="w-4 h-4 mr-2" />
                     Meus Personagens
