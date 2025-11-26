@@ -7,19 +7,6 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-interface CreditPackage {
-  credits: number;
-  price: number;
-  description: string;
-}
-
-const CREDIT_PACKAGES: Record<string, CreditPackage> = {
-  'pack_5': { credits: 5, price: 19.90, description: '5 créditos' },
-  'pack_10': { credits: 10, price: 34.90, description: '10 créditos' },
-  'pack_20': { credits: 20, price: 59.90, description: '20 créditos' },
-  'pack_50': { credits: 50, price: 129.90, description: '50 créditos' },
-};
-
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -51,29 +38,34 @@ serve(async (req) => {
       throw new Error('Unauthorized');
     }
 
-    const { packageId, paymentMethodId, email } = await req.json();
+    const { amount, description } = await req.json();
 
-    // Validate package
-    const creditPackage = CREDIT_PACKAGES[packageId];
-    if (!creditPackage) {
-      throw new Error('Invalid package ID');
+    if (!amount || amount < 5) {
+      throw new Error('Minimum amount is R$ 5.00');
     }
 
-    console.log(`Creating payment for user ${user.id}, package: ${packageId}`);
+    console.log(`Creating PIX payment for user ${user.id}, amount: R$ ${amount}`);
+
+    // Get user profile for email
+    const { data: profile } = await supabaseClient
+      .from('profiles')
+      .select('email')
+      .eq('id', user.id)
+      .single();
 
     // Create payment in Mercado Pago
     const paymentData = {
-      transaction_amount: creditPackage.price,
-      description: `Creator IA - ${creditPackage.description}`,
-      payment_method_id: paymentMethodId || 'pix',
+      transaction_amount: amount,
+      description: description || `Creator IA - ${amount} créditos`,
+      payment_method_id: 'pix',
       payer: {
-        email: email || user.email,
+        email: profile?.email || user.email,
       },
-      external_reference: `${user.id}_${packageId}_${Date.now()}`,
+      external_reference: `${user.id}_${Date.now()}`,
+      notification_url: `${Deno.env.get('SUPABASE_URL')}/functions/v1/process-payment-webhook`,
       metadata: {
         user_id: user.id,
-        credits: creditPackage.credits,
-        package_id: packageId,
+        credits: amount, // 1 real = 1 credit
       },
     };
 
@@ -93,16 +85,16 @@ serve(async (req) => {
       throw new Error(`Mercado Pago error: ${mpData.message || 'Unknown error'}`);
     }
 
-    console.log('Payment created:', mpData.id, 'Status:', mpData.status);
+    console.log('PIX payment created:', mpData.id, 'Status:', mpData.status);
 
     // Create pending transaction in database
     const { error: transactionError } = await supabaseClient
       .from('credit_transactions')
       .insert({
         user_id: user.id,
-        amount: creditPackage.credits,
+        amount: amount,
         type: 'purchase',
-        description: `Compra de ${creditPackage.description}`,
+        description: description || `Compra de ${amount} créditos`,
         payment_id: mpData.id.toString(),
         payment_status: mpData.status,
       });
@@ -111,7 +103,7 @@ serve(async (req) => {
       console.error('Error creating transaction:', transactionError);
     }
 
-    // Return payment info
+    // Return payment info with QR code
     return new Response(
       JSON.stringify({
         payment_id: mpData.id,
@@ -119,7 +111,8 @@ serve(async (req) => {
         qr_code: mpData.point_of_interaction?.transaction_data?.qr_code,
         qr_code_base64: mpData.point_of_interaction?.transaction_data?.qr_code_base64,
         ticket_url: mpData.point_of_interaction?.transaction_data?.ticket_url,
-        external_resource_url: mpData.external_resource_url,
+        amount: amount,
+        credits: amount,
       }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
