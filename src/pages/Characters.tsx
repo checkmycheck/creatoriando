@@ -21,9 +21,18 @@ interface Character {
   is_favorite: boolean;
 }
 
+const getCachedCharacters = (): Character[] => {
+  try {
+    const cached = localStorage.getItem('user_characters');
+    return cached ? JSON.parse(cached) : [];
+  } catch {
+    return [];
+  }
+};
+
 export default function Characters() {
-  const [characters, setCharacters] = useState<Character[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [characters, setCharacters] = useState<Character[]>(getCachedCharacters());
+  const [loading, setLoading] = useState(getCachedCharacters().length === 0);
   const [showOnlyFavorites, setShowOnlyFavorites] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -34,7 +43,11 @@ export default function Characters() {
   }, []);
 
   const fetchCharacters = async () => {
-    setLoading(true);
+    const hadCache = characters.length > 0;
+    if (!hadCache) {
+      setLoading(true);
+    }
+    
     const { data: { user } } = await supabase.auth.getUser();
     
     if (!user) {
@@ -60,7 +73,15 @@ export default function Characters() {
         description: error.message,
       });
     } else {
-      setCharacters(data || []);
+      const newCharacters = data || [];
+      setCharacters(newCharacters);
+      
+      // Update cache
+      try {
+        localStorage.setItem('user_characters', JSON.stringify(newCharacters));
+      } catch (error) {
+        console.error('Failed to cache characters:', error);
+      }
     }
     
     setLoading(false);
