@@ -244,7 +244,7 @@ export default function Subscription() {
                 )}
 
                 <CardHeader className="text-center pb-4">
-                  <div className="text-5xl font-bold mb-2">{pkg.credits}</div>
+                  <div className="text-5xl font-bold mb-2">{pkg.credits.toLocaleString('pt-BR')}</div>
                   <CardDescription className="text-base">créditos</CardDescription>
                 </CardHeader>
 
