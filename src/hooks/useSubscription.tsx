@@ -17,10 +17,53 @@ export const useSubscription = () => {
     canCreateMore: false,
     isLoading: true,
   });
+  const [userId, setUserId] = useState<string | null>(null);
+
+  useEffect(() => {
+    // Get user ID
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      setUserId(user?.id || null);
+    });
+  }, []);
 
   useEffect(() => {
     fetchSubscriptionData();
-  }, []);
+
+    if (!userId) return;
+
+    // Subscribe to realtime changes
+    const channel = supabase
+      .channel('profile-credits-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'profiles',
+          filter: `id=eq.${userId}`
+        },
+        () => {
+          fetchSubscriptionData();
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'credit_transactions',
+          filter: `user_id=eq.${userId}`
+        },
+        () => {
+          fetchSubscriptionData();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [userId]);
 
   const fetchSubscriptionData = async () => {
     const { data: { user } } = await supabase.auth.getUser();

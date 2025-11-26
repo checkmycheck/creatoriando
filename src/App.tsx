@@ -12,6 +12,7 @@ import Characters from "./pages/Characters";
 import PromptResult from "./pages/PromptResult";
 import Admin from "./pages/Admin";
 import Profile from "./pages/Profile";
+import BuyCredits from "./pages/BuyCredits";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -57,6 +58,14 @@ const App = () => {
               element={
                 <ProtectedRoute>
                   <Profile />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/buy-credits"
+              element={
+                <ProtectedRoute>
+                  <BuyCredits />
                 </ProtectedRoute>
               }
             />
