@@ -53,13 +53,13 @@ serve(async (req) => {
       throw new Error('Unauthorized: Failed to authenticate user');
     }
 
-    const { amount, description } = await req.json();
+    const { price, credits, description } = await req.json();
 
-    if (!amount || amount < 5) {
-      throw new Error('Minimum amount is R$ 5.00');
+    if (!price || price < 1) {
+      throw new Error('Minimum price is R$ 1.00');
     }
 
-    console.log(`Creating PIX payment for user ${user.id}, amount: R$ ${amount}`);
+    console.log(`Creating PIX payment for user ${user.id}, price: R$ ${price}, credits: ${credits}`);
 
     // Get user profile for email
     const { data: profile } = await supabaseClient
@@ -71,8 +71,8 @@ serve(async (req) => {
     // Create payment in Mercado Pago
     const idempotencyKey = `${user.id}_${Date.now()}`;
     const paymentData = {
-      transaction_amount: amount,
-      description: description || `Creator IA - ${amount} créditos`,
+      transaction_amount: price,
+      description: description || `Creator IA - ${credits} créditos`,
       payment_method_id: 'pix',
       payer: {
         email: profile?.email || user.email,
@@ -81,7 +81,7 @@ serve(async (req) => {
       notification_url: `${Deno.env.get('SUPABASE_URL')}/functions/v1/process-payment-webhook`,
       metadata: {
         user_id: user.id,
-        credits: amount, // 1 real = 1 credit
+        credits: credits,
       },
     };
 
@@ -109,9 +109,9 @@ serve(async (req) => {
       .from('credit_transactions')
       .insert({
         user_id: user.id,
-        amount: amount,
+        amount: credits,
         type: 'purchase',
-        description: description || `Compra de ${amount} créditos`,
+        description: description || `Compra de ${credits} créditos`,
         payment_id: mpData.id.toString(),
         payment_status: mpData.status,
       });
@@ -128,8 +128,8 @@ serve(async (req) => {
         qr_code: mpData.point_of_interaction?.transaction_data?.qr_code,
         qr_code_base64: mpData.point_of_interaction?.transaction_data?.qr_code_base64,
         ticket_url: mpData.point_of_interaction?.transaction_data?.ticket_url,
-        amount: amount,
-        credits: amount,
+        amount: price,
+        credits: credits,
       }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },

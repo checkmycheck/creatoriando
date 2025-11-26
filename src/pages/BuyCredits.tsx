@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Header } from "@/components/Header";
 import { BuyCreditsPricing } from "@/components/credits/BuyCreditsPricing";
 import { CreditHistory } from "@/components/credits/CreditHistory";
@@ -11,21 +11,13 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
 export default function BuyCredits() {
-  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const amount = searchParams.get('amount');
   const [isPixModalOpen, setIsPixModalOpen] = useState(false);
   const [pixData, setPixData] = useState<any>(null);
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    if (amount) {
-      handleCreatePayment(parseFloat(amount));
-    }
-  }, [amount]);
-
-  const handleCreatePayment = async (credits: number) => {
+  const handleCreatePayment = async (price: number, credits: number) => {
     setLoading(true);
     try {
       // Verify session is valid and get access token
@@ -40,7 +32,8 @@ export default function BuyCredits() {
           Authorization: `Bearer ${session.access_token}`
         },
         body: { 
-          amount: credits,
+          price: price,
+          credits: credits,
           description: `${credits} créditos Creator IA`
         }
       });
