@@ -144,12 +144,12 @@ export default function Characters() {
   }
 
   return (
-    <div className="min-h-screen bg-background p-6">
+    <div className="min-h-screen bg-background p-4 md:p-6">
       <div className="max-w-6xl mx-auto">
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 md:mb-8">
           <div>
-            <h1 className="text-4xl font-bold mb-2">Meus Personagens</h1>
-            <p className="text-muted-foreground">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-1 md:mb-2">Meus Personagens</h1>
+            <p className="text-sm md:text-base text-muted-foreground">
               Gerencie seus personagens criados
             </p>
           </div>
@@ -158,17 +158,19 @@ export default function Characters() {
               variant={showOnlyFavorites ? "default" : "outline"}
               onClick={() => setShowOnlyFavorites(!showOnlyFavorites)}
               className="gap-2"
+              size="sm"
             >
-              <Star className={`w-4 h-4 ${showOnlyFavorites ? "fill-current" : ""}`} />
-              {showOnlyFavorites ? "Todos" : "Favoritos"}
+              <Star className={`w-3 h-3 md:w-4 md:h-4 ${showOnlyFavorites ? "fill-current" : ""}`} />
+              <span className="hidden sm:inline">{showOnlyFavorites ? "Todos" : "Favoritos"}</span>
             </Button>
             <Button 
               onClick={() => navigate("/create")}
               disabled={!canCreateMore}
               className={canCreateMore ? "" : "opacity-50 cursor-not-allowed"}
+              size="sm"
             >
-              <Plus className="w-4 h-4 mr-2" />
-              Novo Personagem
+              <Plus className="w-3 h-3 md:w-4 md:h-4 md:mr-2" />
+              <span className="hidden sm:inline">Novo Personagem</span>
             </Button>
           </div>
         </div>
@@ -239,32 +241,36 @@ export default function Characters() {
                     {character.appearance && (
                       <Badge variant="secondary">{character.appearance}</Badge>
                     )}
-                  </div>
-                  <div className="flex gap-2">
-                    <Button
-                      variant="outline"
-                      className="flex-1"
-                      onClick={() => navigate(`/create?edit=${character.id}`)}
-                    >
-                      <Pencil className="w-4 h-4 mr-2" />
-                      Editar
-                    </Button>
-                    <Button
-                      variant="outline"
-                      className="flex-1"
-                      onClick={() => handleViewPrompt(character)}
-                    >
-                      <FileText className="w-4 h-4 mr-2" />
-                      Ver Prompt
-                    </Button>
-                    <Button
-                      variant="destructive"
-                      size="icon"
-                      onClick={() => handleDelete(character.id)}
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
-                  </div>
+                   </div>
+                   <div className="flex flex-col sm:flex-row gap-2">
+                     <Button
+                       variant="outline"
+                       className="flex-1"
+                       size="sm"
+                       onClick={() => navigate(`/create?edit=${character.id}`)}
+                     >
+                       <Pencil className="w-4 h-4 mr-2" />
+                       Editar
+                     </Button>
+                     <Button
+                       variant="outline"
+                       className="flex-1"
+                       size="sm"
+                       onClick={() => handleViewPrompt(character)}
+                     >
+                       <FileText className="w-4 h-4 mr-2" />
+                       Ver Prompt
+                     </Button>
+                     <Button
+                       variant="destructive"
+                       size="sm"
+                       className="sm:w-auto"
+                       onClick={() => handleDelete(character.id)}
+                     >
+                       <Trash2 className="w-4 h-4 sm:mr-0" />
+                       <span className="sm:hidden ml-2">Deletar</span>
+                     </Button>
+                   </div>
                 </CardContent>
               </Card>
             ))}
