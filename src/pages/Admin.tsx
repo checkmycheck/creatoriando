@@ -28,6 +28,8 @@ interface ThemeColor {
   key: string;
   value: string;
   label: string;
+  description: string;
+  category: string;
 }
 
 export default function Admin() {
@@ -127,26 +129,68 @@ export default function Admin() {
 
       if (error) throw error;
 
-      const colorLabels: Record<string, string> = {
-        background: "Fundo",
-        foreground: "Texto Principal",
-        primary: "Cor Primária",
-        "primary-foreground": "Texto em Primária",
-        card: "Card",
-        "card-foreground": "Texto em Card",
-        muted: "Muted",
-        "muted-foreground": "Texto Muted",
-        lime: "Lime (Accent)",
-        "progress-bar": "Barra de Progresso",
+      const colorLabels: Record<string, { label: string; description: string; category: string }> = {
+        background: { 
+          label: "Fundo Principal", 
+          description: "Cor de fundo de toda a aplicação",
+          category: "Fundos"
+        },
+        foreground: { 
+          label: "Texto Principal", 
+          description: "Cor do texto sobre o fundo principal",
+          category: "Textos"
+        },
+        card: { 
+          label: "Fundo dos Cards", 
+          description: "Cor de fundo dos cartões e painéis",
+          category: "Fundos"
+        },
+        "card-foreground": { 
+          label: "Texto dos Cards", 
+          description: "Cor do texto dentro dos cards",
+          category: "Textos"
+        },
+        primary: { 
+          label: "Botões Primários", 
+          description: "Cor principal dos botões e elementos de destaque",
+          category: "Botões e Destaques"
+        },
+        "primary-foreground": { 
+          label: "Texto em Botões", 
+          description: "Cor do texto sobre botões primários",
+          category: "Botões e Destaques"
+        },
+        lime: { 
+          label: "Cor de Destaque (Lime)", 
+          description: "Cor secundária de destaque e acentos",
+          category: "Botões e Destaques"
+        },
+        "progress-bar": { 
+          label: "Barra de Progresso", 
+          description: "Cor da barra de progresso nas etapas",
+          category: "Componentes"
+        },
+        muted: { 
+          label: "Elementos Sutis", 
+          description: "Cor de fundo de elementos menos importantes",
+          category: "Componentes"
+        },
+        "muted-foreground": { 
+          label: "Texto Secundário", 
+          description: "Cor de textos menos importantes e descrições",
+          category: "Textos"
+        },
       };
 
-      setThemeColors(
-        data.map((item) => ({
-          key: item.setting_key,
-          value: item.setting_value,
-          label: colorLabels[item.setting_key] || item.setting_key,
-        }))
-      );
+      const colorsWithInfo = data.map((item) => ({
+        key: item.setting_key,
+        value: item.setting_value,
+        label: colorLabels[item.setting_key]?.label || item.setting_key,
+        description: colorLabels[item.setting_key]?.description || "",
+        category: colorLabels[item.setting_key]?.category || "Outros",
+      }));
+
+      setThemeColors(colorsWithInfo);
     } catch (error) {
       console.error("Error loading theme colors:", error);
       toast.error("Erro ao carregar cores do tema");
@@ -350,29 +394,46 @@ export default function Admin() {
                   Clique na cor para usar o seletor visual.
                 </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid gap-4 md:grid-cols-2">
-                  {themeColors.map((color) => (
-                    <div key={color.key} className="space-y-2">
-                      <Label htmlFor={color.key}>{color.label}</Label>
-                      <div className="flex gap-2 items-center">
-                        <Input
-                          id={color.key}
-                          value={hslToHex(color.value)}
-                          onChange={(e) => handleColorPickerChange(color.key, e.target.value)}
-                          placeholder="#000000"
-                          className="font-mono"
-                        />
-                        <input
-                          type="color"
-                          value={hslToHex(color.value)}
-                          onChange={(e) => handleColorPickerChange(color.key, e.target.value)}
-                          className="w-12 h-10 rounded border cursor-pointer"
-                        />
+              <CardContent className="space-y-6">
+                {["Fundos", "Textos", "Botões e Destaques", "Componentes", "Outros"].map((category) => {
+                  const categoryColors = themeColors.filter((c) => c.category === category);
+                  if (categoryColors.length === 0) return null;
+
+                  return (
+                    <div key={category} className="space-y-4">
+                      <h3 className="text-lg font-semibold border-b pb-2">{category}</h3>
+                      <div className="grid gap-4 md:grid-cols-2">
+                        {categoryColors.map((color) => (
+                          <div key={color.key} className="space-y-2">
+                            <div className="flex items-start justify-between">
+                              <div className="space-y-1">
+                                <Label htmlFor={color.key} className="text-sm font-medium">
+                                  {color.label}
+                                </Label>
+                                <p className="text-xs text-muted-foreground">{color.description}</p>
+                              </div>
+                            </div>
+                            <div className="flex gap-2 items-center">
+                              <Input
+                                id={color.key}
+                                value={hslToHex(color.value)}
+                                onChange={(e) => handleColorPickerChange(color.key, e.target.value)}
+                                placeholder="#000000"
+                                className="font-mono text-sm"
+                              />
+                              <input
+                                type="color"
+                                value={hslToHex(color.value)}
+                                onChange={(e) => handleColorPickerChange(color.key, e.target.value)}
+                                className="w-12 h-10 rounded border cursor-pointer shrink-0"
+                              />
+                            </div>
+                          </div>
+                        ))}
                       </div>
                     </div>
-                  ))}
-                </div>
+                  );
+                })}
 
                 <Button onClick={handleSaveTheme} disabled={saving} className="w-full">
                   {saving && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
