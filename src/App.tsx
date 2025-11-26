@@ -13,6 +13,7 @@ import PromptResult from "./pages/PromptResult";
 import Admin from "./pages/Admin";
 import Profile from "./pages/Profile";
 import BuyCredits from "./pages/BuyCredits";
+import Terms from "./pages/Terms";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -29,6 +30,7 @@ const App = () => {
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
+            <Route path="/terms" element={<Terms />} />
             <Route
               path="/create"
               element={
