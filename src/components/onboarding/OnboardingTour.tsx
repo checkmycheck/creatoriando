@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { X, ChevronLeft, ChevronRight, Sparkles } from "lucide-react";
+import { ChevronLeft, ChevronRight, Sparkles } from "lucide-react";
 import { OnboardingStep } from "@/hooks/useOnboarding";
 
 interface OnboardingTourProps {
@@ -134,13 +134,6 @@ export const OnboardingTour = ({
           maxWidth: "calc(100vw - 40px)",
         }}
       >
-        <button
-          onClick={onSkip}
-          className="absolute top-4 right-4 text-muted-foreground hover:text-foreground transition-colors"
-        >
-          <X className="w-4 h-4" />
-        </button>
-
         <div className="flex items-center gap-2 mb-3">
           <Sparkles className="w-5 h-5 text-lime animate-pulse" />
           <h3 className="text-lg font-bold text-foreground transition-all duration-300">{step.title}</h3>
