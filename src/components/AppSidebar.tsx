@@ -23,8 +23,8 @@ import {
 } from "@/components/ui/sidebar";
 
 const menuItems = [
-  { title: "Personagens", url: "/characters", icon: LayoutDashboard },
   { title: "Criar Novo", url: "/create", icon: Plus },
+  { title: "Personagens", url: "/characters", icon: LayoutDashboard },
   { title: "Perfil", url: "/profile", icon: User },
 ];
 
