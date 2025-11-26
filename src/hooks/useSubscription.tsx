@@ -76,11 +76,15 @@ export const useSubscription = () => {
     }
 
     // Get user profile with subscription info and credits
-    const { data: profile } = await supabase
+    const { data: profile, error: profileError } = await supabase
       .from("profiles")
       .select("subscription_plan, credits")
       .eq("id", user.id)
-      .single();
+      .maybeSingle();
+
+    if (profileError) {
+      console.error("Error fetching profile:", profileError);
+    }
 
     // Get character count
     const { data: characterCountData } = await supabase
