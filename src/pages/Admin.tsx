@@ -280,6 +280,21 @@ export default function Admin() {
           description: "Cor do texto sobre botões destrutivos",
           category: "Botões e Destaques"
         },
+        sidebar: { 
+          label: "Fundo do Menu Lateral", 
+          description: "Cor de fundo do sidebar de navegação",
+          category: "Menu Lateral (Sidebar)"
+        },
+        "sidebar-foreground": { 
+          label: "Texto do Menu Lateral", 
+          description: "Cor do texto e ícones dentro do sidebar",
+          category: "Menu Lateral (Sidebar)"
+        },
+        "sidebar-border": { 
+          label: "Borda do Menu Lateral", 
+          description: "Cor da borda do sidebar",
+          category: "Menu Lateral (Sidebar)"
+        },
       };
 
       const colorsWithInfo = data.map((item) => ({
@@ -566,7 +581,7 @@ export default function Admin() {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
-                {["Fundos", "Textos", "Botões e Destaques", "Componentes", "Outros"].map((category) => {
+                {["Menu Lateral (Sidebar)", "Fundos", "Textos", "Botões e Destaques", "Componentes", "Outros"].map((category) => {
                   const categoryColors = themeColors.filter((c) => c.category === category);
                   if (categoryColors.length === 0) return null;
 
