@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { User, Mail, Calendar, CreditCard, Crown, Sparkles, Plus } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
 
 export default function Profile() {
   const navigate = useNavigate();
@@ -50,11 +51,7 @@ export default function Profile() {
   const usagePercentage = isPremium ? 0 : ((characterCount - creditsAvailable) / characterLimit) * 100;
 
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-pulse text-muted-foreground">Carregando...</div>
-      </div>
-    );
+    return <LoadingSpinner />;
   }
 
   return (

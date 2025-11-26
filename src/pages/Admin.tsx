@@ -7,13 +7,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Users, Video, Activity, TrendingUp, Palette, Loader2, Home, BarChart3, Search } from "lucide-react";
+import { Users, Video, Activity, TrendingUp, Palette, Home, BarChart3, Search } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
 import { toast } from "sonner";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
 import { AnalyticsDashboard } from "@/components/admin/AnalyticsDashboard";
 import { UsersList } from "@/components/admin/UsersList";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
 
 interface Stats {
   totalUsers: number;
@@ -406,11 +407,7 @@ export default function Admin() {
   };
 
   if (adminLoading || loadingStats) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
-      </div>
-    );
+    return <LoadingSpinner />;
   }
 
   if (!isAdmin) {
@@ -554,9 +551,7 @@ export default function Admin() {
                   </div>
 
                   {loadingUsers ? (
-                    <div className="flex items-center justify-center py-8">
-                      <Loader2 className="w-8 h-8 animate-spin text-primary" />
-                    </div>
+                    <LoadingSpinner />
                   ) : (
                     <UsersList 
                       users={users.filter((user) => {
