@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Users, Sparkles, TrendingUp, Star } from "lucide-react";
 import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import { PopularCharacters } from "./PopularCharacters";
+import { CharacteristicsAnalytics } from "./CharacteristicsAnalytics";
 
 interface AnalyticsData {
   totalUsers: number;
@@ -347,6 +348,9 @@ export const AnalyticsDashboard = () => {
 
       {/* Popular Characters */}
       <PopularCharacters />
+
+      {/* Characteristics Analytics */}
+      <CharacteristicsAnalytics />
     </div>
   );
 };
