@@ -9,7 +9,7 @@ interface ScriptStepProps {
 
 export const ScriptStep = ({ value, onChange }: ScriptStepProps) => {
   const handleGenerateScript = () => {
-    const sampleScript = "Já imaginou fazer vídeos incríveis com IA usando apenas a sua selfie? Com o Selfyai, isso é totalmente possível! Vamos explorar essa tecnologia revolucionária juntos, olha...";
+    const sampleScript = "Já imaginou fazer vídeos incríveis com IA usando apenas a sua selfie? Com o Creator IA, isso é totalmente possível! Vamos explorar essa tecnologia revolucionária juntos, olha...";
     onChange(sampleScript);
   };
 
