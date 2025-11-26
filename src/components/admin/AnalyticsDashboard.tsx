@@ -5,6 +5,8 @@ import { Users, Sparkles, TrendingUp, Star } from "lucide-react";
 import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import { PopularCharacters } from "./PopularCharacters";
 import { CharacteristicsAnalytics } from "./CharacteristicsAnalytics";
+import { ReferralAnalytics } from "./ReferralAnalytics";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface AnalyticsData {
   totalUsers: number;
@@ -179,9 +181,16 @@ export const AnalyticsDashboard = () => {
   ].filter(item => item.value > 0);
 
   return (
-    <div className="space-y-6">
-      {/* Key Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+    <Tabs defaultValue="overview" className="space-y-4">
+      <TabsList>
+        <TabsTrigger value="overview">Visão Geral</TabsTrigger>
+        <TabsTrigger value="characters">Personagens</TabsTrigger>
+        <TabsTrigger value="referrals">Indicações</TabsTrigger>
+      </TabsList>
+
+      <TabsContent value="overview" className="space-y-6">
+        {/* Key Metrics */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium">Total de Usuários</CardTitle>
@@ -351,6 +360,43 @@ export const AnalyticsDashboard = () => {
 
       {/* Characteristics Analytics */}
       <CharacteristicsAnalytics />
-    </div>
+      </TabsContent>
+
+      <TabsContent value="characters">
+        <div className="space-y-6">
+          {characterStats.length > 0 && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Personagens por Gênero</CardTitle>
+                <CardDescription>Distribuição de personagens criados</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ResponsiveContainer width="100%" height={300}>
+                  <BarChart data={characterStats}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                    <XAxis dataKey="gender" stroke="hsl(var(--muted-foreground))" />
+                    <YAxis stroke="hsl(var(--muted-foreground))" />
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: "hsl(var(--card))",
+                        border: "1px solid hsl(var(--border))",
+                        borderRadius: "8px",
+                      }}
+                    />
+                    <Bar dataKey="count" fill="hsl(var(--lime))" name="Personagens" />
+                  </BarChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+          )}
+          <PopularCharacters />
+          <CharacteristicsAnalytics />
+        </div>
+      </TabsContent>
+
+      <TabsContent value="referrals">
+        <ReferralAnalytics />
+      </TabsContent>
+    </Tabs>
   );
 };
