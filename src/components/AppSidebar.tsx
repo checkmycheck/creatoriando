@@ -12,6 +12,7 @@ import { Button } from "./ui/button";
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
@@ -94,33 +95,37 @@ export function AppSidebar() {
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 ))}
-
-                {isAdmin && (
-                  <SidebarMenuItem>
-                    <SidebarMenuButton asChild>
-                      <NavLink 
-                        to="/admin" 
-                        end 
-                        className="hover:bg-muted/50" 
-                        activeClassName="bg-muted text-primary font-medium"
-                      >
-                        <Shield className="mr-2 h-4 w-4" />
-                        {!isCollapsed && <span>Admin</span>}
-                      </NavLink>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                )}
-
-                <SidebarMenuItem>
-                  <SidebarMenuButton onClick={handleLogout}>
-                    <LogOut className="mr-2 h-4 w-4" />
-                    {!isCollapsed && <span>Sair</span>}
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
               </SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>
         </SidebarContent>
+
+        <SidebarFooter>
+          <SidebarMenu>
+            {isAdmin && (
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild>
+                  <NavLink 
+                    to="/admin" 
+                    end 
+                    className="hover:bg-muted/50" 
+                    activeClassName="bg-muted text-primary font-medium"
+                  >
+                    <Shield className="mr-2 h-4 w-4" />
+                    {!isCollapsed && <span>Admin</span>}
+                  </NavLink>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            )}
+
+            <SidebarMenuItem>
+              <SidebarMenuButton onClick={handleLogout}>
+                <LogOut className="mr-2 h-4 w-4" />
+                {!isCollapsed && <span>Sair</span>}
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarFooter>
       </Sidebar>
 
       <AddCreditsModal 
