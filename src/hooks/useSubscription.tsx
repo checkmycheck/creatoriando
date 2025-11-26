@@ -8,6 +8,7 @@ interface SubscriptionData {
   characterCount: number;
   canCreateMore: boolean;
   isLoading: boolean;
+  credits: number;
 }
 
 export const useSubscription = () => {
@@ -16,6 +17,7 @@ export const useSubscription = () => {
     characterCount: 0,
     canCreateMore: false,
     isLoading: true,
+    credits: 0,
   });
   const [userId, setUserId] = useState<string | null>(null);
 
@@ -73,10 +75,10 @@ export const useSubscription = () => {
       return;
     }
 
-    // Get user profile with subscription info
+    // Get user profile with subscription info and credits
     const { data: profile } = await supabase
       .from("profiles")
-      .select("subscription_plan")
+      .select("subscription_plan, credits")
       .eq("id", user.id)
       .single();
 
@@ -93,6 +95,7 @@ export const useSubscription = () => {
       characterCount: characterCountData || 0,
       canCreateMore: canCreate || false,
       isLoading: false,
+      credits: profile?.credits || 0,
     });
   };
 
