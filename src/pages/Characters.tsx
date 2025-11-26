@@ -9,6 +9,7 @@ import { useSubscription } from "@/hooks/useSubscription";
 import { Header } from "@/components/Header";
 import { Trash2, FileText, Plus, Star, Pencil, Sparkles } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
 
 interface Character {
   id: string;
@@ -136,11 +137,7 @@ export default function Characters() {
   };
 
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-pulse text-muted-foreground">Carregando...</div>
-      </div>
-    );
+    return <LoadingSpinner />;
   }
 
   return (
