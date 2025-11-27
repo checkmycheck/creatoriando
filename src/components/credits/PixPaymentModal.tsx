@@ -16,18 +16,28 @@ export function PixPaymentModal({ open, onOpenChange, pixData }: PixPaymentModal
   const [copied, setCopied] = useState(false);
   const [paymentStatus, setPaymentStatus] = useState<'pending' | 'checking' | 'approved' | 'failed'>('pending');
   const [checkingInterval, setCheckingInterval] = useState<NodeJS.Timeout | null>(null);
+  const [elapsedTime, setElapsedTime] = useState(0);
 
   useEffect(() => {
     if (open && pixData?.payment_id) {
+      // Reset timer when modal opens
+      setElapsedTime(0);
+      
       // Start checking payment status every 3 seconds
       const interval = setInterval(() => {
         checkPaymentStatus();
       }, 3000);
       
+      // Start timer to count elapsed time
+      const timerInterval = setInterval(() => {
+        setElapsedTime(prev => prev + 1);
+      }, 1000);
+      
       setCheckingInterval(interval);
       
       return () => {
         if (interval) clearInterval(interval);
+        if (timerInterval) clearInterval(timerInterval);
       };
     } else {
       if (checkingInterval) {
@@ -35,6 +45,7 @@ export function PixPaymentModal({ open, onOpenChange, pixData }: PixPaymentModal
         setCheckingInterval(null);
       }
       setPaymentStatus('pending');
+      setElapsedTime(0);
     }
   }, [open, pixData]);
 
@@ -84,6 +95,16 @@ export function PixPaymentModal({ open, onOpenChange, pixData }: PixPaymentModal
       description: "Cole no seu app de pagamentos.",
     });
     setTimeout(() => setCopied(false), 2000);
+  };
+
+  const formatElapsedTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    
+    if (mins === 0) {
+      return `${secs}s`;
+    }
+    return `${mins}m ${secs}s`;
   };
 
   if (!pixData) return null;
@@ -141,6 +162,11 @@ export function PixPaymentModal({ open, onOpenChange, pixData }: PixPaymentModal
                   <Loader2 className="h-6 w-6 sm:h-8 sm:w-8 animate-spin text-muted-foreground" />
                 </div>
               )}
+            </div>
+
+            {/* Timer */}
+            <div className="flex items-center justify-center gap-2 text-xs sm:text-sm text-muted-foreground">
+              <span>Gerado há {formatElapsedTime(elapsedTime)}</span>
             </div>
 
             {/* Payment Status */}
