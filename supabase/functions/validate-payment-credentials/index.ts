@@ -12,7 +12,8 @@ serve(async (req) => {
   }
 
   try {
-    const supabaseClient = createClient(
+    // Criar cliente para verificar autenticação do usuário
+    const authClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_ANON_KEY') ?? '',
       {
@@ -22,29 +23,45 @@ serve(async (req) => {
       }
     );
 
-    // Verificar se o usuário é admin
-    const { data: { user } } = await supabaseClient.auth.getUser();
+    // Verificar se o usuário está autenticado
+    const { data: { user }, error: authError } = await authClient.auth.getUser();
     
-    if (!user) {
+    if (authError || !user) {
+      console.error('Erro de autenticação:', authError);
       return new Response(
         JSON.stringify({ error: 'Não autenticado' }),
         { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    const { data: roleData } = await supabaseClient
+    console.log('Usuário autenticado:', user.id);
+
+    // Criar cliente com service role para verificar roles
+    const supabaseAdmin = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    );
+
+    const { data: roleData, error: roleError } = await supabaseAdmin
       .from('user_roles')
       .select('role')
       .eq('user_id', user.id)
       .eq('role', 'admin')
       .maybeSingle();
 
+    if (roleError) {
+      console.error('Erro ao verificar role:', roleError);
+    }
+
     if (!roleData) {
+      console.log('Usuário não é admin:', user.id);
       return new Response(
-        JSON.stringify({ error: 'Acesso negado' }),
+        JSON.stringify({ error: 'Acesso negado - apenas administradores podem validar credenciais' }),
         { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
+
+    console.log('Admin verificado:', user.id);
 
     const { accessToken } = await req.json();
 
