@@ -101,19 +101,18 @@ export const LandingPageCMS = () => {
         </TabsContent>
       </Tabs>
 
-      {hasChanges() && (
-        <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50">
-          <Button 
-            size="lg" 
-            onClick={handleSaveAll} 
-            disabled={isSaving}
-            className="shadow-2xl"
-          >
-            <Save className="w-4 h-4 mr-2" />
-            {isSaving ? "Salvando..." : "Salvar Alterações"}
-          </Button>
-        </div>
-      )}
+      <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50">
+        <Button 
+          size="lg" 
+          onClick={handleSaveAll} 
+          disabled={isSaving || !hasChanges()}
+          className="shadow-2xl"
+          variant={hasChanges() ? "default" : "secondary"}
+        >
+          <Save className="w-4 h-4 mr-2" />
+          {isSaving ? "Salvando..." : hasChanges() ? "Salvar Alterações" : "Sem Alterações"}
+        </Button>
+      </div>
 
       <Card>
         <CardHeader>
