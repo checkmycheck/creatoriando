@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Users, Video, Activity, TrendingUp, Palette, Home, BarChart3, Search, Package, Layout } from "lucide-react";
+import { Users, Video, Activity, TrendingUp, Palette, Home, BarChart3, Search, Package, Layout, Receipt } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
@@ -17,6 +17,7 @@ import { AnalyticsDashboard } from "@/components/admin/AnalyticsDashboard";
 import { UsersList } from "@/components/admin/UsersList";
 import { CreditPackagesManager } from "@/components/admin/CreditPackagesManager";
 import { LandingPageCMS } from "@/components/admin/LandingPageCMS";
+import { TransactionsList } from "@/components/admin/TransactionsList";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
 
 interface Stats {
@@ -422,7 +423,7 @@ export default function Admin() {
         </div>
 
         <Tabs defaultValue="metrics" className="w-full">
-          <TabsList className="grid w-full max-w-5xl grid-cols-6">
+          <TabsList className="grid w-full max-w-6xl grid-cols-7">
             <TabsTrigger value="metrics">
               <Activity className="w-4 h-4 mr-2" />
               Métricas
@@ -434,6 +435,10 @@ export default function Admin() {
             <TabsTrigger value="analytics">
               <BarChart3 className="w-4 h-4 mr-2" />
               Analytics
+            </TabsTrigger>
+            <TabsTrigger value="transactions">
+              <Receipt className="w-4 h-4 mr-2" />
+              Transações
             </TabsTrigger>
             <TabsTrigger value="packages">
               <Package className="w-4 h-4 mr-2" />
@@ -601,6 +606,10 @@ export default function Admin() {
 
           <TabsContent value="analytics" className="space-y-6 mt-6">
             <AnalyticsDashboard />
+          </TabsContent>
+
+          <TabsContent value="transactions" className="space-y-6 mt-6">
+            <TransactionsList />
           </TabsContent>
 
           <TabsContent value="packages" className="space-y-6 mt-6">
