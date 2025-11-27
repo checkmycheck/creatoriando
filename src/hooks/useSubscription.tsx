@@ -132,14 +132,8 @@ export const useSubscription = () => {
     });
   };
 
-  const getCharacterLimit = () => {
-    if (subscription.plan === "free") return 1;
-    return Infinity; // Unlimited for pro and enterprise
-  };
-
   return {
     ...subscription,
-    characterLimit: getCharacterLimit(),
     refresh: fetchSubscriptionData,
   };
 };

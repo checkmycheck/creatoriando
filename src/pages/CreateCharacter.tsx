@@ -55,7 +55,7 @@ const CreateCharacter = () => {
   const [userId, setUserId] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [isEditMode, setIsEditMode] = useState(false);
-  const { canCreateMore, characterCount, characterLimit, refresh: refreshSubscription } = useSubscription();
+  const { canCreateMore, credits, refresh: refreshSubscription } = useSubscription();
   
   const {
     isActive,
@@ -183,14 +183,14 @@ const CreateCharacter = () => {
         return;
       }
 
-      // Check if user can create more characters (only for new characters)
+      // Check if user has credits to create character (only for new characters)
       if (!isEditMode && !canCreateMore) {
         toast({
           variant: "destructive",
-          title: "Limite atingido",
-          description: `Você atingiu o limite de ${characterLimit} personagem${characterLimit > 1 ? 's' : ''} do plano gratuito. Faça upgrade para o plano Pro para criar personagens ilimitados!`,
+          title: "Créditos insuficientes",
+          description: "Você não tem créditos suficientes. Compre mais créditos para continuar criando personagens!",
         });
-        navigate("/");
+        navigate("/pacotes");
         return;
       }
 

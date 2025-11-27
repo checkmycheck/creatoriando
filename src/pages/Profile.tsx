@@ -15,7 +15,7 @@ export default function Profile() {
   const navigate = useNavigate();
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(false);
-  const { plan, characterCount, characterLimit, canCreateMore } = useSubscription();
+  const { credits, canCreateMore } = useSubscription();
 
   useEffect(() => {
     loadUserData();
@@ -43,13 +43,7 @@ export default function Profile() {
     setLoading(false);
   };
 
-  const isPremium = plan === "pro" || plan === "enterprise";
-  const creditsUsed = characterCount;
   const creditsAvailable = (user?.credits || 0);
-  const creditsFromPlan = isPremium ? "∞" : characterLimit;
-  const creditsTotal = isPremium ? "∞" : characterLimit + creditsAvailable;
-  const creditsRemaining = isPremium ? "∞" : Math.max(0, characterLimit - characterCount + creditsAvailable);
-  const usagePercentage = isPremium ? 0 : ((characterCount - creditsAvailable) / characterLimit) * 100;
 
   return (
     <div className="min-h-screen bg-background p-3 sm:p-4 md:p-6">
@@ -88,91 +82,40 @@ export default function Profile() {
               </>
             ) : (
               <>
-                 <CardHeader>
-                   <div className="flex items-center justify-between flex-wrap gap-3">
-                     <div>
-                       <CardTitle className="flex items-center gap-2 text-lg sm:text-xl md:text-2xl">
-                         <CreditCard className="w-4 h-4 sm:w-5 sm:h-5 text-lime" />
-                         Créditos Disponíveis
-                       </CardTitle>
-                       <CardDescription className="text-xs sm:text-sm">
-                         1 crédito = 1 personagem criado
-                       </CardDescription>
-                     </div>
-                    <Badge 
-                      variant={isPremium ? "default" : "secondary"}
-                      className={isPremium ? "bg-lime text-lime-foreground" : ""}
-                    >
-                      {plan === "pro" ? (
-                        <>
-                          <Crown className="w-3 h-3 mr-1" />
-                          Plano Pro
-                        </>
-                      ) : plan === "enterprise" ? (
-                        <>
-                          <Sparkles className="w-3 h-3 mr-1" />
-                          Plano Enterprise
-                        </>
-                      ) : (
-                        "Plano Free"
-                      )}
-                    </Badge>
-                  </div>
-                </CardHeader>
+                  <CardHeader>
+                      <div>
+                        <CardTitle className="flex items-center gap-2 text-lg sm:text-xl md:text-2xl">
+                          <CreditCard className="w-4 h-4 sm:w-5 sm:h-5 text-lime" />
+                          Créditos Disponíveis
+                        </CardTitle>
+                        <CardDescription className="text-xs sm:text-sm">
+                          1 crédito = 1 personagem criado
+                        </CardDescription>
+                      </div>
+                 </CardHeader>
             <CardContent className="space-y-3 sm:space-y-4">
-              <div className="grid grid-cols-3 gap-2 sm:gap-3 md:gap-4">
-                <div className="text-center">
-                  <p className="text-xs sm:text-sm text-muted-foreground mb-1">Usados</p>
-                  <p className="text-xl sm:text-2xl md:text-3xl font-bold text-lime">{typeof creditsUsed === 'number' ? creditsUsed.toLocaleString('pt-BR') : creditsUsed}</p>
-                </div>
-                <div className="text-center">
-                  <p className="text-xs sm:text-sm text-muted-foreground mb-1">Extras</p>
-                  <p className="text-xl sm:text-2xl md:text-3xl font-bold">{typeof creditsAvailable === 'number' ? creditsAvailable.toLocaleString('pt-BR') : creditsAvailable}</p>
-                  <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">+ {creditsFromPlan} do plano</p>
-                </div>
-                <div className="text-center">
-                  <p className="text-xs sm:text-sm text-muted-foreground mb-1">Total</p>
-                  <p className="text-xl sm:text-2xl md:text-3xl font-bold">{creditsTotal}</p>
-                </div>
+              <div className="text-center py-4">
+                <p className="text-xs sm:text-sm text-muted-foreground mb-2">Créditos Disponíveis</p>
+                <p className="text-4xl sm:text-5xl md:text-6xl font-bold text-lime">{typeof creditsAvailable === 'number' ? creditsAvailable.toLocaleString('pt-BR') : creditsAvailable}</p>
+                <p className="text-xs sm:text-sm text-muted-foreground mt-2">1 crédito = 1 personagem</p>
               </div>
 
-              {!isPremium && (
-                <>
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">Uso</span>
-                      <span className="font-medium">{Math.round(usagePercentage)}%</span>
-                    </div>
-                    <Progress value={usagePercentage} className="h-2" />
-                  </div>
-
-                  {!canCreateMore && (
-                    <Alert className="border-lime/50 bg-lime/5">
-                      <Sparkles className="h-4 w-4 text-lime" />
-                      <AlertDescription>
-                        Você atingiu o limite do plano gratuito. Faça upgrade para criar personagens ilimitados!
-                      </AlertDescription>
-                    </Alert>
-                  )}
-
-                  <Button 
-                    onClick={() => navigate("/buy-credits")} 
-                    className="w-full bg-lime text-lime-foreground hover:bg-lime/90"
-                  >
-                    <Plus className="w-4 h-4 mr-2" />
-                    Comprar Mais Créditos
-                  </Button>
-                </>
-              )}
-
-              {isPremium && (
+              {!canCreateMore && (
                 <Alert className="border-lime/50 bg-lime/5">
-                  <Crown className="h-4 w-4 text-lime" />
+                  <Sparkles className="h-4 w-4 text-lime" />
                   <AlertDescription>
-                    Você tem créditos ilimitados! Crie quantos personagens quiser.
+                    Você não tem créditos disponíveis. Compre mais créditos para continuar criando!
                   </AlertDescription>
                 </Alert>
               )}
+
+              <Button 
+                onClick={() => navigate("/pacotes")} 
+                className="w-full bg-lime text-lime-foreground hover:bg-lime/90"
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                Comprar Mais Créditos
+              </Button>
             </CardContent>
             </>
           )}
