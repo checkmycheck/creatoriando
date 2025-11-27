@@ -145,14 +145,14 @@ export default function Referrals() {
   }
 
   return (
-    <div className="container mx-auto p-4 md:p-6 max-w-6xl space-y-6 md:space-y-8">
+    <div className="container mx-auto p-3 sm:p-4 md:p-6 max-w-6xl space-y-4 sm:space-y-6 md:space-y-8">
       {/* Header */}
-      <div className="space-y-2">
-        <h1 className="text-2xl md:text-4xl font-bold flex items-center gap-2 md:gap-3">
-          <Gift className="w-6 h-6 md:w-8 md:h-8 text-primary" />
+      <div className="space-y-1 sm:space-y-2">
+        <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold flex items-center gap-2 md:gap-3 leading-tight">
+          <Gift className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 text-primary" />
           Programa de Indicação
         </h1>
-        <p className="text-muted-foreground text-sm md:text-lg font-light">
+        <p className="text-muted-foreground text-xs sm:text-sm md:text-base lg:text-lg font-light leading-relaxed">
           Indique amigos e ganhe créditos grátis para criar mais personagens
         </p>
       </div>
@@ -192,7 +192,7 @@ export default function Referrals() {
               </Badge>
             </div>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-3 sm:space-y-4">
             <div className="flex gap-2">
               <Input
                 readOnly
@@ -233,7 +233,7 @@ export default function Referrals() {
 
       {/* Statistics Cards */}
       {referralCode && (
-        <div className="grid gap-4 grid-cols-1 md:grid-cols-3">
+        <div className="grid gap-3 sm:gap-4 grid-cols-1 md:grid-cols-3">
           <Card>
             <CardHeader className="pb-3">
               <CardDescription className="flex items-center gap-2 text-xs md:text-sm">
@@ -281,7 +281,7 @@ export default function Referrals() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid gap-6 grid-cols-1 md:grid-cols-3">
+          <div className="grid gap-4 sm:gap-5 md:gap-6 grid-cols-1 md:grid-cols-3">
             <div className="space-y-2">
               <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-lg md:text-xl">
                 1

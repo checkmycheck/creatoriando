@@ -52,11 +52,11 @@ export default function Profile() {
   const usagePercentage = isPremium ? 0 : ((characterCount - creditsAvailable) / characterLimit) * 100;
 
   return (
-    <div className="min-h-screen bg-background p-6">
-      <div className="max-w-4xl mx-auto space-y-6">
-          <div>
-            <h1 className="text-4xl font-bold mb-2">Meu Perfil</h1>
-            <p className="text-muted-foreground">
+    <div className="min-h-screen bg-background p-3 sm:p-4 md:p-6">
+      <div className="max-w-4xl mx-auto space-y-4 sm:space-y-6">
+          <div className="space-y-1 sm:space-y-2">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold leading-tight">Meu Perfil</h1>
+            <p className="text-xs sm:text-sm md:text-base text-muted-foreground font-light leading-relaxed">
               Gerencie suas informações e veja seus créditos
             </p>
           </div>
@@ -88,17 +88,17 @@ export default function Profile() {
               </>
             ) : (
               <>
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <CardTitle className="flex items-center gap-2">
-                        <CreditCard className="w-5 h-5 text-lime" />
-                        Créditos Disponíveis
-                      </CardTitle>
-                      <CardDescription>
-                        1 crédito = 1 personagem criado
-                      </CardDescription>
-                    </div>
+                 <CardHeader>
+                   <div className="flex items-center justify-between flex-wrap gap-3">
+                     <div>
+                       <CardTitle className="flex items-center gap-2 text-lg sm:text-xl md:text-2xl">
+                         <CreditCard className="w-4 h-4 sm:w-5 sm:h-5 text-lime" />
+                         Créditos Disponíveis
+                       </CardTitle>
+                       <CardDescription className="text-xs sm:text-sm">
+                         1 crédito = 1 personagem criado
+                       </CardDescription>
+                     </div>
                     <Badge 
                       variant={isPremium ? "default" : "secondary"}
                       className={isPremium ? "bg-lime text-lime-foreground" : ""}
@@ -119,20 +119,20 @@ export default function Profile() {
                     </Badge>
                   </div>
                 </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-3 gap-4">
+            <CardContent className="space-y-3 sm:space-y-4">
+              <div className="grid grid-cols-3 gap-2 sm:gap-3 md:gap-4">
                 <div className="text-center">
-                  <p className="text-sm text-muted-foreground mb-1">Usados</p>
-                  <p className="text-3xl font-bold text-lime">{typeof creditsUsed === 'number' ? creditsUsed.toLocaleString('pt-BR') : creditsUsed}</p>
+                  <p className="text-xs sm:text-sm text-muted-foreground mb-1">Usados</p>
+                  <p className="text-xl sm:text-2xl md:text-3xl font-bold text-lime">{typeof creditsUsed === 'number' ? creditsUsed.toLocaleString('pt-BR') : creditsUsed}</p>
                 </div>
                 <div className="text-center">
-                  <p className="text-sm text-muted-foreground mb-1">Extras</p>
-                  <p className="text-3xl font-bold">{typeof creditsAvailable === 'number' ? creditsAvailable.toLocaleString('pt-BR') : creditsAvailable}</p>
-                  <p className="text-xs text-muted-foreground mt-1">+ {creditsFromPlan} do plano</p>
+                  <p className="text-xs sm:text-sm text-muted-foreground mb-1">Extras</p>
+                  <p className="text-xl sm:text-2xl md:text-3xl font-bold">{typeof creditsAvailable === 'number' ? creditsAvailable.toLocaleString('pt-BR') : creditsAvailable}</p>
+                  <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">+ {creditsFromPlan} do plano</p>
                 </div>
                 <div className="text-center">
-                  <p className="text-sm text-muted-foreground mb-1">Total</p>
-                  <p className="text-3xl font-bold">{creditsTotal}</p>
+                  <p className="text-xs sm:text-sm text-muted-foreground mb-1">Total</p>
+                  <p className="text-xl sm:text-2xl md:text-3xl font-bold">{creditsTotal}</p>
                 </div>
               </div>
 
@@ -200,35 +200,35 @@ export default function Profile() {
             ) : (
               <>
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <User className="w-5 h-5" />
+                  <CardTitle className="flex items-center gap-2 text-lg sm:text-xl md:text-2xl">
+                    <User className="w-4 h-4 sm:w-5 sm:h-5" />
                     Informações da Conta
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
-                    <Mail className="w-5 h-5 text-muted-foreground" />
-                    <div>
-                      <p className="text-sm text-muted-foreground">Email</p>
-                      <p className="font-medium">{user?.email}</p>
+                <CardContent className="space-y-3 sm:space-y-4">
+                  <div className="flex items-center gap-2 sm:gap-3 p-2 sm:p-3 bg-muted/50 rounded-lg">
+                    <Mail className="w-4 h-4 sm:w-5 sm:h-5 text-muted-foreground shrink-0" />
+                    <div className="min-w-0">
+                      <p className="text-xs sm:text-sm text-muted-foreground">Email</p>
+                      <p className="font-medium text-sm sm:text-base truncate">{user?.email}</p>
                     </div>
                   </div>
 
                   {user?.full_name && (
-                    <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
-                      <User className="w-5 h-5 text-muted-foreground" />
-                      <div>
-                        <p className="text-sm text-muted-foreground">Nome</p>
-                        <p className="font-medium">{user.full_name}</p>
+                    <div className="flex items-center gap-2 sm:gap-3 p-2 sm:p-3 bg-muted/50 rounded-lg">
+                      <User className="w-4 h-4 sm:w-5 sm:h-5 text-muted-foreground shrink-0" />
+                      <div className="min-w-0">
+                        <p className="text-xs sm:text-sm text-muted-foreground">Nome</p>
+                        <p className="font-medium text-sm sm:text-base">{user.full_name}</p>
                       </div>
                     </div>
                   )}
 
-                  <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
-                    <Calendar className="w-5 h-5 text-muted-foreground" />
-                    <div className="flex-1">
-                      <p className="text-sm text-muted-foreground">Membro desde</p>
-                      <p className="font-medium">
+                  <div className="flex items-center gap-2 sm:gap-3 p-2 sm:p-3 bg-muted/50 rounded-lg">
+                    <Calendar className="w-4 h-4 sm:w-5 sm:h-5 text-muted-foreground shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs sm:text-sm text-muted-foreground">Membro desde</p>
+                      <p className="font-medium text-sm sm:text-base">
                         {new Date(user?.created_at).toLocaleDateString("pt-BR", {
                           year: "numeric",
                           month: "long",
@@ -238,11 +238,11 @@ export default function Profile() {
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
-                    <Calendar className="w-5 h-5 text-muted-foreground" />
-                    <div className="flex-1">
-                      <p className="text-sm text-muted-foreground">Acesso expira em</p>
-                      <p className="font-medium">
+                  <div className="flex items-center gap-2 sm:gap-3 p-2 sm:p-3 bg-muted/50 rounded-lg">
+                    <Calendar className="w-4 h-4 sm:w-5 sm:h-5 text-muted-foreground shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs sm:text-sm text-muted-foreground">Acesso expira em</p>
+                      <p className="font-medium text-sm sm:text-base">
                         {(() => {
                           const created = new Date(user?.created_at);
                           const expiration = new Date(created);
@@ -254,7 +254,7 @@ export default function Profile() {
                           });
                         })()}
                       </p>
-                      <p className="text-xs text-muted-foreground mt-1">
+                      <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">
                         {(() => {
                           const created = new Date(user?.created_at);
                           const expiration = new Date(created);
@@ -271,26 +271,26 @@ export default function Profile() {
           </Card>
 
           {/* Quick Actions */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
             <Button 
               variant="outline" 
               onClick={() => navigate("/characters")}
-              className="h-auto py-4"
+              className="h-auto py-3 sm:py-4"
             >
               <div className="text-left w-full">
-                <p className="font-semibold mb-1">Meus Personagens</p>
-                <p className="text-sm text-muted-foreground">Ver todos os personagens criados</p>
+                <p className="font-semibold mb-1 text-sm sm:text-base">Meus Personagens</p>
+                <p className="text-xs sm:text-sm text-muted-foreground">Ver todos os personagens criados</p>
               </div>
             </Button>
             <Button 
               variant="outline" 
               onClick={() => navigate("/create")}
-              className="h-auto py-4"
+              className="h-auto py-3 sm:py-4"
               disabled={!canCreateMore}
             >
               <div className="text-left w-full">
-                <p className="font-semibold mb-1">Criar Personagem</p>
-                <p className="text-sm text-muted-foreground">Usar um crédito para criar</p>
+                <p className="font-semibold mb-1 text-sm sm:text-base">Criar Personagem</p>
+                <p className="text-xs sm:text-sm text-muted-foreground">Usar um crédito para criar</p>
               </div>
             </Button>
           </div>
