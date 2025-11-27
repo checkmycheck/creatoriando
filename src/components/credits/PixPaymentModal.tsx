@@ -41,8 +41,6 @@ export function PixPaymentModal({ open, onOpenChange, pixData }: PixPaymentModal
   const checkPaymentStatus = async () => {
     if (!pixData?.payment_id) return;
     
-    setPaymentStatus('checking');
-    
     try {
       const { data: transaction } = await supabase
         .from('credit_transactions')
@@ -70,12 +68,9 @@ export function PixPaymentModal({ open, onOpenChange, pixData }: PixPaymentModal
         if (checkingInterval) {
           clearInterval(checkingInterval);
         }
-      } else {
-        setPaymentStatus('pending');
       }
     } catch (error) {
       console.error('Error checking payment status:', error);
-      setPaymentStatus('pending');
     }
   };
 
@@ -149,10 +144,10 @@ export function PixPaymentModal({ open, onOpenChange, pixData }: PixPaymentModal
             </div>
 
             {/* Payment Status */}
-            {paymentStatus === 'checking' && (
+            {paymentStatus === 'pending' && (
               <div className="flex items-center justify-center gap-2 p-2 sm:p-3 bg-blue-500/10 rounded-lg text-blue-600">
                 <Loader2 className="h-3 w-3 sm:h-4 sm:w-4 animate-spin" />
-                <span className="text-xs sm:text-sm font-medium">Verificando pagamento...</span>
+                <span className="text-xs sm:text-sm font-medium">Aguardando pagamento...</span>
               </div>
             )}
 
