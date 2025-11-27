@@ -36,7 +36,7 @@ export default function Characters() {
   const [showOnlyFavorites, setShowOnlyFavorites] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { plan, characterCount, characterLimit, canCreateMore, isLoading: planLoading } = useSubscription();
+  const { credits, canCreateMore, isLoading: planLoading } = useSubscription();
 
   useEffect(() => {
     fetchCharacters();
@@ -190,14 +190,14 @@ export default function Characters() {
           </div>
         </div>
 
-        {!planLoading && plan === "free" && (
+        {!planLoading && !canCreateMore && (
           <Alert className="mb-4 sm:mb-6 border-lime/50 bg-lime/5">
             <Sparkles className="h-4 w-4 text-lime" />
             <AlertDescription className="text-foreground">
-              <strong>Plano Gratuito:</strong> Você está usando {characterCount} de {characterLimit} personagem.
+              <strong>Sem créditos:</strong> Você não tem créditos disponíveis para criar personagens.
               {!canCreateMore && (
                 <span className="block mt-1">
-                  Faça upgrade para o <strong className="text-lime">Plano Pro</strong> para criar personagens ilimitados! 
+                  Compre <strong className="text-lime">mais créditos</strong> para continuar criando personagens!
                   <Button 
                     variant="link" 
                     className="text-lime p-0 ml-1 h-auto"
