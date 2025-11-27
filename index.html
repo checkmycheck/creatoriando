@@ -34,15 +34,19 @@
         document.documentElement.classList.add(theme);
         document.documentElement.setAttribute('data-theme', theme);
 
-        // Apply custom theme colors from admin
+        // Apply custom theme colors from admin for current mode
         const cached = localStorage.getItem('theme-colors');
         if (cached) {
           try {
             const colors = JSON.parse(cached);
-            const root = document.documentElement;
-            Object.entries(colors).forEach(([key, value]) => {
-              root.style.setProperty('--' + key, value);
-            });
+            const currentModeColors = colors[theme];
+            
+            if (currentModeColors) {
+              const root = document.documentElement;
+              Object.entries(currentModeColors).forEach(([key, value]) => {
+                root.style.setProperty('--' + key, value);
+              });
+            }
           } catch (e) {
             console.error('Error applying cached theme:', e);
           }

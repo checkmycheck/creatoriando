@@ -306,6 +306,7 @@ export type Database = {
           id: string
           setting_key: string
           setting_value: string
+          theme_mode: string
           updated_at: string | null
           updated_by: string | null
         }
@@ -313,6 +314,7 @@ export type Database = {
           id?: string
           setting_key: string
           setting_value: string
+          theme_mode?: string
           updated_at?: string | null
           updated_by?: string | null
         }
@@ -320,6 +322,7 @@ export type Database = {
           id?: string
           setting_key?: string
           setting_value?: string
+          theme_mode?: string
           updated_at?: string | null
           updated_by?: string | null
         }
