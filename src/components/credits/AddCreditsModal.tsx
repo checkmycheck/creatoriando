@@ -65,39 +65,42 @@ export function AddCreditsModal({ open, onOpenChange }: AddCreditsModalProps) {
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="text-2xl">Gerenciar Créditos</DialogTitle>
-            <DialogDescription>
+        <DialogContent className="max-w-4xl max-h-[85vh] sm:max-h-[90vh] overflow-y-auto p-4 sm:p-6">
+          <DialogHeader className="space-y-2">
+            <DialogTitle className="text-xl sm:text-2xl">Gerenciar Créditos</DialogTitle>
+            <DialogDescription className="text-sm">
               Compre créditos, veja seu histórico ou indique amigos
             </DialogDescription>
           </DialogHeader>
 
-          <Tabs defaultValue="buy" className="w-full mt-4">
-            <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="buy" className="gap-2">
-                <ShoppingCart className="w-4 h-4" />
-                Comprar
+          <Tabs defaultValue="buy" className="w-full mt-2 sm:mt-4">
+            <TabsList className="grid w-full grid-cols-3 h-auto">
+              <TabsTrigger value="buy" className="gap-1 sm:gap-2 text-xs sm:text-sm py-2">
+                <ShoppingCart className="w-3 h-3 sm:w-4 sm:h-4" />
+                <span className="hidden xs:inline">Comprar</span>
+                <span className="xs:hidden">💳</span>
               </TabsTrigger>
-              <TabsTrigger value="history" className="gap-2">
-                <History className="w-4 h-4" />
-                Histórico
+              <TabsTrigger value="history" className="gap-1 sm:gap-2 text-xs sm:text-sm py-2">
+                <History className="w-3 h-3 sm:w-4 sm:h-4" />
+                <span className="hidden xs:inline">Histórico</span>
+                <span className="xs:hidden">📋</span>
               </TabsTrigger>
-              <TabsTrigger value="referral" className="gap-2">
-                <Gift className="w-4 h-4" />
-                Indicar
+              <TabsTrigger value="referral" className="gap-1 sm:gap-2 text-xs sm:text-sm py-2">
+                <Gift className="w-3 h-3 sm:w-4 sm:h-4" />
+                <span className="hidden xs:inline">Indicar</span>
+                <span className="xs:hidden">🎁</span>
               </TabsTrigger>
             </TabsList>
 
-            <TabsContent value="buy" className="mt-6">
+            <TabsContent value="buy" className="mt-4 sm:mt-6">
               <BuyCreditsPricing onPurchase={handleCreatePayment} loading={loading} />
             </TabsContent>
 
-            <TabsContent value="history" className="mt-6">
+            <TabsContent value="history" className="mt-4 sm:mt-6">
               <CreditHistory />
             </TabsContent>
 
-            <TabsContent value="referral" className="mt-6">
+            <TabsContent value="referral" className="mt-4 sm:mt-6">
               <ReferralProgram />
             </TabsContent>
           </Tabs>
