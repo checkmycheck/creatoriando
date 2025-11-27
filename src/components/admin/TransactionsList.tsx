@@ -151,31 +151,67 @@ export function TransactionsList() {
     return matchesSearch && matchesStatus && matchesType && matchesDate;
   });
 
-  const totalValue = filteredTransactions
-    .filter(t => t.type === "purchase" && t.payment_status === "approved")
-    .reduce((sum, t) => {
-      // Estimar valor baseado nos créditos (2 reais = 10 créditos, proporção)
-      const creditsValue = Math.abs(t.amount);
-      return sum + (creditsValue * 0.2); // 0.2 reais por crédito (aproximado)
-    }, 0);
+  // Calcular métricas
+  const approvedTransactions = filteredTransactions.filter(t => t.type === "purchase" && t.payment_status === "approved");
+  const purchaseTransactions = filteredTransactions.filter(t => t.type === "purchase");
+  
+  const totalValue = approvedTransactions.reduce((sum, t) => {
+    const creditsValue = Math.abs(t.amount);
+    return sum + (creditsValue * 0.2); // 0.2 reais por crédito (aproximado)
+  }, 0);
+
+  // Ticket médio
+  const averageTicket = approvedTransactions.length > 0 
+    ? totalValue / approvedTransactions.length 
+    : 0;
+
+  // Taxa de conversão
+  const conversionRate = purchaseTransactions.length > 0
+    ? (approvedTransactions.length / purchaseTransactions.length) * 100
+    : 0;
 
   // Preparar dados para os gráficos
   const prepareChartData = () => {
     const dataMap = new Map<string, { date: string; receita: number; volume: number }>();
 
-    filteredTransactions
-      .filter(t => t.type === "purchase" && t.payment_status === "approved")
+    approvedTransactions.forEach(transaction => {
+      const date = format(new Date(transaction.created_at), "dd/MM", { locale: ptBR });
+      
+      if (!dataMap.has(date)) {
+        dataMap.set(date, { date, receita: 0, volume: 0 });
+      }
+      
+      const existing = dataMap.get(date)!;
+      const creditsValue = Math.abs(transaction.amount);
+      existing.receita += creditsValue * 0.2;
+      existing.volume += 1;
+    });
+
+    return Array.from(dataMap.values()).sort((a, b) => {
+      const [dayA, monthA] = a.date.split('/').map(Number);
+      const [dayB, monthB] = b.date.split('/').map(Number);
+      return monthA !== monthB ? monthA - monthB : dayA - dayB;
+    });
+  };
+
+  // Preparar dados de novos clientes pagantes
+  const prepareNewCustomersData = () => {
+    const userFirstPurchase = new Map<string, Date>();
+    const dataMap = new Map<string, { date: string; novosClientes: number }>();
+
+    // Encontrar primeira compra de cada usuário
+    approvedTransactions
+      .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
       .forEach(transaction => {
-        const date = format(new Date(transaction.created_at), "dd/MM", { locale: ptBR });
-        
-        if (!dataMap.has(date)) {
-          dataMap.set(date, { date, receita: 0, volume: 0 });
+        if (!userFirstPurchase.has(transaction.user_id)) {
+          userFirstPurchase.set(transaction.user_id, new Date(transaction.created_at));
+          
+          const date = format(new Date(transaction.created_at), "dd/MM", { locale: ptBR });
+          if (!dataMap.has(date)) {
+            dataMap.set(date, { date, novosClientes: 0 });
+          }
+          dataMap.get(date)!.novosClientes += 1;
         }
-        
-        const existing = dataMap.get(date)!;
-        const creditsValue = Math.abs(transaction.amount);
-        existing.receita += creditsValue * 0.2;
-        existing.volume += 1;
       });
 
     return Array.from(dataMap.values()).sort((a, b) => {
@@ -186,6 +222,8 @@ export function TransactionsList() {
   };
 
   const chartData = prepareChartData();
+  const newCustomersData = prepareNewCustomersData();
+  const totalNewCustomers = newCustomersData.reduce((sum, d) => sum + d.novosClientes, 0);
 
   return (
     <div className="space-y-6">
@@ -253,7 +291,7 @@ export function TransactionsList() {
 
           {/* Gráficos */}
           {chartData.length > 0 && (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
               <Card>
                 <CardHeader>
                   <CardTitle className="text-base font-semibold flex items-center gap-2">
@@ -337,11 +375,52 @@ export function TransactionsList() {
                   </ResponsiveContainer>
                 </CardContent>
               </Card>
+
+              {newCustomersData.length > 0 && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-base font-semibold flex items-center gap-2">
+                      <DollarSign className="h-4 w-4" />
+                      Novos Clientes Pagantes
+                    </CardTitle>
+                    <CardDescription>Usuários que fizeram primeira compra</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <ResponsiveContainer width="100%" height={250}>
+                      <BarChart data={newCustomersData}>
+                        <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                        <XAxis 
+                          dataKey="date" 
+                          className="text-xs"
+                          tick={{ fill: 'hsl(var(--muted-foreground))' }}
+                        />
+                        <YAxis 
+                          className="text-xs"
+                          tick={{ fill: 'hsl(var(--muted-foreground))' }}
+                        />
+                        <Tooltip 
+                          formatter={(value: number) => [value, 'Novos Clientes']}
+                          contentStyle={{
+                            backgroundColor: 'hsl(var(--background))',
+                            border: '1px solid hsl(var(--border))',
+                            borderRadius: '6px'
+                          }}
+                        />
+                        <Bar 
+                          dataKey="novosClientes" 
+                          fill="hsl(var(--chart-2))" 
+                          radius={[4, 4, 0, 0]}
+                        />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </CardContent>
+                </Card>
+              )}
             </div>
           )}
 
           {/* Stats Card */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
             <Card>
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium">Total de Transações</CardTitle>
@@ -356,18 +435,51 @@ export function TransactionsList() {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold text-green-600">
-                  {filteredTransactions.filter(t => t.payment_status === "approved").length.toLocaleString('pt-BR')}
+                  {approvedTransactions.length.toLocaleString('pt-BR')}
                 </div>
               </CardContent>
             </Card>
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium">Valor Total (Aprovadas)</CardTitle>
+                <CardTitle className="text-sm font-medium">Valor Total</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
                   R$ {totalValue.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium">Ticket Médio</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">
+                  R$ {averageTicket.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">Por transação</p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium">Taxa de Conversão</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">
+                  {conversionRate.toLocaleString('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 1 })}%
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">Aprovação/Total</p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium">Novos Clientes</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-blue-600">
+                  {totalNewCustomers.toLocaleString('pt-BR')}
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">Primeira compra</p>
               </CardContent>
             </Card>
           </div>
