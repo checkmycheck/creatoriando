@@ -27,13 +27,14 @@
     <script>
       (function() {
         // Apply theme (dark/light mode)
-        const theme = localStorage.getItem('theme') || 
+        const theme = localStorage.getItem('app-theme') || 
                      (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-        if (theme === 'dark') {
-          document.documentElement.classList.add('dark');
-        }
+        
+        // Apply theme class and attribute
+        document.documentElement.classList.add(theme);
+        document.documentElement.setAttribute('data-theme', theme);
 
-        // Apply custom theme colors
+        // Apply custom theme colors from admin
         const cached = localStorage.getItem('theme-colors');
         if (cached) {
           try {
