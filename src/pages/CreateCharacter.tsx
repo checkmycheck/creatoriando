@@ -190,7 +190,7 @@ const CreateCharacter = () => {
           title: "Créditos insuficientes",
           description: "Você não tem créditos suficientes. Compre mais créditos para continuar criando personagens!",
         });
-        navigate("/pacotes");
+        navigate("/subscription");
         return;
       }
 
@@ -263,7 +263,8 @@ const CreateCharacter = () => {
           description: "Seu personagem foi criado com sucesso.",
         });
         
-        refreshSubscription();
+        // Atualizar créditos após criação do personagem
+        await refreshSubscription();
       }
 
       // Generate final prompt

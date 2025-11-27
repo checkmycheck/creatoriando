@@ -110,7 +110,7 @@ export default function Profile() {
               )}
 
               <Button 
-                onClick={() => navigate("/pacotes")} 
+                onClick={() => navigate("/subscription")} 
                 className="w-full bg-lime text-lime-foreground hover:bg-lime/90"
               >
                 <Plus className="w-4 h-4 mr-2" />
