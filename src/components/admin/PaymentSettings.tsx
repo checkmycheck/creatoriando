@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -21,18 +22,13 @@ export function PaymentSettings() {
 
   const checkConfiguration = async () => {
     try {
-      // Verificar se o secret está configurado
-      const response = await fetch('/api/check-payment-config', {
-        method: 'GET',
-      });
+      const { data, error } = await supabase.functions.invoke('check-payment-config');
       
-      if (response.ok) {
-        const data = await response.json();
-        setIsConfigured(data.configured || false);
-      }
+      if (error) throw error;
+      
+      setIsConfigured(data?.configured || false);
     } catch (error) {
       console.error("Erro ao verificar configuração:", error);
-      // Se não conseguir verificar, assumir que não está configurado
       setIsConfigured(false);
     }
   };
@@ -45,19 +41,28 @@ export function PaymentSettings() {
 
     setIsSaving(true);
     try {
-      // Aqui você implementará a lógica para salvar o token
-      // Por enquanto, vamos simular o salvamento
-      toast.info("Para salvar credenciais de pagamento de forma segura, use a ferramenta de secrets do Lovable Cloud");
-      
-      // Simular salvamento bem-sucedido
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Validar credenciais antes de salvar
+      const { data, error } = await supabase.functions.invoke('validate-payment-credentials', {
+        body: { accessToken }
+      });
+
+      if (error) throw error;
+
+      if (!data?.valid) {
+        toast.error(data?.error || "Token inválido");
+        return;
+      }
+
+      // Token validado com sucesso
+      toast.success(`Credenciais validadas! Conta: ${data.accountInfo?.email || data.accountInfo?.nickname}`);
+      toast.info("Para salvar permanentemente, atualize o secret MERCADOPAGO_ACCESS_TOKEN no Lovable Cloud");
       
       setIsConfigured(true);
       setAccessToken("");
-      toast.success("Configuração salva com sucesso!");
-    } catch (error) {
-      console.error("Erro ao salvar configuração:", error);
-      toast.error("Erro ao salvar configuração");
+      
+    } catch (error: any) {
+      console.error("Erro ao validar credenciais:", error);
+      toast.error(error.message || "Erro ao validar credenciais");
     } finally {
       setIsSaving(false);
     }
@@ -71,19 +76,18 @@ export function PaymentSettings() {
 
     setIsTesting(true);
     try {
-      // Testar a conexão com o Mercado Pago
-      const response = await fetch('/api/test-payment-connection', {
-        method: 'POST',
-      });
+      const { data, error } = await supabase.functions.invoke('check-payment-config');
 
-      if (response.ok) {
-        toast.success("Conexão com Mercado Pago testada com sucesso!");
+      if (error) throw error;
+
+      if (data?.configured) {
+        toast.success("Mercado Pago configurado e pronto para uso!");
       } else {
-        toast.error("Erro ao testar conexão com Mercado Pago");
+        toast.warning("Mercado Pago não está configurado");
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Erro ao testar conexão:", error);
-      toast.error("Erro ao testar conexão");
+      toast.error(error.message || "Erro ao testar conexão");
     } finally {
       setIsTesting(false);
     }
