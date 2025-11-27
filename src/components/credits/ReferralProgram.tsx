@@ -78,7 +78,7 @@ export const ReferralProgram = () => {
   const copyReferralLink = () => {
     if (!referralCode) return;
 
-    const link = `${window.location.origin}/auth?ref=${referralCode.code}`;
+    const link = `https://criacreator.online/auth?ref=${referralCode.code}`;
     navigator.clipboard.writeText(link);
     setCopied(true);
     
@@ -137,7 +137,7 @@ export const ReferralProgram = () => {
               <div className="flex gap-2">
                 <Input
                   readOnly
-                  value={`${window.location.origin}/auth?ref=${referralCode.code}`}
+                  value={`https://criacreator.online/auth?ref=${referralCode.code}`}
                   className="font-mono text-sm"
                 />
                 <Button

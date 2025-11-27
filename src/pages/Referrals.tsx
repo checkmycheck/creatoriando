@@ -108,7 +108,7 @@ export default function Referrals() {
 
   const copyReferralLink = () => {
     if (!referralCode) return;
-    const link = `${window.location.origin}/auth?ref=${referralCode.code}`;
+    const link = `https://criacreator.online/auth?ref=${referralCode.code}`;
     navigator.clipboard.writeText(link);
     setCopied(true);
     
@@ -122,7 +122,7 @@ export default function Referrals() {
 
   const shareWhatsApp = () => {
     if (!referralCode) return;
-    const link = `${window.location.origin}/auth?ref=${referralCode.code}`;
+    const link = `https://criacreator.online/auth?ref=${referralCode.code}`;
     const message = `Junte-se ao Creator IA e ganhe 3 créditos grátis! Use meu link: ${link}`;
     window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank');
   };
@@ -196,7 +196,7 @@ export default function Referrals() {
             <div className="flex gap-2">
               <Input
                 readOnly
-                value={`${window.location.origin}/auth?ref=${referralCode.code}`}
+                value={`https://criacreator.online/auth?ref=${referralCode.code}`}
                 className="font-mono text-xs md:text-sm"
               />
               <Button
