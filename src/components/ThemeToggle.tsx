@@ -36,14 +36,16 @@ export const ThemeToggle = () => {
       variant="ghost"
       size="icon"
       onClick={toggleTheme}
-      className="w-9 h-9"
+      className="w-9 h-9 transition-transform hover:scale-110 active:scale-95"
       title={theme === "light" ? "Modo escuro" : "Modo claro"}
     >
-      {theme === "light" ? (
-        <Moon className="w-4 h-4" />
-      ) : (
-        <Sun className="w-4 h-4" />
-      )}
+      <div className="relative w-4 h-4">
+        {theme === "light" ? (
+          <Moon className="w-4 h-4 absolute inset-0 animate-in spin-in-180 zoom-in-50 duration-300" />
+        ) : (
+          <Sun className="w-4 h-4 absolute inset-0 animate-in spin-in-180 zoom-in-50 duration-300" />
+        )}
+      </div>
     </Button>
   );
 };
