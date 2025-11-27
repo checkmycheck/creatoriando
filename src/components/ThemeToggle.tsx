@@ -7,7 +7,7 @@ export const ThemeToggle = () => {
 
   useEffect(() => {
     // Load theme from localStorage
-    const savedTheme = localStorage.getItem("theme") as "light" | "dark" | null;
+    const savedTheme = localStorage.getItem("app-theme") as "light" | "dark" | null;
     const systemTheme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
     const initialTheme = savedTheme || systemTheme;
     
@@ -17,10 +17,18 @@ export const ThemeToggle = () => {
 
   const applyTheme = (newTheme: "light" | "dark") => {
     const root = document.documentElement;
+    
+    // Remove both classes first
+    root.classList.remove("light", "dark");
+    
+    // Add the appropriate class
+    root.classList.add(newTheme);
+    
+    // Force update CSS variables for the theme
     if (newTheme === "dark") {
-      root.classList.add("dark");
+      root.setAttribute("data-theme", "dark");
     } else {
-      root.classList.remove("dark");
+      root.setAttribute("data-theme", "light");
     }
   };
 
@@ -28,7 +36,10 @@ export const ThemeToggle = () => {
     const newTheme = theme === "light" ? "dark" : "light";
     setTheme(newTheme);
     applyTheme(newTheme);
-    localStorage.setItem("theme", newTheme);
+    localStorage.setItem("app-theme", newTheme);
+    
+    // Trigger a re-render of components that depend on theme
+    window.dispatchEvent(new Event("themechange"));
   };
 
   return (
