@@ -1,4 +1,4 @@
-import { LayoutDashboard, Plus, User, LogOut, Shield, Coins, CreditCard, Gift, History } from "lucide-react";
+import { LayoutDashboard, Plus, User, LogOut, Shield, Coins, CreditCard, Gift } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -27,7 +27,6 @@ const menuItems = [
   { title: "Personagens", url: "/characters", icon: LayoutDashboard },
   { title: "Assinatura", url: "/subscription", icon: CreditCard },
   { title: "Indicações", url: "/referrals", icon: Gift },
-  { title: "Histórico", url: "/credit-history", icon: History },
 ];
 
 export function AppSidebar() {

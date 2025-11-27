@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Users, Video, Activity, TrendingUp, Palette, Home, BarChart3, Search, Package, Layout, Receipt, Settings } from "lucide-react";
+import { Users, Video, Activity, TrendingUp, Palette, Home, BarChart3, Search, Package, Layout, Receipt, Settings, History } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
@@ -20,6 +20,7 @@ import { LandingPageCMS } from "@/components/admin/LandingPageCMS";
 import { TransactionsList } from "@/components/admin/TransactionsList";
 import { PaymentSettings } from "@/components/admin/PaymentSettings";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
+import { AdminCreditHistory } from "@/components/admin/AdminCreditHistory";
 
 interface Stats {
   totalUsers: number;
@@ -424,7 +425,7 @@ export default function Admin() {
         </div>
 
         <Tabs defaultValue="metrics" className="w-full">
-          <TabsList className="grid w-full max-w-6xl grid-cols-8">
+          <TabsList className="grid w-full max-w-7xl grid-cols-9 gap-1">
             <TabsTrigger value="metrics">
               <Activity className="w-4 h-4 mr-2" />
               Métricas
@@ -440,6 +441,10 @@ export default function Admin() {
             <TabsTrigger value="transactions">
               <Receipt className="w-4 h-4 mr-2" />
               Transações
+            </TabsTrigger>
+            <TabsTrigger value="history">
+              <History className="w-4 h-4 mr-2" />
+              Histórico
             </TabsTrigger>
             <TabsTrigger value="payments">
               <Settings className="w-4 h-4 mr-2" />
@@ -615,6 +620,10 @@ export default function Admin() {
 
           <TabsContent value="transactions" className="space-y-6 mt-6">
             <TransactionsList />
+          </TabsContent>
+
+          <TabsContent value="history" className="space-y-6 mt-6">
+            <AdminCreditHistory />
           </TabsContent>
 
           <TabsContent value="payments" className="space-y-6 mt-6">
