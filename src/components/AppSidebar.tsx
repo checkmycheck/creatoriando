@@ -25,7 +25,7 @@ import {
 const menuItems = [
   { title: "Criar Novo", url: "/create", icon: Plus },
   { title: "Personagens", url: "/characters", icon: LayoutDashboard },
-  { title: "Assinatura", url: "/subscription", icon: CreditCard },
+  { title: "Pacotes", url: "/subscription", icon: CreditCard },
   { title: "Indicações", url: "/referrals", icon: Gift },
 ];
 
