@@ -159,12 +159,12 @@ export default function Characters() {
   };
 
   return (
-    <div className="min-h-screen bg-background p-4 md:p-6">
+    <div className="min-h-screen bg-background p-3 sm:p-4 md:p-6">
       <div className="max-w-6xl mx-auto">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 md:mb-8">
-          <div>
-            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-1 md:mb-2">Meus Personagens</h1>
-            <p className="text-sm md:text-base text-muted-foreground font-light">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 mb-4 sm:mb-6 md:mb-8">
+          <div className="space-y-1 sm:space-y-2">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold leading-tight">Meus Personagens</h1>
+            <p className="text-xs sm:text-sm md:text-base text-muted-foreground font-light leading-relaxed">
               Gerencie seus personagens criados
             </p>
           </div>
@@ -191,7 +191,7 @@ export default function Characters() {
         </div>
 
         {!planLoading && plan === "free" && (
-          <Alert className="mb-6 border-lime/50 bg-lime/5">
+          <Alert className="mb-4 sm:mb-6 border-lime/50 bg-lime/5">
             <Sparkles className="h-4 w-4 text-lime" />
             <AlertDescription className="text-foreground">
               <strong>Plano Gratuito:</strong> Você está usando {characterCount} de {characterLimit} personagem.
@@ -212,7 +212,7 @@ export default function Characters() {
         )}
 
         {loading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
             {[1, 2, 3].map((i) => (
               <Card key={i}>
                 <CardHeader>
@@ -245,7 +245,7 @@ export default function Characters() {
             </CardContent>
           </Card>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
             {characters.map((character) => (
               <Card key={character.id} className="relative">
                 <button

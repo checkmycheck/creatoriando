@@ -282,10 +282,10 @@ const CreateCharacter = () => {
     switch (currentStep) {
       case 0:
         return (
-          <div className="space-y-6">
-            <div>
-              <h2 className="text-2xl font-bold mb-2">Nome do Personagem</h2>
-              <p className="text-muted-foreground font-light">Como você quer chamar seu personagem?</p>
+          <div className="space-y-4 sm:space-y-6">
+            <div className="space-y-2">
+              <h2 className="text-xl sm:text-2xl md:text-3xl font-bold leading-tight">Nome do Personagem</h2>
+              <p className="text-sm sm:text-base text-muted-foreground font-light leading-relaxed">Como você quer chamar seu personagem?</p>
             </div>
             <div className="space-y-2">
               <Label htmlFor="character-name">Nome</Label>
@@ -340,7 +340,7 @@ const CreateCharacter = () => {
         isActive={isActive}
       />
       
-      <div className="min-h-screen bg-background text-foreground p-4 md:p-8">
+      <div className="min-h-screen bg-background text-foreground p-3 sm:p-4 md:p-6 lg:p-8">
         <div className="max-w-6xl mx-auto">
           <div className="flex items-center justify-between mb-4">
             <div className="flex-1" data-onboarding="step-progress">
@@ -358,17 +358,17 @@ const CreateCharacter = () => {
             </Button>
           </div>
         
-        <div className="mt-8 mb-40 pb-8" data-onboarding="step-content">
+        <div className="mt-6 sm:mt-8 mb-32 sm:mb-40 pb-6 sm:pb-8" data-onboarding="step-content">
           {renderStep()}
         </div>
 
-        <div className="fixed bottom-0 left-0 right-0 bg-background/95 backdrop-blur-sm border-t border-border p-4">
+        <div className="fixed bottom-0 left-0 right-0 bg-background/95 backdrop-blur-sm border-t border-border p-3 sm:p-4">
           <div className="max-w-6xl mx-auto">
             <div data-onboarding="character-summary">
               <CharacterSummary data={characterData} />
             </div>
             
-            <div className="flex justify-between items-center mt-4" data-onboarding="navigation-buttons">
+            <div className="flex justify-between items-center mt-3 sm:mt-4 gap-2 sm:gap-4" data-onboarding="navigation-buttons">
               <Button
                 variant="outline"
                 onClick={handlePrevious}
