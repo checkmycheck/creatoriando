@@ -102,12 +102,12 @@ export const LandingPageCMS = () => {
       </Tabs>
 
       {hasChanges() && (
-        <div className="sticky bottom-6 flex justify-center">
+        <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50">
           <Button 
             size="lg" 
             onClick={handleSaveAll} 
             disabled={isSaving}
-            className="shadow-lg"
+            className="shadow-2xl"
           >
             <Save className="w-4 h-4 mr-2" />
             {isSaving ? "Salvando..." : "Salvar Alterações"}
