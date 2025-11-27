@@ -6,14 +6,14 @@ export const Header = () => {
 
   return (
     <nav className="border-b border-border bg-background">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8">
+        <div className="flex items-center justify-between h-12 sm:h-14 md:h-16">
           <button 
             onClick={() => navigate("/")} 
-            className="flex items-center gap-2 hover:opacity-80 transition-opacity cursor-pointer"
+            className="flex items-center gap-2 hover:opacity-80 transition-opacity cursor-pointer active:scale-95"
           >
-            <Video className="w-6 h-6 text-lime" />
-            <span className="text-xl font-bold">Creator IA</span>
+            <Video className="w-5 h-5 sm:w-6 sm:h-6 text-lime" />
+            <span className="text-lg sm:text-xl font-bold">Creator IA</span>
           </button>
         </div>
       </div>

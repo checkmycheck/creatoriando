@@ -135,12 +135,12 @@ export default function Subscription() {
   };
 
   return (
-    <div className="min-h-screen bg-background p-4 md:p-6">
-      <div className="max-w-7xl mx-auto space-y-8">
+    <div className="min-h-screen bg-background p-3 sm:p-4 md:p-6">
+      <div className="max-w-7xl mx-auto space-y-6 sm:space-y-8">
         {/* Header */}
         <div>
-          <h1 className="text-3xl md:text-4xl font-bold mb-2">Gerenciar Assinatura</h1>
-          <p className="text-muted-foreground">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2">Gerenciar Assinatura</h1>
+          <p className="text-sm sm:text-base text-muted-foreground">
             Gerencie seu plano e veja detalhes da sua assinatura
           </p>
         </div>
@@ -159,50 +159,50 @@ export default function Subscription() {
           </Card>
         ) : (
           <Card className="border-2 border-lime/50 bg-lime/5">
-            <CardHeader>
+            <CardHeader className="p-4 sm:p-6">
             <div className="flex items-center justify-between">
-              <CardTitle className="flex items-center gap-2">
+              <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
                 Seus Créditos
-                <Badge variant="outline" className="ml-2">
+                <Badge variant="outline" className="ml-2 text-xs sm:text-sm">
                   {credits} disponíveis
                 </Badge>
               </CardTitle>
             </div>
-              <CardDescription>Seus créditos e informações da conta</CardDescription>
+              <CardDescription className="text-xs sm:text-sm">Seus créditos e informações da conta</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="flex items-center gap-3 p-4 bg-card rounded-lg border">
-                  <Sparkles className="w-8 h-8 text-lime" />
+            <CardContent className="space-y-4 p-4 sm:p-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
+                <div className="flex items-center gap-3 p-3 sm:p-4 bg-card rounded-lg border">
+                  <Sparkles className="w-6 h-6 sm:w-8 sm:h-8 text-lime flex-shrink-0" />
                   <div>
-                    <p className="text-sm text-muted-foreground">Plano Atual</p>
-                    <p className="text-xl font-bold capitalize">{plan}</p>
+                    <p className="text-xs sm:text-sm text-muted-foreground">Plano Atual</p>
+                    <p className="text-base sm:text-xl font-bold capitalize">{plan}</p>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-3 p-4 bg-card rounded-lg border">
-                  <CreditCard className="w-8 h-8 text-lime" />
+                <div className="flex items-center gap-3 p-3 sm:p-4 bg-card rounded-lg border">
+                  <CreditCard className="w-6 h-6 sm:w-8 sm:h-8 text-lime flex-shrink-0" />
                   <div>
-                    <p className="text-sm text-muted-foreground">Créditos Disponíveis</p>
-                    <p className="text-2xl font-bold">{credits}</p>
+                    <p className="text-xs sm:text-sm text-muted-foreground">Créditos Disponíveis</p>
+                    <p className="text-xl sm:text-2xl font-bold">{credits}</p>
                   </div>
                 </div>
                 
-                <div className="flex items-center gap-3 p-4 bg-card rounded-lg border">
-                  <Calendar className="w-8 h-8 text-lime" />
+                <div className="flex items-center gap-3 p-3 sm:p-4 bg-card rounded-lg border">
+                  <Calendar className="w-6 h-6 sm:w-8 sm:h-8 text-lime flex-shrink-0" />
                   <div>
-                    <p className="text-sm text-muted-foreground">Membro desde</p>
-                    <p className="text-sm font-medium">{formatDate(profileData?.created_at || null)}</p>
+                    <p className="text-xs sm:text-sm text-muted-foreground">Membro desde</p>
+                    <p className="text-xs sm:text-sm font-medium">{formatDate(profileData?.created_at || null)}</p>
                   </div>
                 </div>
               </div>
 
               {credits === 0 && (
-                <div className="flex items-start gap-3 p-4 bg-muted/50 rounded-lg">
-                  <Sparkles className="w-5 h-5 text-lime mt-0.5" />
+                <div className="flex items-start gap-3 p-3 sm:p-4 bg-muted/50 rounded-lg">
+                  <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-lime mt-0.5 flex-shrink-0" />
                   <div>
-                    <p className="font-medium">Compre créditos para criar personagens</p>
-                    <p className="text-sm text-muted-foreground mt-1">
+                    <p className="font-medium text-sm sm:text-base">Compre créditos para criar personagens</p>
+                    <p className="text-xs sm:text-sm text-muted-foreground mt-1">
                       Cada crédito permite criar 1 personagem completo com todas as configurações!
                     </p>
                   </div>
@@ -217,14 +217,14 @@ export default function Subscription() {
         {/* Credit Packages */}
         <div>
           <div className="flex items-center gap-2 mb-2">
-            <Coins className="w-6 h-6 text-lime" />
-            <h2 className="text-2xl font-bold">Escolha seu pacote</h2>
+            <Coins className="w-5 h-5 sm:w-6 sm:h-6 text-lime" />
+            <h2 className="text-xl sm:text-2xl font-bold">Escolha seu pacote</h2>
           </div>
-          <p className="text-muted-foreground mb-6">
+          <p className="text-xs sm:text-sm text-muted-foreground mb-4 sm:mb-6">
             Escolha o pacote ideal para suas necessidades
           </p>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
             {creditPackages.map((pkg) => (
               <Card
                 key={pkg.id}
@@ -236,42 +236,47 @@ export default function Subscription() {
               >
                 {pkg.is_popular && (
                   <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                    <Badge className="bg-lime text-lime-foreground">
+                    <Badge className="bg-lime text-lime-foreground text-xs">
                       <Sparkles className="w-3 h-3 mr-1" />
                       Popular
                     </Badge>
                   </div>
                 )}
 
-                <CardHeader className="text-center pb-4">
-                  <div className="text-5xl font-bold mb-2">{pkg.credits.toLocaleString('pt-BR')}</div>
-                  <CardDescription className="text-base">créditos</CardDescription>
+                <CardHeader className="text-center pb-3 sm:pb-4 p-4 sm:p-6">
+                  <div className="text-4xl sm:text-5xl font-bold mb-2">{pkg.credits.toLocaleString('pt-BR')}</div>
+                  <CardDescription className="text-sm sm:text-base">créditos</CardDescription>
                 </CardHeader>
 
-                <CardContent className="space-y-6">
+                <CardContent className="space-y-4 sm:space-y-6 p-4 sm:p-6">
                   <div className="text-center">
-                    <div className="text-3xl font-bold">R$ {pkg.price_brl.toFixed(2)}</div>
+                    <div className="text-2xl sm:text-3xl font-bold">R$ {pkg.price_brl.toFixed(2)}</div>
                   </div>
 
-                  <ul className="space-y-3">
-                    <li className="flex items-center gap-2 text-sm">
-                      <Check className="w-4 h-4 text-lime flex-shrink-0" />
+                  <ul className="space-y-2 sm:space-y-3">
+                    <li className="flex items-center gap-2 text-xs sm:text-sm">
+                      <Check className="w-3 h-3 sm:w-4 sm:h-4 text-lime flex-shrink-0" />
                       <span>{pkg.credits} personagens</span>
                     </li>
-                    <li className="flex items-center gap-2 text-sm">
-                      <Check className="w-4 h-4 text-lime flex-shrink-0" />
+                    <li className="flex items-center gap-2 text-xs sm:text-sm">
+                      <Check className="w-3 h-3 sm:w-4 sm:h-4 text-lime flex-shrink-0" />
                       <span>Sem vencimento</span>
+                    </li>
+                    <li className="flex items-center gap-2 text-xs sm:text-sm">
+                      <Check className="w-3 h-3 sm:w-4 sm:h-4 text-lime flex-shrink-0" />
+                      <span>Use quando quiser</span>
                     </li>
                   </ul>
 
                   <Button
-                    className="w-full"
+                    className="w-full text-sm sm:text-base"
+                    size="sm"
                     variant={pkg.is_popular ? "default" : "outline"}
                     onClick={() => handleBuyCredits(pkg)}
                     disabled={processingPackageId !== null}
                   >
-                    <Coins className="w-4 h-4 mr-2" />
-                    {processingPackageId === pkg.id ? "Gerando PIX..." : "Comprar"}
+                    <Coins className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
+                    {processingPackageId === pkg.id ? "Gerando..." : "Comprar"}
                   </Button>
                 </CardContent>
               </Card>
