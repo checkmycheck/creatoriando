@@ -77,18 +77,15 @@ export function AddCreditsModal({ open, onOpenChange }: AddCreditsModalProps) {
             <TabsList className="grid w-full grid-cols-3 h-auto">
               <TabsTrigger value="buy" className="gap-1 sm:gap-2 text-xs sm:text-sm py-2">
                 <ShoppingCart className="w-3 h-3 sm:w-4 sm:h-4" />
-                <span className="hidden xs:inline">Comprar</span>
-                <span className="xs:hidden">💳</span>
+                Comprar
               </TabsTrigger>
               <TabsTrigger value="history" className="gap-1 sm:gap-2 text-xs sm:text-sm py-2">
                 <History className="w-3 h-3 sm:w-4 sm:h-4" />
-                <span className="hidden xs:inline">Histórico</span>
-                <span className="xs:hidden">📋</span>
+                Histórico
               </TabsTrigger>
               <TabsTrigger value="referral" className="gap-1 sm:gap-2 text-xs sm:text-sm py-2">
                 <Gift className="w-3 h-3 sm:w-4 sm:h-4" />
-                <span className="hidden xs:inline">Indicar</span>
-                <span className="xs:hidden">🎁</span>
+                Indicar
               </TabsTrigger>
             </TabsList>
 
