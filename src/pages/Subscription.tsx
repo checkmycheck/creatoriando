@@ -6,10 +6,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { Check, Sparkles, Calendar, CreditCard, Coins } from "lucide-react";
+import { Check, Sparkles, Calendar, CreditCard, Coins, TrendingUp, ShoppingCart } from "lucide-react";
 import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
 import { PixPaymentModal } from "@/components/credits/PixPaymentModal";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface ProfileData {
   credits: number;
@@ -26,6 +27,15 @@ interface CreditPackage {
   display_order: number;
 }
 
+interface Transaction {
+  id: string;
+  amount: number;
+  created_at: string;
+  description: string | null;
+  payment_status: string | null;
+  type: string;
+}
+
 export default function Subscription() {
   const navigate = useNavigate();
   const { credits, isLoading: subscriptionLoading } = useSubscription();
@@ -35,10 +45,13 @@ export default function Subscription() {
   const [isPixModalOpen, setIsPixModalOpen] = useState(false);
   const [pixData, setPixData] = useState<any>(null);
   const [processingPackageId, setProcessingPackageId] = useState<string | null>(null);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [loadingTransactions, setLoadingTransactions] = useState(true);
 
   useEffect(() => {
     loadProfileData();
     loadCreditPackages();
+    loadTransactions();
   }, []);
 
   const loadCreditPackages = async () => {
@@ -80,6 +93,30 @@ export default function Subscription() {
     setLoading(false);
   };
 
+  const loadTransactions = async () => {
+    setLoadingTransactions(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) return;
+
+      const { data, error } = await supabase
+        .from("credit_transactions")
+        .select("*")
+        .eq("user_id", user.id)
+        .eq("type", "purchase")
+        .order("created_at", { ascending: false })
+        .limit(10);
+
+      if (error) throw error;
+      setTransactions(data || []);
+    } catch (error) {
+      console.error("Error loading transactions:", error);
+    } finally {
+      setLoadingTransactions(false);
+    }
+  };
+
   const formatDate = (dateString: string | null) => {
     if (!dateString) return "N/A";
     return new Date(dateString).toLocaleDateString("pt-BR", {
@@ -87,6 +124,28 @@ export default function Subscription() {
       month: "long",
       year: "numeric",
     });
+  };
+
+  const getStatusBadge = (status: string | null) => {
+    if (!status) return null;
+    
+    const colors: Record<string, string> = {
+      approved: "bg-green-500/10 text-green-500 border-green-500/20",
+      pending: "bg-yellow-500/10 text-yellow-500 border-yellow-500/20",
+      rejected: "bg-red-500/10 text-red-500 border-red-500/20",
+    };
+
+    const labels: Record<string, string> = {
+      approved: "Aprovado",
+      pending: "Pendente",
+      rejected: "Rejeitado",
+    };
+
+    return (
+      <Badge variant="outline" className={colors[status] || ""}>
+        {labels[status] || status}
+      </Badge>
+    );
   };
 
   const handleBuyCredits = async (pkg: CreditPackage) => {
@@ -274,6 +333,88 @@ export default function Subscription() {
               </Card>
             ))}
           </div>
+        </div>
+
+        <Separator />
+
+        {/* Transaction History */}
+        <div>
+          <div className="flex items-center gap-2 mb-4">
+            <TrendingUp className="w-5 h-5 sm:w-6 sm:h-6 text-lime" />
+            <h2 className="text-xl sm:text-2xl font-bold">Histórico de Compras</h2>
+          </div>
+
+          {loadingTransactions ? (
+            <Card>
+              <CardContent className="p-6">
+                <div className="space-y-4">
+                  {[1, 2, 3].map((i) => (
+                    <Skeleton key={i} className="h-20 w-full" />
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          ) : transactions.length === 0 ? (
+            <Card className="bg-muted/50">
+              <CardContent className="py-12 text-center">
+                <ShoppingCart className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                <p className="text-muted-foreground">Você ainda não fez nenhuma compra</p>
+                <p className="text-sm text-muted-foreground mt-2">
+                  Suas transações aparecerão aqui após a primeira compra
+                </p>
+              </CardContent>
+            </Card>
+          ) : (
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base sm:text-lg">Últimas transações PIX</CardTitle>
+                <CardDescription className="text-xs sm:text-sm">
+                  Histórico das suas compras de créditos
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ScrollArea className="h-[400px] pr-4">
+                  <div className="space-y-3">
+                    {transactions.map((transaction) => (
+                      <div
+                        key={transaction.id}
+                        className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 sm:p-4 border rounded-lg hover:bg-muted/50 transition-colors"
+                      >
+                        <div className="flex items-start gap-3 flex-1">
+                          <div className="p-2 rounded-full bg-lime/10 flex-shrink-0">
+                            <Coins className="w-4 h-4 text-lime" />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="font-medium text-sm sm:text-base truncate">
+                              {transaction.description || "Compra de créditos"}
+                            </p>
+                            <p className="text-xs sm:text-sm text-muted-foreground">
+                              {new Date(transaction.created_at).toLocaleDateString("pt-BR", {
+                                day: "2-digit",
+                                month: "short",
+                                year: "numeric",
+                                hour: "2-digit",
+                                minute: "2-digit",
+                              })}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-3 sm:gap-4 justify-between sm:justify-end">
+                          {getStatusBadge(transaction.payment_status)}
+                          <div className="text-right">
+                            <p className="text-lg sm:text-xl font-bold text-lime">
+                              +{transaction.amount.toLocaleString('pt-BR')}
+                            </p>
+                            <p className="text-xs text-muted-foreground">créditos</p>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </ScrollArea>
+              </CardContent>
+            </Card>
+          )}
         </div>
 
         {/* Additional Info */}
