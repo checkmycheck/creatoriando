@@ -1,6 +1,5 @@
 import { Video } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { ThemeToggle } from "@/components/ThemeToggle";
 
 export const Header = () => {
   const navigate = useNavigate();
@@ -16,7 +15,6 @@ export const Header = () => {
             <Video className="w-6 h-6 text-lime" />
             <span className="text-xl font-bold">Creator IA</span>
           </button>
-          <ThemeToggle />
         </div>
       </div>
     </nav>

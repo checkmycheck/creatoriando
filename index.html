@@ -26,24 +26,20 @@
   <body>
     <script>
       (function() {
-        // Apply theme (dark/light mode)
-        const theme = localStorage.getItem('app-theme') || 
-                     (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-        
-        // Apply theme class and attribute
-        document.documentElement.classList.add(theme);
-        document.documentElement.setAttribute('data-theme', theme);
+        // Always use dark theme
+        document.documentElement.classList.add('dark');
+        document.documentElement.setAttribute('data-theme', 'dark');
 
-        // Apply custom theme colors from admin for current mode
+        // Apply custom theme colors from admin for dark mode
         const cached = localStorage.getItem('theme-colors');
         if (cached) {
           try {
             const colors = JSON.parse(cached);
-            const currentModeColors = colors[theme];
+            const darkModeColors = colors['dark'];
             
-            if (currentModeColors) {
+            if (darkModeColors) {
               const root = document.documentElement;
-              Object.entries(currentModeColors).forEach(([key, value]) => {
+              Object.entries(darkModeColors).forEach(([key, value]) => {
                 root.style.setProperty('--' + key, value);
               });
             }
