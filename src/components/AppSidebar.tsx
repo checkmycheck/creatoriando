@@ -109,8 +109,8 @@ export function AppSidebar() {
                       <NavLink 
                         to={item.url} 
                         end 
-                        className="hover:bg-muted/50" 
-                        activeClassName="bg-muted text-primary font-medium"
+                        className="hover:bg-primary/10 hover:text-primary transition-colors" 
+                        activeClassName="bg-primary/20 text-primary font-semibold"
                         onClick={handleNavClick}
                       >
                         <item.icon className="mr-2 h-4 w-4" />
@@ -132,8 +132,8 @@ export function AppSidebar() {
                   <NavLink 
                     to="/admin" 
                     end 
-                    className="hover:bg-muted/50" 
-                    activeClassName="bg-muted text-primary font-medium"
+                    className="hover:bg-primary/10 hover:text-primary transition-colors" 
+                    activeClassName="bg-primary/20 text-primary font-semibold"
                     onClick={handleNavClick}
                   >
                     <Shield className="mr-2 h-4 w-4" />
@@ -144,7 +144,7 @@ export function AppSidebar() {
             )}
 
             <SidebarMenuItem>
-              <SidebarMenuButton onClick={handleLogout}>
+              <SidebarMenuButton onClick={handleLogout} className="hover:bg-destructive/10 hover:text-destructive transition-colors">
                 <LogOut className="mr-2 h-4 w-4" />
                 {shouldShowText && <span>Sair</span>}
               </SidebarMenuButton>
