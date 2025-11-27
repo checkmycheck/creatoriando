@@ -6,9 +6,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Search, DollarSign } from "lucide-react";
-import { format } from "date-fns";
+import { Search, DollarSign, TrendingUp, Calendar } from "lucide-react";
+import { format, subDays, startOfDay, endOfDay, startOfMonth, endOfMonth, startOfWeek, endOfWeek } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
 
 interface Transaction {
   id: string;
@@ -25,16 +26,66 @@ interface Transaction {
   };
 }
 
+type DateRange = {
+  from: Date;
+  to: Date;
+};
+
 export function TransactionsList() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [typeFilter, setTypeFilter] = useState<string>("all");
+  const [periodFilter, setPeriodFilter] = useState<string>("all");
+  const [dateRange, setDateRange] = useState<DateRange>({
+    from: subDays(new Date(), 30),
+    to: new Date()
+  });
 
   useEffect(() => {
     loadTransactions();
   }, []);
+
+  useEffect(() => {
+    updateDateRange(periodFilter);
+  }, [periodFilter]);
+
+  const updateDateRange = (period: string) => {
+    const now = new Date();
+    let from: Date;
+    let to: Date = endOfDay(now);
+
+    switch (period) {
+      case "today":
+        from = startOfDay(now);
+        break;
+      case "week":
+        from = startOfWeek(now, { locale: ptBR });
+        to = endOfWeek(now, { locale: ptBR });
+        break;
+      case "month":
+        from = startOfMonth(now);
+        to = endOfMonth(now);
+        break;
+      case "last7":
+        from = subDays(now, 7);
+        break;
+      case "last30":
+        from = subDays(now, 30);
+        break;
+      case "last90":
+        from = subDays(now, 90);
+        break;
+      case "all":
+      default:
+        from = new Date(0); // Beginning of time
+        to = new Date();
+        break;
+    }
+
+    setDateRange({ from, to });
+  };
 
   const loadTransactions = async () => {
     setLoading(true);
@@ -86,6 +137,7 @@ export function TransactionsList() {
   };
 
   const filteredTransactions = transactions.filter((transaction) => {
+    const transactionDate = new Date(transaction.created_at);
     const matchesSearch = 
       transaction.profiles?.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       transaction.profiles?.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -94,8 +146,9 @@ export function TransactionsList() {
 
     const matchesStatus = statusFilter === "all" || transaction.payment_status === statusFilter;
     const matchesType = typeFilter === "all" || transaction.type === typeFilter;
+    const matchesDate = periodFilter === "all" || (transactionDate >= dateRange.from && transactionDate <= dateRange.to);
 
-    return matchesSearch && matchesStatus && matchesType;
+    return matchesSearch && matchesStatus && matchesType && matchesDate;
   });
 
   const totalValue = filteredTransactions
@@ -105,6 +158,34 @@ export function TransactionsList() {
       const creditsValue = Math.abs(t.amount);
       return sum + (creditsValue * 0.2); // 0.2 reais por crédito (aproximado)
     }, 0);
+
+  // Preparar dados para os gráficos
+  const prepareChartData = () => {
+    const dataMap = new Map<string, { date: string; receita: number; volume: number }>();
+
+    filteredTransactions
+      .filter(t => t.type === "purchase" && t.payment_status === "approved")
+      .forEach(transaction => {
+        const date = format(new Date(transaction.created_at), "dd/MM", { locale: ptBR });
+        
+        if (!dataMap.has(date)) {
+          dataMap.set(date, { date, receita: 0, volume: 0 });
+        }
+        
+        const existing = dataMap.get(date)!;
+        const creditsValue = Math.abs(transaction.amount);
+        existing.receita += creditsValue * 0.2;
+        existing.volume += 1;
+      });
+
+    return Array.from(dataMap.values()).sort((a, b) => {
+      const [dayA, monthA] = a.date.split('/').map(Number);
+      const [dayB, monthB] = b.date.split('/').map(Number);
+      return monthA !== monthB ? monthA - monthB : dayA - dayB;
+    });
+  };
+
+  const chartData = prepareChartData();
 
   return (
     <div className="space-y-6">
@@ -120,7 +201,7 @@ export function TransactionsList() {
         </CardHeader>
         <CardContent className="space-y-6">
           {/* Filtros */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
@@ -130,9 +211,23 @@ export function TransactionsList() {
                 className="pl-10"
               />
             </div>
+            <Select value={periodFilter} onValueChange={setPeriodFilter}>
+              <SelectTrigger>
+                <SelectValue placeholder="Período" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Todo período</SelectItem>
+                <SelectItem value="today">Hoje</SelectItem>
+                <SelectItem value="week">Esta semana</SelectItem>
+                <SelectItem value="month">Este mês</SelectItem>
+                <SelectItem value="last7">Últimos 7 dias</SelectItem>
+                <SelectItem value="last30">Últimos 30 dias</SelectItem>
+                <SelectItem value="last90">Últimos 90 dias</SelectItem>
+              </SelectContent>
+            </Select>
             <Select value={statusFilter} onValueChange={setStatusFilter}>
               <SelectTrigger>
-                <SelectValue placeholder="Filtrar por status" />
+                <SelectValue placeholder="Status" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Todos os status</SelectItem>
@@ -144,7 +239,7 @@ export function TransactionsList() {
             </Select>
             <Select value={typeFilter} onValueChange={setTypeFilter}>
               <SelectTrigger>
-                <SelectValue placeholder="Filtrar por tipo" />
+                <SelectValue placeholder="Tipo" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Todos os tipos</SelectItem>
@@ -155,6 +250,95 @@ export function TransactionsList() {
               </SelectContent>
             </Select>
           </div>
+
+          {/* Gráficos */}
+          {chartData.length > 0 && (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-base font-semibold flex items-center gap-2">
+                    <TrendingUp className="h-4 w-4" />
+                    Evolução de Receita
+                  </CardTitle>
+                  <CardDescription>Receita de transações aprovadas por dia</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <ResponsiveContainer width="100%" height={250}>
+                    <LineChart data={chartData}>
+                      <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                      <XAxis 
+                        dataKey="date" 
+                        className="text-xs"
+                        tick={{ fill: 'hsl(var(--muted-foreground))' }}
+                      />
+                      <YAxis 
+                        className="text-xs"
+                        tick={{ fill: 'hsl(var(--muted-foreground))' }}
+                        tickFormatter={(value) => `R$ ${value.toFixed(0)}`}
+                      />
+                      <Tooltip 
+                        formatter={(value: number) => [
+                          `R$ ${value.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+                          'Receita'
+                        ]}
+                        contentStyle={{
+                          backgroundColor: 'hsl(var(--background))',
+                          border: '1px solid hsl(var(--border))',
+                          borderRadius: '6px'
+                        }}
+                      />
+                      <Line 
+                        type="monotone" 
+                        dataKey="receita" 
+                        stroke="hsl(var(--primary))" 
+                        strokeWidth={2}
+                        dot={{ fill: 'hsl(var(--primary))' }}
+                      />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-base font-semibold flex items-center gap-2">
+                    <Calendar className="h-4 w-4" />
+                    Volume de Transações
+                  </CardTitle>
+                  <CardDescription>Número de transações aprovadas por dia</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <ResponsiveContainer width="100%" height={250}>
+                    <BarChart data={chartData}>
+                      <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                      <XAxis 
+                        dataKey="date" 
+                        className="text-xs"
+                        tick={{ fill: 'hsl(var(--muted-foreground))' }}
+                      />
+                      <YAxis 
+                        className="text-xs"
+                        tick={{ fill: 'hsl(var(--muted-foreground))' }}
+                      />
+                      <Tooltip 
+                        formatter={(value: number) => [value, 'Transações']}
+                        contentStyle={{
+                          backgroundColor: 'hsl(var(--background))',
+                          border: '1px solid hsl(var(--border))',
+                          borderRadius: '6px'
+                        }}
+                      />
+                      <Bar 
+                        dataKey="volume" 
+                        fill="hsl(var(--primary))" 
+                        radius={[4, 4, 0, 0]}
+                      />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </CardContent>
+              </Card>
+            </div>
+          )}
 
           {/* Stats Card */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
