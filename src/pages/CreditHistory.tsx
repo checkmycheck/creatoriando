@@ -238,54 +238,54 @@ export default function CreditHistory() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-6 sm:px-6 sm:py-8 max-w-7xl">
+    <div className="min-h-screen w-full px-3 py-4 sm:px-4 sm:py-6 md:px-6 md:py-8 max-w-7xl mx-auto">
       {/* Header */}
-      <div className="mb-6 sm:mb-8">
-        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2">
+      <div className="mb-4 sm:mb-6 md:mb-8">
+        <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold mb-2">
           📊 Histórico de Créditos
         </h1>
-        <p className="text-sm sm:text-base text-muted-foreground">
+        <p className="text-xs sm:text-sm md:text-base text-muted-foreground">
           Visualize todas as suas transações de créditos
         </p>
       </div>
 
       {/* Metrics Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mb-4 sm:mb-6">
         <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-              <Activity className="w-4 h-4" />
-              Total de Transações
+          <CardHeader className="pb-2 sm:pb-3 p-4 sm:p-6">
+            <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground flex items-center gap-2">
+              <Activity className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
+              <span className="truncate">Total de Transações</span>
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <p className="text-2xl sm:text-3xl font-bold">{totalTransactions.toLocaleString('pt-BR')}</p>
+          <CardContent className="p-4 pt-0 sm:p-6 sm:pt-0">
+            <p className="text-xl sm:text-2xl md:text-3xl font-bold">{totalTransactions.toLocaleString('pt-BR')}</p>
           </CardContent>
         </Card>
 
         <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-              <TrendingUp className="w-4 h-4 text-green-500" />
-              Créditos Ganhos
+          <CardHeader className="pb-2 sm:pb-3 p-4 sm:p-6">
+            <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground flex items-center gap-2">
+              <TrendingUp className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0 text-green-500" />
+              <span className="truncate">Créditos Ganhos</span>
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <p className="text-2xl sm:text-3xl font-bold text-green-500">
+          <CardContent className="p-4 pt-0 sm:p-6 sm:pt-0">
+            <p className="text-xl sm:text-2xl md:text-3xl font-bold text-green-500">
               +{creditsAdded.toLocaleString('pt-BR')}
             </p>
           </CardContent>
         </Card>
 
         <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-              <TrendingDown className="w-4 h-4 text-red-500" />
-              Créditos Usados
+          <CardHeader className="pb-2 sm:pb-3 p-4 sm:p-6">
+            <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground flex items-center gap-2">
+              <TrendingDown className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0 text-red-500" />
+              <span className="truncate">Créditos Usados</span>
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <p className="text-2xl sm:text-3xl font-bold text-red-500">
+          <CardContent className="p-4 pt-0 sm:p-6 sm:pt-0">
+            <p className="text-xl sm:text-2xl md:text-3xl font-bold text-red-500">
               -{creditsUsed.toLocaleString('pt-BR')}
             </p>
           </CardContent>
@@ -293,13 +293,13 @@ export default function CreditHistory() {
       </div>
 
       {/* Filters */}
-      <Card className="mb-6">
-        <CardHeader>
-          <CardTitle>Filtros</CardTitle>
-          <CardDescription>Filtre as transações por período, tipo e status</CardDescription>
+      <Card className="mb-4 sm:mb-6">
+        <CardHeader className="p-4 sm:p-6">
+          <CardTitle className="text-base sm:text-lg">Filtros</CardTitle>
+          <CardDescription className="text-xs sm:text-sm">Filtre as transações por período, tipo e status</CardDescription>
         </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <CardContent className="p-4 sm:p-6 pt-0">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
             {/* Period Filter */}
             <Select value={periodFilter} onValueChange={(value: PeriodFilter) => setPeriodFilter(value)}>
               <SelectTrigger>
@@ -361,10 +361,10 @@ export default function CreditHistory() {
             )}
           </div>
 
-          <div className="flex justify-end mt-4">
-            <Button onClick={handleExportCSV} variant="outline" size="sm">
-              <Download className="w-4 h-4 mr-2" />
-              Exportar CSV
+          <div className="flex justify-end mt-3 sm:mt-4">
+            <Button onClick={handleExportCSV} variant="outline" size="sm" className="w-full sm:w-auto">
+              <Download className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
+              <span className="text-xs sm:text-sm">Exportar CSV</span>
             </Button>
           </div>
         </CardContent>
@@ -372,66 +372,72 @@ export default function CreditHistory() {
 
       {/* Transactions Table */}
       <Card>
-        <CardHeader>
-          <CardTitle>Transações</CardTitle>
-          <CardDescription>
+        <CardHeader className="p-4 sm:p-6">
+          <CardTitle className="text-base sm:text-lg">Transações</CardTitle>
+          <CardDescription className="text-xs sm:text-sm">
             Mostrando {startIndex + 1}-{Math.min(endIndex, transactions.length)} de {transactions.length} transações
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          <div className="overflow-x-auto">
+        <CardContent className="p-0 sm:p-6 sm:pt-0">
+          <div className="overflow-x-auto -mx-4 sm:mx-0">
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Data/Hora</TableHead>
-                  {isAdmin && <TableHead>Usuário</TableHead>}
-                  <TableHead>Tipo</TableHead>
-                  <TableHead>Descrição</TableHead>
-                  <TableHead className="text-right">Créditos</TableHead>
-                  <TableHead>Status</TableHead>
+                  <TableHead className="text-xs sm:text-sm whitespace-nowrap px-2 sm:px-4">Data/Hora</TableHead>
+                  {isAdmin && <TableHead className="text-xs sm:text-sm whitespace-nowrap px-2 sm:px-4">Usuário</TableHead>}
+                  <TableHead className="text-xs sm:text-sm whitespace-nowrap px-2 sm:px-4">Tipo</TableHead>
+                  <TableHead className="text-xs sm:text-sm whitespace-nowrap px-2 sm:px-4">Descrição</TableHead>
+                  <TableHead className="text-xs sm:text-sm text-right whitespace-nowrap px-2 sm:px-4">Créditos</TableHead>
+                  <TableHead className="text-xs sm:text-sm whitespace-nowrap px-2 sm:px-4">Status</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {currentTransactions.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={isAdmin ? 6 : 5} className="text-center py-8 text-muted-foreground">
+                    <TableCell colSpan={isAdmin ? 6 : 5} className="text-center py-6 sm:py-8 text-xs sm:text-sm text-muted-foreground px-2 sm:px-4">
                       Nenhuma transação encontrada
                     </TableCell>
                   </TableRow>
                 ) : (
                   currentTransactions.map((transaction) => (
                     <TableRow key={transaction.id}>
-                      <TableCell className="whitespace-nowrap">
-                        <div className="text-sm">
-                          {format(new Date(transaction.created_at), "dd/MM/yyyy")}
+                      <TableCell className="whitespace-nowrap px-2 sm:px-4 py-2 sm:py-4">
+                        <div className="text-xs sm:text-sm">
+                          {format(new Date(transaction.created_at), "dd/MM/yy")}
                         </div>
-                        <div className="text-xs text-muted-foreground">
-                          {format(new Date(transaction.created_at), "HH:mm:ss")}
+                        <div className="text-[10px] sm:text-xs text-muted-foreground">
+                          {format(new Date(transaction.created_at), "HH:mm")}
                         </div>
                       </TableCell>
                       {isAdmin && (
-                        <TableCell>
-                          <div className="text-sm">{transaction.profiles?.full_name || "-"}</div>
-                          <div className="text-xs text-muted-foreground">
+                        <TableCell className="px-2 sm:px-4 py-2 sm:py-4">
+                          <div className="text-xs sm:text-sm max-w-[120px] sm:max-w-none truncate">
+                            {transaction.profiles?.full_name || "-"}
+                          </div>
+                          <div className="text-[10px] sm:text-xs text-muted-foreground max-w-[120px] sm:max-w-none truncate">
                             {transaction.profiles?.email}
                           </div>
                         </TableCell>
                       )}
-                      <TableCell>
-                        <Badge variant={getTypeBadge(transaction.type)}>
+                      <TableCell className="px-2 sm:px-4 py-2 sm:py-4">
+                        <Badge variant={getTypeBadge(transaction.type)} className="text-[10px] sm:text-xs whitespace-nowrap">
                           {getTypeLabel(transaction.type)}
                         </Badge>
                       </TableCell>
-                      <TableCell className="max-w-xs truncate">
-                        {transaction.description || "-"}
+                      <TableCell className="px-2 sm:px-4 py-2 sm:py-4 max-w-[120px] sm:max-w-xs">
+                        <div className="text-xs sm:text-sm truncate">
+                          {transaction.description || "-"}
+                        </div>
                       </TableCell>
-                      <TableCell className="text-right font-semibold">
+                      <TableCell className="text-right font-semibold px-2 sm:px-4 py-2 sm:py-4 whitespace-nowrap">
                         <span className={transaction.amount > 0 ? "text-green-500" : "text-red-500"}>
-                          {transaction.amount > 0 ? "+" : ""}
-                          {transaction.amount.toLocaleString('pt-BR')}
+                          <span className="text-xs sm:text-sm">
+                            {transaction.amount > 0 ? "+" : ""}
+                            {transaction.amount.toLocaleString('pt-BR')}
+                          </span>
                         </span>
                       </TableCell>
-                      <TableCell>{getStatusBadge(transaction.payment_status)}</TableCell>
+                      <TableCell className="px-2 sm:px-4 py-2 sm:py-4">{getStatusBadge(transaction.payment_status)}</TableCell>
                     </TableRow>
                   ))
                 )}
@@ -441,19 +447,28 @@ export default function CreditHistory() {
 
           {/* Pagination */}
           {totalPages > 1 && (
-            <div className="flex items-center justify-center gap-2 mt-6">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-2 mt-4 sm:mt-6 px-4 sm:px-0 pb-4 sm:pb-0">
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => handlePageChange(currentPage - 1)}
                 disabled={currentPage === 1}
+                className="w-full sm:w-auto text-xs sm:text-sm"
               >
-                <ChevronLeft className="w-4 h-4" />
-                Anterior
+                <ChevronLeft className="w-3 h-3 sm:w-4 sm:h-4" />
+                <span className="hidden sm:inline">Anterior</span>
               </Button>
 
-              <div className="flex items-center gap-1">
+              <div className="flex items-center gap-1 overflow-x-auto max-w-full py-2">
                 {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => {
+                  // Em mobile, mostrar apenas páginas adjacentes e primeira/última
+                  const showOnMobile = 
+                    page === 1 ||
+                    page === totalPages ||
+                    page === currentPage ||
+                    page === currentPage - 1 ||
+                    page === currentPage + 1;
+
                   if (
                     page === 1 ||
                     page === totalPages ||
@@ -465,14 +480,14 @@ export default function CreditHistory() {
                         variant={currentPage === page ? "default" : "outline"}
                         size="sm"
                         onClick={() => handlePageChange(page)}
-                        className="min-w-[40px]"
+                        className={`min-w-[32px] sm:min-w-[40px] h-8 sm:h-9 text-xs sm:text-sm ${!showOnMobile ? 'hidden sm:inline-flex' : ''}`}
                       >
                         {page}
                       </Button>
                     );
                   } else if (page === currentPage - 2 || page === currentPage + 2) {
                     return (
-                      <span key={page} className="px-2">
+                      <span key={page} className="px-1 sm:px-2 text-xs sm:text-sm hidden sm:inline">
                         ...
                       </span>
                     );
@@ -486,9 +501,10 @@ export default function CreditHistory() {
                 size="sm"
                 onClick={() => handlePageChange(currentPage + 1)}
                 disabled={currentPage === totalPages}
+                className="w-full sm:w-auto text-xs sm:text-sm"
               >
-                Próximo
-                <ChevronRight className="w-4 h-4" />
+                <span className="hidden sm:inline">Próximo</span>
+                <ChevronRight className="w-3 h-3 sm:w-4 sm:h-4" />
               </Button>
             </div>
           )}
