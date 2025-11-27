@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, forwardRef, useImperativeHandle } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -17,8 +17,14 @@ interface Testimonial {
   text: string;
 }
 
-export const TestimonialsEditor = () => {
+export interface TestimonialsEditorRef {
+  save: () => Promise<void>;
+  isDirty: () => boolean;
+}
+
+export const TestimonialsEditor = forwardRef<TestimonialsEditorRef>((props, ref) => {
   const { content, loading, updateContent, createContent } = useLandingContent("testimonials");
+  const [isDirty, setIsDirty] = useState(false);
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
 
   useEffect(() => {
@@ -27,20 +33,25 @@ export const TestimonialsEditor = () => {
     }
   }, [content]);
 
-  const handleSave = async () => {
-    const contentData = { items: testimonials };
-    
-    if (content.length > 0) {
-      await updateContent(content[0].id, { content: contentData });
-    } else {
-      await createContent({
-        section: "testimonials",
-        content: contentData,
-        display_order: 0,
-        is_active: true,
-      });
-    }
-  };
+  useImperativeHandle(ref, () => ({
+    save: async () => {
+      if (isDirty) {
+        const contentData = { items: testimonials };
+        if (content.length > 0) {
+          await updateContent(content[0].id, { content: contentData });
+        } else {
+          await createContent({
+            section: "testimonials",
+            content: contentData,
+            display_order: 0,
+            is_active: true,
+          });
+        }
+        setIsDirty(false);
+      }
+    },
+    isDirty: () => isDirty,
+  }));
 
   const handleAdd = () => {
     setTestimonials([
@@ -53,18 +64,20 @@ export const TestimonialsEditor = () => {
         text: "",
       },
     ]);
+    setIsDirty(true);
   };
 
   const handleRemove = (index: number) => {
     const newTestimonials = testimonials.filter((_, i) => i !== index);
     setTestimonials(newTestimonials);
-    setTimeout(handleSave, 100);
+    setIsDirty(true);
   };
 
   const handleChange = (index: number, field: keyof Testimonial, value: any) => {
     const newTestimonials = [...testimonials];
     newTestimonials[index] = { ...newTestimonials[index], [field]: value };
     setTestimonials(newTestimonials);
+    setIsDirty(true);
   };
 
   if (loading) {
@@ -109,7 +122,6 @@ export const TestimonialsEditor = () => {
                 <Input
                   value={testimonial.name}
                   onChange={(e) => handleChange(index, "name", e.target.value)}
-                  onBlur={handleSave}
                   placeholder="Maria Silva"
                 />
               </div>
@@ -119,7 +131,6 @@ export const TestimonialsEditor = () => {
                 <Input
                   value={testimonial.role}
                   onChange={(e) => handleChange(index, "role", e.target.value)}
-                  onBlur={handleSave}
                   placeholder="Criadora de Conteúdo"
                 />
               </div>
@@ -131,7 +142,6 @@ export const TestimonialsEditor = () => {
                 <Input
                   value={testimonial.avatar}
                   onChange={(e) => handleChange(index, "avatar", e.target.value)}
-                  onBlur={handleSave}
                   placeholder="MS"
                   maxLength={2}
                 />
@@ -145,7 +155,6 @@ export const TestimonialsEditor = () => {
                   max="5"
                   value={testimonial.rating}
                   onChange={(e) => handleChange(index, "rating", parseInt(e.target.value))}
-                  onBlur={handleSave}
                 />
               </div>
             </div>
@@ -155,7 +164,6 @@ export const TestimonialsEditor = () => {
               <Textarea
                 value={testimonial.text}
                 onChange={(e) => handleChange(index, "text", e.target.value)}
-                onBlur={handleSave}
                 rows={3}
                 placeholder="O Creator IA revolucionou meu trabalho!"
               />
@@ -172,4 +180,4 @@ export const TestimonialsEditor = () => {
       </CardContent>
     </Card>
   );
-};
+});

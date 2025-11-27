@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, forwardRef, useImperativeHandle } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -6,8 +6,14 @@ import { Textarea } from "@/components/ui/textarea";
 import { useLandingContent } from "@/hooks/useLandingContent";
 import { Skeleton } from "@/components/ui/skeleton";
 
-export const HeroEditor = () => {
+export interface HeroEditorRef {
+  save: () => Promise<void>;
+  isDirty: () => boolean;
+}
+
+export const HeroEditor = forwardRef<HeroEditorRef>((props, ref) => {
   const { content, loading, updateContent } = useLandingContent("hero");
+  const [isDirty, setIsDirty] = useState(false);
   const [formData, setFormData] = useState({
     badge: "",
     title: "",
@@ -32,16 +38,18 @@ export const HeroEditor = () => {
   const handleChange = (field: string, value: string) => {
     const newFormData = { ...formData, [field]: value };
     setFormData(newFormData);
-
-    // Auto-save after 500ms debounce
-    if (content.length > 0) {
-      setTimeout(() => {
-        updateContent(content[0].id, {
-          content: newFormData,
-        });
-      }, 500);
-    }
+    setIsDirty(true);
   };
+
+  useImperativeHandle(ref, () => ({
+    save: async () => {
+      if (content.length > 0 && isDirty) {
+        await updateContent(content[0].id, { content: formData });
+        setIsDirty(false);
+      }
+    },
+    isDirty: () => isDirty,
+  }));
 
   if (loading) {
     return (
@@ -124,4 +132,4 @@ export const HeroEditor = () => {
       </CardContent>
     </Card>
   );
-};
+});

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, forwardRef, useImperativeHandle } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -14,8 +14,14 @@ interface FAQ {
   answer: string;
 }
 
-export const FAQEditor = () => {
+export interface FAQEditorRef {
+  save: () => Promise<void>;
+  isDirty: () => boolean;
+}
+
+export const FAQEditor = forwardRef<FAQEditorRef>((props, ref) => {
   const { content, loading, updateContent, createContent } = useLandingContent("faq");
+  const [isDirty, setIsDirty] = useState(false);
   const [faqs, setFaqs] = useState<FAQ[]>([]);
 
   useEffect(() => {
@@ -24,20 +30,25 @@ export const FAQEditor = () => {
     }
   }, [content]);
 
-  const handleSave = async () => {
-    const contentData = { items: faqs };
-    
-    if (content.length > 0) {
-      await updateContent(content[0].id, { content: contentData });
-    } else {
-      await createContent({
-        section: "faq",
-        content: contentData,
-        display_order: 0,
-        is_active: true,
-      });
-    }
-  };
+  useImperativeHandle(ref, () => ({
+    save: async () => {
+      if (isDirty) {
+        const contentData = { items: faqs };
+        if (content.length > 0) {
+          await updateContent(content[0].id, { content: contentData });
+        } else {
+          await createContent({
+            section: "faq",
+            content: contentData,
+            display_order: 0,
+            is_active: true,
+          });
+        }
+        setIsDirty(false);
+      }
+    },
+    isDirty: () => isDirty,
+  }));
 
   const handleAdd = () => {
     setFaqs([
@@ -47,18 +58,20 @@ export const FAQEditor = () => {
         answer: "",
       },
     ]);
+    setIsDirty(true);
   };
 
   const handleRemove = (index: number) => {
     const newFaqs = faqs.filter((_, i) => i !== index);
     setFaqs(newFaqs);
-    setTimeout(handleSave, 100);
+    setIsDirty(true);
   };
 
   const handleChange = (index: number, field: keyof FAQ, value: string) => {
     const newFaqs = [...faqs];
     newFaqs[index] = { ...newFaqs[index], [field]: value };
     setFaqs(newFaqs);
+    setIsDirty(true);
   };
 
   if (loading) {
@@ -102,7 +115,6 @@ export const FAQEditor = () => {
               <Input
                 value={faq.question}
                 onChange={(e) => handleChange(index, "question", e.target.value)}
-                onBlur={handleSave}
                 placeholder="Como funciona o Creator IA?"
               />
             </div>
@@ -112,7 +124,6 @@ export const FAQEditor = () => {
               <Textarea
                 value={faq.answer}
                 onChange={(e) => handleChange(index, "answer", e.target.value)}
-                onBlur={handleSave}
                 rows={4}
                 placeholder="O Creator IA é um wizard guiado..."
               />
@@ -129,4 +140,4 @@ export const FAQEditor = () => {
       </CardContent>
     </Card>
   );
-};
+});

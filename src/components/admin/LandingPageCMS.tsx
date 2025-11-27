@@ -1,17 +1,45 @@
+import { useRef, useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Home, Sparkles, MessageSquare, Video, HelpCircle } from "lucide-react";
-import { HeroEditor } from "./cms/HeroEditor";
-import { FeaturesEditor } from "./cms/FeaturesEditor";
-import { TestimonialsEditor } from "./cms/TestimonialsEditor";
-import { VideoEditor } from "./cms/VideoEditor";
-import { FAQEditor } from "./cms/FAQEditor";
+import { Home, Sparkles, MessageSquare, Video, HelpCircle, Save } from "lucide-react";
+import { HeroEditor, HeroEditorRef } from "./cms/HeroEditor";
+import { FeaturesEditor, FeaturesEditorRef } from "./cms/FeaturesEditor";
+import { TestimonialsEditor, TestimonialsEditorRef } from "./cms/TestimonialsEditor";
+import { VideoEditor, VideoEditorRef } from "./cms/VideoEditor";
+import { FAQEditor, FAQEditorRef } from "./cms/FAQEditor";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { Package } from "lucide-react";
+import { toast } from "sonner";
 
 export const LandingPageCMS = () => {
   const navigate = useNavigate();
+  const [isSaving, setIsSaving] = useState(false);
+
+  const heroRef = useRef<HeroEditorRef>(null);
+  const featuresRef = useRef<FeaturesEditorRef>(null);
+  const testimonialsRef = useRef<TestimonialsEditorRef>(null);
+  const videoRef = useRef<VideoEditorRef>(null);
+  const faqRef = useRef<FAQEditorRef>(null);
+
+  const handleSaveAll = async () => {
+    setIsSaving(true);
+    try {
+      const refs = [heroRef, featuresRef, testimonialsRef, videoRef, faqRef];
+      await Promise.all(refs.map(ref => ref.current?.save()));
+      toast.success("Todas as alterações foram salvas com sucesso!");
+    } catch (error) {
+      console.error("Error saving content:", error);
+      toast.error("Erro ao salvar alterações");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const hasChanges = () => {
+    return [heroRef, featuresRef, testimonialsRef, videoRef, faqRef]
+      .some(ref => ref.current?.isDirty());
+  };
 
   return (
     <div className="space-y-6">
@@ -53,25 +81,39 @@ export const LandingPageCMS = () => {
         </TabsList>
 
         <TabsContent value="hero" className="mt-6">
-          <HeroEditor />
+          <HeroEditor ref={heroRef} />
         </TabsContent>
 
         <TabsContent value="features" className="mt-6">
-          <FeaturesEditor />
+          <FeaturesEditor ref={featuresRef} />
         </TabsContent>
 
         <TabsContent value="testimonials" className="mt-6">
-          <TestimonialsEditor />
+          <TestimonialsEditor ref={testimonialsRef} />
         </TabsContent>
 
         <TabsContent value="video" className="mt-6">
-          <VideoEditor />
+          <VideoEditor ref={videoRef} />
         </TabsContent>
 
         <TabsContent value="faq" className="mt-6">
-          <FAQEditor />
+          <FAQEditor ref={faqRef} />
         </TabsContent>
       </Tabs>
+
+      {hasChanges() && (
+        <div className="sticky bottom-6 flex justify-center">
+          <Button 
+            size="lg" 
+            onClick={handleSaveAll} 
+            disabled={isSaving}
+            className="shadow-lg"
+          >
+            <Save className="w-4 h-4 mr-2" />
+            {isSaving ? "Salvando..." : "Salvar Alterações"}
+          </Button>
+        </div>
+      )}
 
       <Card>
         <CardHeader>
