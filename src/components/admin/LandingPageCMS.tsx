@@ -11,10 +11,21 @@ import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { Package } from "lucide-react";
 import { toast } from "sonner";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 export const LandingPageCMS = () => {
   const navigate = useNavigate();
   const [isSaving, setIsSaving] = useState(false);
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
 
   const heroRef = useRef<HeroEditorRef>(null);
   const featuresRef = useRef<FeaturesEditorRef>(null);
@@ -24,6 +35,7 @@ export const LandingPageCMS = () => {
 
   const handleSaveAll = async () => {
     setIsSaving(true);
+    setShowConfirmDialog(false);
     try {
       const refs = [heroRef, featuresRef, testimonialsRef, videoRef, faqRef];
       await Promise.all(refs.map(ref => ref.current?.save()));
@@ -33,6 +45,12 @@ export const LandingPageCMS = () => {
       toast.error("Erro ao salvar alterações");
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const handleSaveClick = () => {
+    if (hasChanges()) {
+      setShowConfirmDialog(true);
     }
   };
 
@@ -122,13 +140,31 @@ export const LandingPageCMS = () => {
       <div className="flex justify-end pt-6">
         <Button 
           size="lg" 
-          onClick={handleSaveAll} 
+          onClick={handleSaveClick} 
           disabled={isSaving || !hasChanges()}
         >
           <Save className="w-4 h-4 mr-2" />
           {isSaving ? "Salvando..." : "Salvar Alterações"}
         </Button>
       </div>
+
+      <AlertDialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirmar alterações</AlertDialogTitle>
+            <AlertDialogDescription>
+              Tem certeza que deseja salvar todas as alterações feitas no conteúdo da landing page? 
+              As mudanças serão aplicadas imediatamente e ficarão visíveis para todos os visitantes.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={handleSaveAll}>
+              Sim, salvar alterações
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
