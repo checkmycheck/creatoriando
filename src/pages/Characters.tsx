@@ -279,32 +279,32 @@ export default function Characters() {
                       <Badge variant="secondary">{character.appearance}</Badge>
                     )}
                    </div>
-                   <div className="flex flex-col sm:flex-row gap-2">
+                   <div className="flex flex-col sm:flex-row gap-2 w-full">
                      <Button
                        variant="outline"
-                       className="flex-1"
+                       className="flex-1 min-w-0"
                        size="sm"
                        onClick={() => navigate(`/create?edit=${character.id}`)}
                      >
-                       <Pencil className="w-4 h-4 mr-2" />
-                       Editar
+                       <Pencil className="w-4 h-4 mr-2 shrink-0" />
+                       <span className="truncate">Editar</span>
                      </Button>
                      <Button
                        variant="outline"
-                       className="flex-1"
+                       className="flex-1 min-w-0"
                        size="sm"
                        onClick={() => handleViewPrompt(character)}
                      >
-                       <FileText className="w-4 h-4 mr-2" />
-                       Ver Prompt
+                       <FileText className="w-4 h-4 mr-2 shrink-0" />
+                       <span className="truncate">Ver Prompt</span>
                      </Button>
                      <Button
                        variant="destructive"
                        size="sm"
-                       className="sm:w-auto"
+                       className="sm:px-3"
                        onClick={() => handleDelete(character.id)}
                      >
-                       <Trash2 className="w-4 h-4 sm:mr-0" />
+                       <Trash2 className="w-4 h-4" />
                        <span className="sm:hidden ml-2">Deletar</span>
                      </Button>
                    </div>
