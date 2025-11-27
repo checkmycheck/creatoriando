@@ -4,8 +4,10 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { useState, useEffect } from "react";
+import { useLandingContent } from "@/hooks/useLandingContent";
 
-const faqs = [
+const defaultFaqs = [
   {
     question: "Como funciona o Creator IA?",
     answer: "O Creator IA é um wizard guiado que te ajuda a configurar cada detalhe do seu personagem de vídeo em 13 etapas. Você escolhe gênero, idade, visual, ambiente, postura e muito mais. No final, geramos um prompt profissional otimizado para plataformas de IA de vídeo.",
@@ -33,6 +35,15 @@ const faqs = [
 ];
 
 export const FAQ = () => {
+  const { content, loading } = useLandingContent("faq");
+  const [faqs, setFaqs] = useState(defaultFaqs);
+
+  useEffect(() => {
+    if (content.length > 0 && content[0].content?.items) {
+      setFaqs(content[0].content.items);
+    }
+  }, [content]);
+
   return (
     <section className="py-24 bg-muted/30">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">

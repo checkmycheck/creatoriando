@@ -1,7 +1,9 @@
 import { Star } from "lucide-react";
 import { Card } from "@/components/ui/card";
+import { useState, useEffect } from "react";
+import { useLandingContent } from "@/hooks/useLandingContent";
 
-const testimonials = [
+const defaultTestimonials = [
   {
     name: "Maria Silva",
     role: "Criadora de Conteúdo",
@@ -26,6 +28,15 @@ const testimonials = [
 ];
 
 export const Testimonials = () => {
+  const { content, loading } = useLandingContent("testimonials");
+  const [testimonials, setTestimonials] = useState(defaultTestimonials);
+
+  useEffect(() => {
+    if (content.length > 0 && content[0].content?.items) {
+      setTestimonials(content[0].content.items);
+    }
+  }, [content]);
+
   return (
     <section className="py-24 bg-background">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

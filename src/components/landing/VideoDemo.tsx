@@ -1,16 +1,33 @@
 import { Play } from "lucide-react";
 import { Card } from "@/components/ui/card";
+import { useState, useEffect } from "react";
+import { useLandingContent } from "@/hooks/useLandingContent";
 
 export const VideoDemo = () => {
+  const { content, loading } = useLandingContent("video");
+  const [videoData, setVideoData] = useState({
+    title: "Veja o Creator IA em ação",
+    subtitle: "Assista como é fácil criar personagens profissionais",
+    videoUrl: "",
+    duration: "3:24",
+    tip: "💡 Dica: O vídeo mostra todas as 13 etapas do wizard de criação",
+  });
+
+  useEffect(() => {
+    if (content.length > 0 && content[0].content) {
+      setVideoData(content[0].content);
+    }
+  }, [content]);
+
   return (
     <section className="py-24 bg-background">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
-            Veja o Creator IA em ação
+            {videoData.title}
           </h2>
           <p className="text-muted-foreground text-lg">
-            Assista como é fácil criar personagens profissionais
+            {videoData.subtitle}
           </p>
         </div>
 
@@ -27,16 +44,14 @@ export const VideoDemo = () => {
                 Tutorial: Como criar seu primeiro personagem
               </p>
               <p className="text-sm text-muted-foreground">
-                3:24 min
+                {videoData.duration}
               </p>
             </div>
           </div>
         </Card>
 
         <div className="mt-8 text-center text-muted-foreground">
-          <p>
-            💡 <strong>Dica:</strong> O vídeo mostra todas as 13 etapas do wizard de criação
-          </p>
+          <p>{videoData.tip}</p>
         </div>
       </div>
     </section>
