@@ -27,7 +27,6 @@ const menuItems = [
   { title: "Personagens", url: "/characters", icon: LayoutDashboard },
   { title: "Assinatura", url: "/subscription", icon: CreditCard },
   { title: "Indicações", url: "/referrals", icon: Gift },
-  { title: "Perfil", url: "/profile", icon: User },
 ];
 
 export function AppSidebar() {
@@ -142,6 +141,21 @@ export function AppSidebar() {
                 </SidebarMenuButton>
               </SidebarMenuItem>
             )}
+
+            <SidebarMenuItem>
+              <SidebarMenuButton asChild>
+                <NavLink 
+                  to="/profile" 
+                  end 
+                  className="hover:bg-primary/10 hover:text-primary transition-colors" 
+                  activeClassName="bg-primary/20 text-primary font-semibold"
+                  onClick={handleNavClick}
+                >
+                  <User className="mr-2 h-4 w-4" />
+                  {shouldShowText && <span>Perfil</span>}
+                </NavLink>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
 
             <SidebarMenuItem>
               <SidebarMenuButton onClick={handleLogout} className="hover:bg-destructive/10 hover:text-destructive transition-colors">

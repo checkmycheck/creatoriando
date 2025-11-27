@@ -103,7 +103,7 @@ export const OnboardingTour = ({
   return (
     <>
       {/* Overlay */}
-      <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-[9998] animate-fade-in transition-all duration-500" />
+      <div className="fixed inset-0 bg-background/50 z-[9998] animate-fade-in transition-all duration-500" />
 
       {/* Highlight spotlight */}
       {targetRect && (
