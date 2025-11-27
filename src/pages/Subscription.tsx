@@ -28,7 +28,7 @@ interface CreditPackage {
 
 export default function Subscription() {
   const navigate = useNavigate();
-  const { plan, credits, isLoading: subscriptionLoading } = useSubscription();
+  const { credits, isLoading: subscriptionLoading } = useSubscription();
   const [profileData, setProfileData] = useState<ProfileData | null>(null);
   const [creditPackages, setCreditPackages] = useState<CreditPackage[]>([]);
   const [loading, setLoading] = useState(true);
@@ -139,9 +139,9 @@ export default function Subscription() {
       <div className="max-w-7xl mx-auto space-y-6 sm:space-y-8">
         {/* Header */}
         <div>
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2">Gerenciar Assinatura</h1>
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2">Seus Créditos</h1>
           <p className="text-sm sm:text-base text-muted-foreground">
-            Gerencie seu plano e veja detalhes da sua assinatura
+            Compre pacotes de créditos para criar personagens incríveis
           </p>
         </div>
 
@@ -171,20 +171,12 @@ export default function Subscription() {
               <CardDescription className="text-xs sm:text-sm">Seus créditos e informações da conta</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4 p-4 sm:p-6">
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
-                <div className="flex items-center gap-3 p-3 sm:p-4 bg-card rounded-lg border">
-                  <Sparkles className="w-6 h-6 sm:w-8 sm:h-8 text-lime flex-shrink-0" />
-                  <div>
-                    <p className="text-xs sm:text-sm text-muted-foreground">Plano Atual</p>
-                    <p className="text-base sm:text-xl font-bold capitalize">{plan}</p>
-                  </div>
-                </div>
-
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 <div className="flex items-center gap-3 p-3 sm:p-4 bg-card rounded-lg border">
                   <CreditCard className="w-6 h-6 sm:w-8 sm:h-8 text-lime flex-shrink-0" />
                   <div>
                     <p className="text-xs sm:text-sm text-muted-foreground">Créditos Disponíveis</p>
-                    <p className="text-xl sm:text-2xl font-bold">{credits}</p>
+                    <p className="text-xl sm:text-2xl font-bold">{credits.toLocaleString('pt-BR')}</p>
                   </div>
                 </div>
                 
@@ -291,7 +283,7 @@ export default function Subscription() {
           </CardHeader>
           <CardContent className="space-y-3">
             <p className="text-sm text-muted-foreground">
-              Tem dúvidas sobre qual plano escolher? Nossa equipe está aqui para ajudar!
+              Tem dúvidas sobre quantos créditos comprar? Nossa equipe está aqui para ajudar!
             </p>
             <div className="flex flex-wrap gap-2">
               <Button variant="outline" size="sm">
