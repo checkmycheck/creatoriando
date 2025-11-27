@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, forwardRef, useImperativeHandle } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -7,8 +7,14 @@ import { useLandingContent } from "@/hooks/useLandingContent";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
 
-export const FeaturesEditor = () => {
+export interface FeaturesEditorRef {
+  save: () => Promise<void>;
+  isDirty: () => boolean;
+}
+
+export const FeaturesEditor = forwardRef<FeaturesEditorRef>((props, ref) => {
   const { content, loading, updateContent } = useLandingContent("features");
+  const [isDirty, setIsDirty] = useState(false);
   const [formData, setFormData] = useState({
     title: "",
     subtitle: "",
@@ -33,13 +39,18 @@ export const FeaturesEditor = () => {
   const handleChange = (field: string, value: any) => {
     const newFormData = { ...formData, [field]: value };
     setFormData(newFormData);
-
-    if (content.length > 0) {
-      setTimeout(() => {
-        updateContent(content[0].id, { content: newFormData });
-      }, 500);
-    }
+    setIsDirty(true);
   };
+
+  useImperativeHandle(ref, () => ({
+    save: async () => {
+      if (content.length > 0 && isDirty) {
+        await updateContent(content[0].id, { content: formData });
+        setIsDirty(false);
+      }
+    },
+    isDirty: () => isDirty,
+  }));
 
   const handleItemChange = (index: number, field: string, value: string) => {
     const newItems = [...formData.items];
@@ -136,4 +147,4 @@ export const FeaturesEditor = () => {
       </CardContent>
     </Card>
   );
-};
+});

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, forwardRef, useImperativeHandle } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -6,8 +6,14 @@ import { Textarea } from "@/components/ui/textarea";
 import { useLandingContent } from "@/hooks/useLandingContent";
 import { Skeleton } from "@/components/ui/skeleton";
 
-export const VideoEditor = () => {
+export interface VideoEditorRef {
+  save: () => Promise<void>;
+  isDirty: () => boolean;
+}
+
+export const VideoEditor = forwardRef<VideoEditorRef>((props, ref) => {
   const { content, loading, updateContent } = useLandingContent("video");
+  const [isDirty, setIsDirty] = useState(false);
   const [formData, setFormData] = useState({
     title: "",
     subtitle: "",
@@ -32,13 +38,18 @@ export const VideoEditor = () => {
   const handleChange = (field: string, value: string) => {
     const newFormData = { ...formData, [field]: value };
     setFormData(newFormData);
-
-    if (content.length > 0) {
-      setTimeout(() => {
-        updateContent(content[0].id, { content: newFormData });
-      }, 500);
-    }
+    setIsDirty(true);
   };
+
+  useImperativeHandle(ref, () => ({
+    save: async () => {
+      if (content.length > 0 && isDirty) {
+        await updateContent(content[0].id, { content: formData });
+        setIsDirty(false);
+      }
+    },
+    isDirty: () => isDirty,
+  }));
 
   if (loading) {
     return (
@@ -122,4 +133,4 @@ export const VideoEditor = () => {
       </CardContent>
     </Card>
   );
-};
+});
