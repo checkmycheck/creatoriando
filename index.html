@@ -26,6 +26,14 @@
   <body>
     <script>
       (function() {
+        // Apply theme (dark/light mode)
+        const theme = localStorage.getItem('theme') || 
+                     (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        if (theme === 'dark') {
+          document.documentElement.classList.add('dark');
+        }
+
+        // Apply custom theme colors
         const cached = localStorage.getItem('theme-colors');
         if (cached) {
           try {
