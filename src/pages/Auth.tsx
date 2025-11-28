@@ -146,8 +146,15 @@ export default function Auth() {
       } else {
         toast({
           title: "Cadastro realizado!",
-          description: "Você já pode fazer login.",
+          description: "Entrando automaticamente...",
         });
+      }
+
+      // Auto-login após signup
+      if (data.user) {
+        // Delay para garantir que a sessão foi estabelecida
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        navigate("/create");
       }
     } catch (error: any) {
       toast({
