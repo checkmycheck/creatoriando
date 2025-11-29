@@ -15,6 +15,7 @@ export const HeroEditor = forwardRef<HeroEditorRef>((props, ref) => {
   const { content, loading, updateContent } = useLandingContent("hero");
   const [isDirty, setIsDirty] = useState(false);
   const [formData, setFormData] = useState({
+    appName: "",
     badge: "",
     title: "",
     subtitle: "",
@@ -26,6 +27,7 @@ export const HeroEditor = forwardRef<HeroEditorRef>((props, ref) => {
     if (content.length > 0) {
       const heroContent = content[0].content;
       setFormData({
+        appName: heroContent.appName || "",
         badge: heroContent.badge || "",
         title: heroContent.title || "",
         subtitle: heroContent.subtitle || "",
@@ -79,6 +81,16 @@ export const HeroEditor = forwardRef<HeroEditorRef>((props, ref) => {
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
+        <div className="space-y-2">
+          <Label htmlFor="appName">Nome do Aplicativo (Header)</Label>
+          <Input
+            id="appName"
+            value={formData.appName}
+            onChange={(e) => handleChange("appName", e.target.value)}
+            placeholder="CriaCreator"
+          />
+        </div>
+
         <div className="space-y-2">
           <Label htmlFor="badge">Badge (Tag)</Label>
           <Input

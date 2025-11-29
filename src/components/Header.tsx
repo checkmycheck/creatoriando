@@ -1,8 +1,14 @@
 import { Video } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useLandingContent } from "@/hooks/useLandingContent";
 
 export const Header = () => {
   const navigate = useNavigate();
+  const { content } = useLandingContent("hero");
+  
+  const appName = content.length > 0 && content[0].content?.appName 
+    ? content[0].content.appName 
+    : "CriaCreator";
 
   return (
     <nav className="border-b border-border bg-background">
@@ -13,7 +19,7 @@ export const Header = () => {
             className="flex items-center gap-2 hover:opacity-80 transition-opacity cursor-pointer active:scale-95"
           >
             <Video className="w-5 h-5 sm:w-6 sm:h-6 text-lime" />
-            <span className="text-lg sm:text-xl font-bold">CriaCreator</span>
+            <span className="text-lg sm:text-xl font-bold">{appName}</span>
           </button>
         </div>
       </div>
