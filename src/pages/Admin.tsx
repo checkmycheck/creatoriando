@@ -300,7 +300,12 @@ export default function Admin() {
         },
       };
 
-      const colorsWithInfo = data.map((item) => ({
+      // Remove duplicatas mantendo apenas a primeira ocorrência de cada setting_key
+      const uniqueData = data.filter((item, index, self) => 
+        index === self.findIndex((t) => t.setting_key === item.setting_key)
+      );
+
+      const colorsWithInfo = uniqueData.map((item) => ({
         key: item.setting_key,
         value: item.setting_value,
         label: colorLabels[item.setting_key]?.label || item.setting_key,
