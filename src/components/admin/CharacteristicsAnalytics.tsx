@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
+import { BarChart, Bar, PieChart, Pie, Cell, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import { Loader2, Download, FileText } from "lucide-react";
 import { toast } from "sonner";
 import jsPDF from "jspdf";
@@ -31,6 +31,12 @@ interface RawCharacterData {
   angle?: string;
   lighting?: string;
   voice_tone?: string;
+  created_at?: string;
+}
+
+interface TrendData {
+  date: string;
+  [key: string]: string | number;
 }
 
 const COLORS = [
@@ -61,11 +67,12 @@ export const CharacteristicsAnalytics = () => {
   const [correlationEnvPosture, setCorrelationEnvPosture] = useState<CorrelationData[]>([]);
   const [correlationVisualMood, setCorrelationVisualMood] = useState<CorrelationData[]>([]);
   const [correlationMovementAngle, setCorrelationMovementAngle] = useState<CorrelationData[]>([]);
+  const [trendGender, setTrendGender] = useState<TrendData[]>([]);
+  const [trendEnvironment, setTrendEnvironment] = useState<TrendData[]>([]);
+  const [trendVisual, setTrendVisual] = useState<TrendData[]>([]);
+  const [trendPeriod, setTrendPeriod] = useState<'7d' | '30d' | '90d'>('30d');
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetchCharacteristics();
-  }, []);
 
   const aggregateData = (data: any[], field: string): CharacteristicData[] => {
     const counts: { [key: string]: number } = {};
@@ -121,11 +128,56 @@ export const CharacteristicsAnalytics = () => {
     }).slice(0, 5); // Top 5 for readability
   };
 
+  const calculateTrends = (
+    data: RawCharacterData[],
+    field: keyof RawCharacterData,
+    days: number
+  ): TrendData[] => {
+    const now = new Date();
+    const startDate = new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
+    
+    // Filter data by period
+    const filteredData = data.filter(item => {
+      if (!item.created_at) return false;
+      const itemDate = new Date(item.created_at);
+      return itemDate >= startDate;
+    });
+
+    // Group by date and characteristic value
+    const trendMap: { [date: string]: { [value: string]: number } } = {};
+    
+    filteredData.forEach(item => {
+      if (!item.created_at || !item[field]) return;
+      
+      const date = new Date(item.created_at).toLocaleDateString('pt-BR');
+      const value = item[field] as string;
+      
+      if (!trendMap[date]) {
+        trendMap[date] = {};
+      }
+      trendMap[date][value] = (trendMap[date][value] || 0) + 1;
+    });
+
+    // Convert to array format
+    const result: TrendData[] = Object.entries(trendMap)
+      .map(([date, values]) => ({
+        date,
+        ...values
+      }))
+      .sort((a, b) => {
+        const dateA = new Date(a.date.split('/').reverse().join('-'));
+        const dateB = new Date(b.date.split('/').reverse().join('-'));
+        return dateA.getTime() - dateB.getTime();
+      });
+
+    return result;
+  };
+
   const fetchCharacteristics = async () => {
     try {
       const { data, error } = await supabase
         .from("characters")
-        .select("gender, age, appearance, environment, posture, action, mood, visual, movement, angle, lighting, voice_tone");
+        .select("gender, age, appearance, environment, posture, action, mood, visual, movement, angle, lighting, voice_tone, created_at");
 
       if (error) throw error;
 
@@ -147,12 +199,22 @@ export const CharacteristicsAnalytics = () => {
       setCorrelationEnvPosture(calculateCorrelation(data || [], "environment", "posture"));
       setCorrelationVisualMood(calculateCorrelation(data || [], "visual", "mood"));
       setCorrelationMovementAngle(calculateCorrelation(data || [], "movement", "angle"));
+
+      // Calculate trends based on selected period
+      const days = trendPeriod === '7d' ? 7 : trendPeriod === '30d' ? 30 : 90;
+      setTrendGender(calculateTrends(data || [], "gender", days));
+      setTrendEnvironment(calculateTrends(data || [], "environment", days));
+      setTrendVisual(calculateTrends(data || [], "visual", days));
     } catch (error) {
       console.error("Error fetching characteristics:", error);
     } finally {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchCharacteristics();
+  }, [trendPeriod]);
 
   const exportToCSV = () => {
     try {
@@ -823,6 +885,176 @@ export const CharacteristicsAnalytics = () => {
                         <Bar key={key} dataKey={key} stackId="a" fill={COLORS[index % COLORS.length]} />
                       ))}
                   </BarChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+          )}
+        </div>
+      </div>
+
+      {/* Tendências Temporais */}
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="text-lg font-semibold text-foreground">Tendências Temporais</h3>
+            <p className="text-sm text-muted-foreground">Evolução das preferências ao longo do tempo</p>
+          </div>
+          <div className="flex gap-2">
+            <Button
+              variant={trendPeriod === '7d' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setTrendPeriod('7d')}
+            >
+              7 dias
+            </Button>
+            <Button
+              variant={trendPeriod === '30d' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setTrendPeriod('30d')}
+            >
+              30 dias
+            </Button>
+            <Button
+              variant={trendPeriod === '90d' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setTrendPeriod('90d')}
+            >
+              90 dias
+            </Button>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 gap-6">
+          {trendGender.length > 0 && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Evolução de Gênero</CardTitle>
+                <CardDescription>Como a escolha de gênero mudou ao longo do tempo</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ResponsiveContainer width="100%" height={300}>
+                  <LineChart data={trendGender}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                    <XAxis 
+                      dataKey="date" 
+                      stroke="hsl(var(--muted-foreground))"
+                      angle={-45}
+                      textAnchor="end"
+                      height={80}
+                    />
+                    <YAxis stroke="hsl(var(--muted-foreground))" />
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: "hsl(var(--card))",
+                        border: "1px solid hsl(var(--border))",
+                        borderRadius: "8px",
+                      }}
+                    />
+                    <Legend />
+                    {Object.keys(trendGender[0] || {})
+                      .filter(key => key !== 'date')
+                      .map((key, index) => (
+                        <Line
+                          key={key}
+                          type="monotone"
+                          dataKey={key}
+                          stroke={COLORS[index % COLORS.length]}
+                          strokeWidth={2}
+                          dot={{ r: 4 }}
+                          activeDot={{ r: 6 }}
+                        />
+                      ))}
+                  </LineChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+          )}
+
+          {trendEnvironment.length > 0 && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Evolução de Ambientes</CardTitle>
+                <CardDescription>Tendência de escolha de cenários ao longo do tempo</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ResponsiveContainer width="100%" height={300}>
+                  <LineChart data={trendEnvironment}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                    <XAxis 
+                      dataKey="date" 
+                      stroke="hsl(var(--muted-foreground))"
+                      angle={-45}
+                      textAnchor="end"
+                      height={80}
+                    />
+                    <YAxis stroke="hsl(var(--muted-foreground))" />
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: "hsl(var(--card))",
+                        border: "1px solid hsl(var(--border))",
+                        borderRadius: "8px",
+                      }}
+                    />
+                    <Legend />
+                    {Object.keys(trendEnvironment[0] || {})
+                      .filter(key => key !== 'date')
+                      .map((key, index) => (
+                        <Line
+                          key={key}
+                          type="monotone"
+                          dataKey={key}
+                          stroke={COLORS[index % COLORS.length]}
+                          strokeWidth={2}
+                          dot={{ r: 4 }}
+                          activeDot={{ r: 6 }}
+                        />
+                      ))}
+                  </LineChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+          )}
+
+          {trendVisual.length > 0 && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Evolução de Estilo Visual</CardTitle>
+                <CardDescription>Como as preferências de estilo visual mudaram ao longo do tempo</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ResponsiveContainer width="100%" height={300}>
+                  <LineChart data={trendVisual}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                    <XAxis 
+                      dataKey="date" 
+                      stroke="hsl(var(--muted-foreground))"
+                      angle={-45}
+                      textAnchor="end"
+                      height={80}
+                    />
+                    <YAxis stroke="hsl(var(--muted-foreground))" />
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: "hsl(var(--card))",
+                        border: "1px solid hsl(var(--border))",
+                        borderRadius: "8px",
+                      }}
+                    />
+                    <Legend />
+                    {Object.keys(trendVisual[0] || {})
+                      .filter(key => key !== 'date')
+                      .map((key, index) => (
+                        <Line
+                          key={key}
+                          type="monotone"
+                          dataKey={key}
+                          stroke={COLORS[index % COLORS.length]}
+                          strokeWidth={2}
+                          dot={{ r: 4 }}
+                          activeDot={{ r: 6 }}
+                        />
+                      ))}
+                  </LineChart>
                 </ResponsiveContainer>
               </CardContent>
             </Card>
