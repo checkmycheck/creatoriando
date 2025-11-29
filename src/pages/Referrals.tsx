@@ -127,7 +127,8 @@ export default function Referrals() {
     window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank');
   };
 
-  const totalCreditsEarned = referralCode ? referralCode.uses * referralCode.bonus_credits : 0;
+  // Calcular créditos ganhos somando os valores reais do histórico
+  const totalCreditsEarned = referralHistory.reduce((sum, item) => sum + item.credits_awarded, 0);
   const conversionRate = referralCode && referralCode.uses > 0 ? 100 : 0;
 
   if (loading) {
