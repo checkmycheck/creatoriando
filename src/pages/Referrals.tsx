@@ -123,7 +123,7 @@ export default function Referrals() {
   const shareWhatsApp = () => {
     if (!referralCode) return;
     const link = `https://criacreator.online/auth?ref=${referralCode.code}`;
-    const message = `Junte-se ao Creator IA e ganhe 3 créditos grátis! Use meu link: ${link}`;
+    const message = `Junte-se ao CriaCreator e ganhe 3 créditos grátis! Use meu link: ${link}`;
     window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank');
   };
 

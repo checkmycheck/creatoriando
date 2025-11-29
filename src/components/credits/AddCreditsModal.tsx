@@ -37,7 +37,7 @@ export function AddCreditsModal({ open, onOpenChange }: AddCreditsModalProps) {
         body: { 
           price: price,
           credits: credits,
-          description: `${credits} créditos Creator IA`
+          description: `${credits} créditos CriaCreator`
         }
       });
 

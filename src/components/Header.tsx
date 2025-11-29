@@ -13,7 +13,7 @@ export const Header = () => {
             className="flex items-center gap-2 hover:opacity-80 transition-opacity cursor-pointer active:scale-95"
           >
             <Video className="w-5 h-5 sm:w-6 sm:h-6 text-lime" />
-            <span className="text-lg sm:text-xl font-bold">Creator IA</span>
+            <span className="text-lg sm:text-xl font-bold">CriaCreator</span>
           </button>
         </div>
       </div>
