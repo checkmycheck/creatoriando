@@ -126,6 +126,10 @@ export default function Subscription() {
     });
   };
 
+  const calculateCostPerCredit = (price: number, credits: number) => {
+    return (price / credits).toFixed(2);
+  };
+
   const getStatusBadge = (status: string | null) => {
     if (!status) return null;
     
@@ -305,6 +309,10 @@ export default function Subscription() {
                   </div>
 
                   <ul className="space-y-2 sm:space-y-3">
+                    <li className="flex items-center gap-2 text-xs sm:text-sm">
+                      <Check className="w-3 h-3 sm:w-4 sm:h-4 text-lime flex-shrink-0" />
+                      <span className="font-semibold">R$ {calculateCostPerCredit(pkg.price_brl, pkg.credits)} por crédito</span>
+                    </li>
                     <li className="flex items-center gap-2 text-xs sm:text-sm">
                       <Check className="w-3 h-3 sm:w-4 sm:h-4 text-lime flex-shrink-0" />
                       <span>{pkg.credits} personagens</span>
