@@ -115,7 +115,7 @@ export const FAQEditor = forwardRef<FAQEditorRef>((props, ref) => {
               <Input
                 value={faq.question}
                 onChange={(e) => handleChange(index, "question", e.target.value)}
-                placeholder="Como funciona o Creator IA?"
+                placeholder="Como funciona o CriaCreator?"
               />
             </div>
 
@@ -125,7 +125,7 @@ export const FAQEditor = forwardRef<FAQEditorRef>((props, ref) => {
                 value={faq.answer}
                 onChange={(e) => handleChange(index, "answer", e.target.value)}
                 rows={4}
-                placeholder="O Creator IA é um wizard guiado..."
+                placeholder="O CriaCreator é um wizard guiado..."
               />
             </div>
           </div>

@@ -98,7 +98,7 @@ export function PixPaymentModal({ open, onOpenChange, pixData }: PixPaymentModal
   };
 
   const shareViaWhatsApp = () => {
-    const message = `💳 *Pagamento PIX - Creator IA*
+    const message = `💳 *Pagamento PIX - CriaCreator*
 
 Valor: R$ ${pixData.amount.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
 Créditos: ${pixData.credits.toLocaleString('pt-BR')}

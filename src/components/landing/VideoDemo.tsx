@@ -6,7 +6,7 @@ import { useLandingContent } from "@/hooks/useLandingContent";
 export const VideoDemo = () => {
   const { content, loading } = useLandingContent("video");
   const [videoData, setVideoData] = useState({
-    title: "Veja o Creator IA em ação",
+    title: "Veja o CriaCreator em ação",
     subtitle: "Assista como é fácil criar personagens profissionais",
     videoUrl: "",
     duration: "3:24",

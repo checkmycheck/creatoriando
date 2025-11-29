@@ -83,7 +83,7 @@ export const VideoEditor = forwardRef<VideoEditorRef>((props, ref) => {
             id="video-title"
             value={formData.title}
             onChange={(e) => handleChange("title", e.target.value)}
-            placeholder="Veja o Creator IA em ação"
+            placeholder="Veja o CriaCreator em ação"
           />
         </div>
 

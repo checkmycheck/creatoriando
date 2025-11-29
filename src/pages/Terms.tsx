@@ -27,7 +27,7 @@ export default function Terms() {
             <section>
               <h2 className="text-xl font-semibold mb-3">1. Aceitação dos Termos</h2>
               <p className="text-muted-foreground">
-                Ao acessar e usar o Creator IA, você concorda em cumprir e estar vinculado a estes Termos de Uso. 
+                Ao acessar e usar o CriaCreator, você concorda em cumprir e estar vinculado a estes Termos de Uso. 
                 Se você não concordar com qualquer parte destes termos, não deve usar nossos serviços.
               </p>
             </section>
@@ -35,7 +35,7 @@ export default function Terms() {
             <section>
               <h2 className="text-xl font-semibold mb-3">2. Descrição do Serviço</h2>
               <p className="text-muted-foreground">
-                O Creator IA é uma plataforma de criação de personagens para vídeos usando inteligência artificial. 
+                O CriaCreator é uma plataforma de criação de personagens para vídeos usando inteligência artificial. 
                 Oferecemos ferramentas para gerar prompts detalhados para criação de conteúdo em vídeo.
               </p>
             </section>
@@ -57,7 +57,7 @@ export default function Terms() {
             <section>
               <h2 className="text-xl font-semibold mb-3">4. Sistema de Créditos</h2>
               <p className="text-muted-foreground">
-                O Creator IA utiliza um sistema de créditos para criação de personagens:
+                O CriaCreator utiliza um sistema de créditos para criação de personagens:
               </p>
               <ul className="list-disc pl-6 text-muted-foreground mt-2 space-y-1">
                 <li>Novos usuários recebem 1 crédito gratuito ao se cadastrar</li>
@@ -79,7 +79,7 @@ export default function Terms() {
             <section>
               <h2 className="text-xl font-semibold mb-3">6. Uso Aceitável</h2>
               <p className="text-muted-foreground">
-                Você concorda em usar o Creator IA apenas para fins legais e de acordo com estes Termos. É proibido:
+                Você concorda em usar o CriaCreator apenas para fins legais e de acordo com estes Termos. É proibido:
               </p>
               <ul className="list-disc pl-6 text-muted-foreground mt-2 space-y-1">
                 <li>Criar conteúdo ofensivo, difamatório ou ilegal</li>
@@ -93,8 +93,8 @@ export default function Terms() {
             <section>
               <h2 className="text-xl font-semibold mb-3">7. Propriedade Intelectual</h2>
               <p className="text-muted-foreground">
-                Os personagens e prompts criados através do Creator IA são de propriedade do usuário que os criou. 
-                O Creator IA mantém os direitos sobre a plataforma, tecnologia e marca.
+                Os personagens e prompts criados através do CriaCreator são de propriedade do usuário que os criou. 
+                O CriaCreator mantém os direitos sobre a plataforma, tecnologia e marca.
               </p>
             </section>
 
@@ -109,7 +109,7 @@ export default function Terms() {
             <section>
               <h2 className="text-xl font-semibold mb-3">9. Limitação de Responsabilidade</h2>
               <p className="text-muted-foreground">
-                O Creator IA é fornecido "como está". Não garantimos que o serviço será ininterrupto ou livre de erros. 
+                O CriaCreator é fornecido "como está". Não garantimos que o serviço será ininterrupto ou livre de erros. 
                 Não nos responsabilizamos por danos indiretos, incidentais ou consequenciais.
               </p>
             </section>

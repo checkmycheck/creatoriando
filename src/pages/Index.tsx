@@ -31,7 +31,7 @@ const Index = () => {
   });
 
   const [features, setFeatures] = useState({
-    title: "Por que escolher Creator IA?",
+    title: "Por que escolher CriaCreator?",
     subtitle: "Tudo que você precisa para criar vídeos profissionais",
     items: [
       { icon: "Zap", title: "Rápido e Intuitivo", description: "Wizard guiado com 13 etapas simples para configurar cada detalhe" },
