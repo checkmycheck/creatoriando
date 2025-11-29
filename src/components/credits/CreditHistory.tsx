@@ -23,9 +23,16 @@ export const CreditHistory = () => {
   }, []);
 
   const fetchTransactions = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      setLoading(false);
+      return;
+    }
+
     const { data, error } = await supabase
       .from('credit_transactions')
       .select('*')
+      .eq('user_id', user.id)
       .order('created_at', { ascending: false })
       .limit(20);
 
