@@ -3,8 +3,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
 import { useLandingContent } from "@/hooks/useLandingContent";
 import { Skeleton } from "@/components/ui/skeleton";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+import { Upload, X } from "lucide-react";
 
 export interface HeroEditorRef {
   save: () => Promise<void>;
@@ -14,6 +18,7 @@ export interface HeroEditorRef {
 export const HeroEditor = forwardRef<HeroEditorRef>((props, ref) => {
   const { content, loading, updateContent } = useLandingContent("hero");
   const [isDirty, setIsDirty] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [formData, setFormData] = useState({
     appName: "",
     faviconUrl: "",
@@ -43,6 +48,65 @@ export const HeroEditor = forwardRef<HeroEditorRef>((props, ref) => {
     const newFormData = { ...formData, [field]: value };
     setFormData(newFormData);
     setIsDirty(true);
+  };
+
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    const validTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/x-icon', 'image/vnd.microsoft.icon'];
+    if (!validTypes.includes(file.type)) {
+      toast.error("Formato inválido. Use PNG, JPG ou ICO.");
+      return;
+    }
+
+    // Validate file size (max 1MB)
+    if (file.size > 1024 * 1024) {
+      toast.error("Arquivo muito grande. Máximo 1MB.");
+      return;
+    }
+
+    setUploading(true);
+    try {
+      // Delete old favicon if exists
+      if (formData.faviconUrl && formData.faviconUrl.includes('site-assets')) {
+        const oldPath = formData.faviconUrl.split('/site-assets/')[1];
+        if (oldPath) {
+          await supabase.storage.from('site-assets').remove([oldPath]);
+        }
+      }
+
+      // Upload new file
+      const fileExt = file.name.split('.').pop();
+      const fileName = `favicon-${Date.now()}.${fileExt}`;
+      const { data, error } = await supabase.storage
+        .from('site-assets')
+        .upload(fileName, file, {
+          cacheControl: '3600',
+          upsert: true
+        });
+
+      if (error) throw error;
+
+      // Get public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from('site-assets')
+        .getPublicUrl(data.path);
+
+      handleChange('faviconUrl', publicUrl);
+      toast.success("Favicon enviado com sucesso!");
+    } catch (error) {
+      console.error('Error uploading favicon:', error);
+      toast.error("Erro ao enviar favicon");
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleRemoveFavicon = () => {
+    handleChange('faviconUrl', '');
+    toast.success("Favicon removido");
   };
 
   useImperativeHandle(ref, () => ({
@@ -94,15 +158,64 @@ export const HeroEditor = forwardRef<HeroEditorRef>((props, ref) => {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="faviconUrl">URL do Favicon</Label>
-          <Input
-            id="faviconUrl"
-            value={formData.faviconUrl}
-            onChange={(e) => handleChange("faviconUrl", e.target.value)}
-            placeholder="/favicon.ico"
-          />
+          <Label>Favicon</Label>
+          <div className="space-y-3">
+            {formData.faviconUrl && (
+              <div className="flex items-center gap-3 p-3 border border-border rounded-lg bg-muted/50">
+                <img 
+                  src={formData.faviconUrl} 
+                  alt="Favicon" 
+                  className="w-8 h-8 object-contain"
+                  onError={(e) => {
+                    e.currentTarget.src = '/favicon.ico';
+                  }}
+                />
+                <span className="text-sm flex-1 truncate">{formData.faviconUrl}</span>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleRemoveFavicon}
+                >
+                  <X className="w-4 h-4" />
+                </Button>
+              </div>
+            )}
+            
+            <div className="flex gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                disabled={uploading}
+                onClick={() => document.getElementById('favicon-upload')?.click()}
+                className="flex-1"
+              >
+                <Upload className="w-4 h-4 mr-2" />
+                {uploading ? "Enviando..." : "Upload de Imagem"}
+              </Button>
+              <input
+                id="favicon-upload"
+                type="file"
+                accept="image/png,image/jpeg,image/jpg,image/x-icon"
+                className="hidden"
+                onChange={handleFileUpload}
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="faviconUrl" className="text-sm text-muted-foreground">
+                Ou cole a URL:
+              </Label>
+              <Input
+                id="faviconUrl"
+                value={formData.faviconUrl}
+                onChange={(e) => handleChange("faviconUrl", e.target.value)}
+                placeholder="/favicon.ico ou https://..."
+              />
+            </div>
+          </div>
           <p className="text-xs text-muted-foreground">
-            Cole a URL do favicon (ex: /favicon.ico ou https://...)
+            Formatos aceitos: PNG, JPG, ICO (máx. 1MB)
           </p>
         </div>
 
