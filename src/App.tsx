@@ -8,6 +8,7 @@ import { DashboardLayout } from "./components/DashboardLayout";
 import { ScrollToTop } from "./components/ScrollToTop";
 import { RouteTransition } from "./components/RouteTransition";
 import { useTheme } from "./hooks/useTheme";
+import { useFavicon } from "./hooks/useFavicon";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import CreateCharacter from "./pages/CreateCharacter";
@@ -26,6 +27,7 @@ const queryClient = new QueryClient();
 
 const App = () => {
   useTheme();
+  useFavicon();
 
   return (
     <QueryClientProvider client={queryClient}>
