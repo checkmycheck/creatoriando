@@ -16,6 +16,7 @@ export const HeroEditor = forwardRef<HeroEditorRef>((props, ref) => {
   const [isDirty, setIsDirty] = useState(false);
   const [formData, setFormData] = useState({
     appName: "",
+    faviconUrl: "",
     badge: "",
     title: "",
     subtitle: "",
@@ -25,9 +26,10 @@ export const HeroEditor = forwardRef<HeroEditorRef>((props, ref) => {
 
   useEffect(() => {
     if (content.length > 0) {
-      const heroContent = content[0].content;
+      const heroContent = content[0].content as any;
       setFormData({
         appName: heroContent.appName || "",
+        faviconUrl: heroContent.faviconUrl || "",
         badge: heroContent.badge || "",
         title: heroContent.title || "",
         subtitle: heroContent.subtitle || "",
@@ -89,6 +91,19 @@ export const HeroEditor = forwardRef<HeroEditorRef>((props, ref) => {
             onChange={(e) => handleChange("appName", e.target.value)}
             placeholder="CriaCreator"
           />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="faviconUrl">URL do Favicon</Label>
+          <Input
+            id="faviconUrl"
+            value={formData.faviconUrl}
+            onChange={(e) => handleChange("faviconUrl", e.target.value)}
+            placeholder="/favicon.ico"
+          />
+          <p className="text-xs text-muted-foreground">
+            Cole a URL do favicon (ex: /favicon.ico ou https://...)
+          </p>
         </div>
 
         <div className="space-y-2">

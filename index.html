@@ -47,6 +47,18 @@
             console.error('Error applying cached theme:', e);
           }
         }
+
+        // Apply cached favicon
+        const faviconUrl = localStorage.getItem('favicon-url');
+        if (faviconUrl) {
+          const existingLinks = document.querySelectorAll("link[rel*='icon']");
+          existingLinks.forEach(link => link.remove());
+          
+          const link = document.createElement('link');
+          link.rel = 'icon';
+          link.href = faviconUrl;
+          document.head.appendChild(link);
+        }
       })();
     </script>
     <div id="root"></div>
