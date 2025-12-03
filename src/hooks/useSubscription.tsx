@@ -49,7 +49,17 @@ export const useSubscription = () => {
   useEffect(() => {
     fetchSubscriptionData();
 
-    if (!userId) return;
+    // Listen for custom event to sync credits across components
+    const handleCreditsUpdate = () => {
+      fetchSubscriptionData();
+    };
+    window.addEventListener('credits-updated', handleCreditsUpdate);
+
+    if (!userId) {
+      return () => {
+        window.removeEventListener('credits-updated', handleCreditsUpdate);
+      };
+    }
 
     // Subscribe to realtime changes
     const channel = supabase
@@ -81,6 +91,7 @@ export const useSubscription = () => {
       .subscribe();
 
     return () => {
+      window.removeEventListener('credits-updated', handleCreditsUpdate);
       supabase.removeChannel(channel);
     };
   }, [userId]);
@@ -132,8 +143,14 @@ export const useSubscription = () => {
     });
   };
 
+  const refresh = async () => {
+    await fetchSubscriptionData();
+    // Dispatch event to sync other components
+    window.dispatchEvent(new CustomEvent('credits-updated'));
+  };
+
   return {
     ...subscription,
-    refresh: fetchSubscriptionData,
+    refresh,
   };
 };
