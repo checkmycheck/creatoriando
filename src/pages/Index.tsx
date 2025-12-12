@@ -22,6 +22,12 @@ const Index = () => {
   const navigate = useNavigate();
   const { content: heroContent, loading: heroLoading } = useLandingContent("hero");
   const [landingEnabled, setLandingEnabled] = useState<boolean | null>(null);
+  const [sectionVisibility, setSectionVisibility] = useState({
+    showTestimonials: true,
+    showVideo: true,
+    showPricing: true,
+    showFAQ: true,
+  });
   const { content: featuresContent } = useLandingContent("features");
 
   const [hero, setHero] = useState({
@@ -48,6 +54,13 @@ const Index = () => {
       setHero(heroData);
       // Check if landing page is enabled (default true if not set)
       setLandingEnabled(heroData.landingPageEnabled !== false);
+      // Set section visibility
+      setSectionVisibility({
+        showTestimonials: heroData.showTestimonials !== false,
+        showVideo: heroData.showVideo !== false,
+        showPricing: heroData.showPricing !== false,
+        showFAQ: heroData.showFAQ !== false,
+      });
     } else if (!heroLoading && heroContent.length === 0) {
       // No hero content, assume landing is enabled
       setLandingEnabled(true);
@@ -130,10 +143,10 @@ const Index = () => {
         </div>
       </main>
 
-      <Testimonials />
-      <VideoDemo />
-      <Pricing />
-      <FAQ />
+      {sectionVisibility.showTestimonials && <Testimonials />}
+      {sectionVisibility.showVideo && <VideoDemo />}
+      {sectionVisibility.showPricing && <Pricing />}
+      {sectionVisibility.showFAQ && <FAQ />}
     </div>
   );
 };
