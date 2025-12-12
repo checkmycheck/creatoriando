@@ -53,14 +53,7 @@ Deno.serve(async (req) => {
     }
 
     // Parse request body
-    const { email, password, full_name, credits = 1 } = await req.json();
-
-    if (!email || !password) {
-      return new Response(
-        JSON.stringify({ error: "Email and password are required" }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
+    const { action, email, password, full_name, credits = 1, user_id } = await req.json();
 
     // Create admin client with service role
     const adminClient = createClient(supabaseUrl, supabaseServiceRoleKey, {
@@ -69,6 +62,41 @@ Deno.serve(async (req) => {
         persistSession: false,
       },
     });
+
+    // Handle password reset action
+    if (action === "reset_password") {
+      if (!user_id || !password) {
+        return new Response(
+          JSON.stringify({ error: "User ID and new password are required" }),
+          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+
+      const { error: resetError } = await adminClient.auth.admin.updateUserById(user_id, {
+        password,
+      });
+
+      if (resetError) {
+        console.error("Error resetting password:", resetError);
+        return new Response(
+          JSON.stringify({ error: resetError.message }),
+          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+
+      return new Response(
+        JSON.stringify({ success: true, message: "Password reset successfully" }),
+        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // Default action: create user
+    if (!email || !password) {
+      return new Response(
+        JSON.stringify({ error: "Email and password are required" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
 
     // Create user via Admin API
     const { data: newUser, error: createError } = await adminClient.auth.admin.createUser({

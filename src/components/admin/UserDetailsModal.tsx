@@ -25,7 +25,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Loader2, User, CreditCard, Video, Calendar, Mail, Edit2, X, Save, Trash2 } from "lucide-react";
+import { Loader2, User, CreditCard, Video, Calendar, Mail, Edit2, X, Save, Trash2, KeyRound } from "lucide-react";
 import { toast } from "sonner";
 
 const updateProfileSchema = z.object({
@@ -71,6 +71,9 @@ export function UserDetailsModal({ user, open, onClose, onUserDeleted }: UserDet
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [showResetPasswordDialog, setShowResetPasswordDialog] = useState(false);
+  const [newPassword, setNewPassword] = useState("");
+  const [resettingPassword, setResettingPassword] = useState(false);
   const [editedCredits, setEditedCredits] = useState(user.credits);
   const [editedPlan, setEditedPlan] = useState(user.subscription_plan);
   const [characterStats, setCharacterStats] = useState<CharacterStats>({
@@ -221,6 +224,50 @@ export function UserDetailsModal({ user, open, onClose, onUserDeleted }: UserDet
     }
   };
 
+  const handleResetPassword = async () => {
+    if (!newPassword || newPassword.length < 6) {
+      toast.error("A senha deve ter pelo menos 6 caracteres");
+      return;
+    }
+
+    try {
+      setResettingPassword(true);
+
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/create-user`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${session?.access_token}`,
+          },
+          body: JSON.stringify({
+            action: "reset_password",
+            user_id: user.id,
+            password: newPassword,
+          }),
+        }
+      );
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || "Erro ao redefinir senha");
+      }
+
+      toast.success("Senha redefinida com sucesso!");
+      setShowResetPasswordDialog(false);
+      setNewPassword("");
+    } catch (error: any) {
+      console.error("Error resetting password:", error);
+      toast.error("Erro ao redefinir senha: " + error.message);
+    } finally {
+      setResettingPassword(false);
+    }
+  };
+
   const calculateExpirationDate = (createdAt: string) => {
     const created = new Date(createdAt);
     const expiration = new Date(created);
@@ -266,7 +313,16 @@ export function UserDetailsModal({ user, open, onClose, onUserDeleted }: UserDet
                   Informações completas sobre o usuário e suas atividades
                 </DialogDescription>
               </div>
-              <div className="flex gap-2">
+              <div className="flex gap-2 flex-wrap">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowResetPasswordDialog(true)}
+                  disabled={loading}
+                >
+                  <KeyRound className="w-4 h-4 mr-2" />
+                  Redefinir Senha
+                </Button>
                 <Button
                   variant="destructive"
                   size="sm"
@@ -511,6 +567,48 @@ export function UserDetailsModal({ user, open, onClose, onUserDeleted }: UserDet
               </>
             ) : (
               "Deletar Usuário"
+            )}
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+
+    <AlertDialog open={showResetPasswordDialog} onOpenChange={(open) => {
+      setShowResetPasswordDialog(open);
+      if (!open) setNewPassword("");
+    }}>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Redefinir Senha</AlertDialogTitle>
+          <AlertDialogDescription>
+            Defina uma nova senha para o usuário <strong>{user.email}</strong>.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <div className="py-4">
+          <Label htmlFor="new-password">Nova Senha</Label>
+          <Input
+            id="new-password"
+            type="password"
+            placeholder="Mínimo 6 caracteres"
+            value={newPassword}
+            onChange={(e) => setNewPassword(e.target.value)}
+            disabled={resettingPassword}
+            className="mt-2"
+          />
+        </div>
+        <AlertDialogFooter>
+          <AlertDialogCancel disabled={resettingPassword}>Cancelar</AlertDialogCancel>
+          <AlertDialogAction
+            onClick={handleResetPassword}
+            disabled={resettingPassword || newPassword.length < 6}
+          >
+            {resettingPassword ? (
+              <>
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                Redefinindo...
+              </>
+            ) : (
+              "Redefinir Senha"
             )}
           </AlertDialogAction>
         </AlertDialogFooter>
