@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect, useCallback } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Home, Sparkles, MessageSquare, Video, HelpCircle, Save } from "lucide-react";
 import { HeroEditor, HeroEditorRef } from "./cms/HeroEditor";
@@ -26,12 +26,26 @@ export const LandingPageCMS = () => {
   const navigate = useNavigate();
   const [isSaving, setIsSaving] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [hasPendingChanges, setHasPendingChanges] = useState(false);
 
   const heroRef = useRef<HeroEditorRef>(null);
   const featuresRef = useRef<FeaturesEditorRef>(null);
   const testimonialsRef = useRef<TestimonialsEditorRef>(null);
   const videoRef = useRef<VideoEditorRef>(null);
   const faqRef = useRef<FAQEditorRef>(null);
+
+  // Check for changes periodically
+  const checkForChanges = useCallback(() => {
+    const hasChanges = [heroRef, featuresRef, testimonialsRef, videoRef, faqRef]
+      .some(ref => ref.current?.isDirty());
+    setHasPendingChanges(hasChanges);
+  }, []);
+
+  // Poll for changes every 500ms
+  useEffect(() => {
+    const interval = setInterval(checkForChanges, 500);
+    return () => clearInterval(interval);
+  }, [checkForChanges]);
 
   const handleSaveAll = async () => {
     setIsSaving(true);
@@ -40,6 +54,7 @@ export const LandingPageCMS = () => {
       const refs = [heroRef, featuresRef, testimonialsRef, videoRef, faqRef];
       await Promise.all(refs.map(ref => ref.current?.save()));
       toast.success("Todas as alterações foram salvas com sucesso!");
+      setHasPendingChanges(false);
     } catch (error) {
       console.error("Error saving content:", error);
       toast.error("Erro ao salvar alterações");
@@ -49,14 +64,9 @@ export const LandingPageCMS = () => {
   };
 
   const handleSaveClick = () => {
-    if (hasChanges()) {
+    if (hasPendingChanges) {
       setShowConfirmDialog(true);
     }
-  };
-
-  const hasChanges = () => {
-    return [heroRef, featuresRef, testimonialsRef, videoRef, faqRef]
-      .some(ref => ref.current?.isDirty());
   };
 
   return (
@@ -141,10 +151,10 @@ export const LandingPageCMS = () => {
         <Button 
           size="lg" 
           onClick={handleSaveClick} 
-          disabled={isSaving || !hasChanges()}
+          disabled={isSaving || !hasPendingChanges}
         >
           <Save className="w-4 h-4 mr-2" />
-          {isSaving ? "Salvando..." : "Salvar Alterações"}
+          {isSaving ? "Salvando..." : hasPendingChanges ? "Salvar Alterações" : "Sem Alterações"}
         </Button>
       </div>
 
