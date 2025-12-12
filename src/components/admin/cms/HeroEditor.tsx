@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
 import { useLandingContent } from "@/hooks/useLandingContent";
 import { Skeleton } from "@/components/ui/skeleton";
 import { supabase } from "@/integrations/supabase/client";
@@ -22,6 +23,7 @@ export const HeroEditor = forwardRef<HeroEditorRef>((props, ref) => {
   const [formData, setFormData] = useState({
     appName: "",
     faviconUrl: "",
+    landingPageEnabled: true,
     badge: "",
     title: "",
     subtitle: "",
@@ -35,6 +37,7 @@ export const HeroEditor = forwardRef<HeroEditorRef>((props, ref) => {
       setFormData({
         appName: heroContent.appName || "",
         faviconUrl: heroContent.faviconUrl || "",
+        landingPageEnabled: heroContent.landingPageEnabled !== false, // default true
         badge: heroContent.badge || "",
         title: heroContent.title || "",
         subtitle: heroContent.subtitle || "",
@@ -44,7 +47,7 @@ export const HeroEditor = forwardRef<HeroEditorRef>((props, ref) => {
     }
   }, [content]);
 
-  const handleChange = (field: string, value: string) => {
+  const handleChange = (field: string, value: string | boolean) => {
     const newFormData = { ...formData, [field]: value };
     setFormData(newFormData);
     setIsDirty(true);
@@ -154,6 +157,20 @@ export const HeroEditor = forwardRef<HeroEditorRef>((props, ref) => {
             value={formData.appName}
             onChange={(e) => handleChange("appName", e.target.value)}
             placeholder="CriaCreator"
+          />
+        </div>
+
+        <div className="flex items-center justify-between p-4 border border-border rounded-lg bg-muted/30">
+          <div className="space-y-0.5">
+            <Label htmlFor="landingPageEnabled">Landing Page Ativa</Label>
+            <p className="text-sm text-muted-foreground">
+              Quando desativada, a página inicial redireciona para /auth
+            </p>
+          </div>
+          <Switch
+            id="landingPageEnabled"
+            checked={formData.landingPageEnabled}
+            onCheckedChange={(checked) => handleChange("landingPageEnabled", checked)}
           />
         </div>
 

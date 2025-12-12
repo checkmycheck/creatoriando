@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Sparkles, Video, Zap, Settings } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Navigate } from "react-router-dom";
 import { Header } from "@/components/Header";
 import { Testimonials } from "@/components/landing/Testimonials";
 import { FAQ } from "@/components/landing/FAQ";
@@ -8,6 +8,7 @@ import { VideoDemo } from "@/components/landing/VideoDemo";
 import { Pricing } from "@/components/landing/Pricing";
 import { useState, useEffect } from "react";
 import { useLandingContent } from "@/hooks/useLandingContent";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
 
 // Mapeia nome do ícone para componente
 const iconMap: Record<string, any> = {
@@ -19,7 +20,8 @@ const iconMap: Record<string, any> = {
 
 const Index = () => {
   const navigate = useNavigate();
-  const { content: heroContent } = useLandingContent("hero");
+  const { content: heroContent, loading: heroLoading } = useLandingContent("hero");
+  const [landingEnabled, setLandingEnabled] = useState<boolean | null>(null);
   const { content: featuresContent } = useLandingContent("features");
 
   const [hero, setHero] = useState({
@@ -42,15 +44,31 @@ const Index = () => {
 
   useEffect(() => {
     if (heroContent.length > 0 && heroContent[0].content) {
-      setHero(heroContent[0].content);
+      const heroData = heroContent[0].content as any;
+      setHero(heroData);
+      // Check if landing page is enabled (default true if not set)
+      setLandingEnabled(heroData.landingPageEnabled !== false);
+    } else if (!heroLoading && heroContent.length === 0) {
+      // No hero content, assume landing is enabled
+      setLandingEnabled(true);
     }
-  }, [heroContent]);
+  }, [heroContent, heroLoading]);
 
   useEffect(() => {
     if (featuresContent.length > 0 && featuresContent[0].content) {
       setFeatures(featuresContent[0].content);
     }
   }, [featuresContent]);
+
+  // Show loading while checking if landing is enabled
+  if (landingEnabled === null) {
+    return <LoadingSpinner />;
+  }
+
+  // Redirect to auth if landing page is disabled
+  if (landingEnabled === false) {
+    return <Navigate to="/auth" replace />;
+  }
 
   return (
     <div className="min-h-screen bg-background text-foreground">
