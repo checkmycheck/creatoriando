@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Users, Video, Activity, TrendingUp, Palette, Home, BarChart3, Search, Package, Layout, Receipt, Settings, History } from "lucide-react";
+import { Users, Video, Activity, TrendingUp, Palette, Home, BarChart3, Search, Package, Layout, Receipt, Settings, History, UserPlus } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
@@ -21,6 +21,7 @@ import { TransactionsList } from "@/components/admin/TransactionsList";
 import { PaymentSettings } from "@/components/admin/PaymentSettings";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { AdminCreditHistory } from "@/components/admin/AdminCreditHistory";
+import { CreateUserModal } from "@/components/admin/CreateUserModal";
 
 interface Stats {
   totalUsers: number;
@@ -53,6 +54,7 @@ export default function Admin() {
   const [loadingUsers, setLoadingUsers] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [planFilter, setPlanFilter] = useState<string>("all");
+  const [showCreateUserModal, setShowCreateUserModal] = useState(false);
   const saveTimeoutRef = useRef<Record<string, NodeJS.Timeout>>({});
 
   useEffect(() => {
@@ -571,10 +573,18 @@ export default function Admin() {
           <TabsContent value="users" className="space-y-6 mt-6">
             <Card>
               <CardHeader>
-                <CardTitle>Usuários Cadastrados</CardTitle>
-                <CardDescription>
-                  Lista de todos os usuários da plataforma. Clique em um usuário para ver detalhes.
-                </CardDescription>
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                  <div>
+                    <CardTitle>Usuários Cadastrados</CardTitle>
+                    <CardDescription>
+                      Lista de todos os usuários da plataforma. Clique em um usuário para ver detalhes.
+                    </CardDescription>
+                  </div>
+                  <Button onClick={() => setShowCreateUserModal(true)}>
+                    <UserPlus className="w-4 h-4 mr-2" />
+                    Adicionar Usuário
+                  </Button>
+                </div>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
@@ -737,6 +747,12 @@ export default function Admin() {
           </TabsContent>
         </Tabs>
       </div>
+
+      <CreateUserModal
+        open={showCreateUserModal}
+        onClose={() => setShowCreateUserModal(false)}
+        onUserCreated={loadUsers}
+      />
     </div>
   );
 }
