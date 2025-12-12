@@ -24,6 +24,10 @@ export const HeroEditor = forwardRef<HeroEditorRef>((props, ref) => {
     appName: "",
     faviconUrl: "",
     landingPageEnabled: true,
+    showTestimonials: true,
+    showVideo: true,
+    showPricing: true,
+    showFAQ: true,
     badge: "",
     title: "",
     subtitle: "",
@@ -37,7 +41,11 @@ export const HeroEditor = forwardRef<HeroEditorRef>((props, ref) => {
       setFormData({
         appName: heroContent.appName || "",
         faviconUrl: heroContent.faviconUrl || "",
-        landingPageEnabled: heroContent.landingPageEnabled !== false, // default true
+        landingPageEnabled: heroContent.landingPageEnabled !== false,
+        showTestimonials: heroContent.showTestimonials !== false,
+        showVideo: heroContent.showVideo !== false,
+        showPricing: heroContent.showPricing !== false,
+        showFAQ: heroContent.showFAQ !== false,
         badge: heroContent.badge || "",
         title: heroContent.title || "",
         subtitle: heroContent.subtitle || "",
@@ -160,18 +168,60 @@ export const HeroEditor = forwardRef<HeroEditorRef>((props, ref) => {
           />
         </div>
 
-        <div className="flex items-center justify-between p-4 border border-border rounded-lg bg-muted/30">
-          <div className="space-y-0.5">
-            <Label htmlFor="landingPageEnabled">Landing Page Ativa</Label>
-            <p className="text-sm text-muted-foreground">
-              Quando desativada, a página inicial redireciona para /auth
-            </p>
+        <div className="space-y-3">
+          <Label className="text-base font-semibold">Visibilidade</Label>
+          
+          <div className="flex items-center justify-between p-4 border border-border rounded-lg bg-muted/30">
+            <div className="space-y-0.5">
+              <Label htmlFor="landingPageEnabled">Landing Page Ativa</Label>
+              <p className="text-sm text-muted-foreground">
+                Quando desativada, a página inicial redireciona para /auth
+              </p>
+            </div>
+            <Switch
+              id="landingPageEnabled"
+              checked={formData.landingPageEnabled}
+              onCheckedChange={(checked) => handleChange("landingPageEnabled", checked)}
+            />
           </div>
-          <Switch
-            id="landingPageEnabled"
-            checked={formData.landingPageEnabled}
-            onCheckedChange={(checked) => handleChange("landingPageEnabled", checked)}
-          />
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="flex items-center justify-between p-3 border border-border rounded-lg bg-muted/30">
+              <Label htmlFor="showTestimonials">Depoimentos</Label>
+              <Switch
+                id="showTestimonials"
+                checked={formData.showTestimonials}
+                onCheckedChange={(checked) => handleChange("showTestimonials", checked)}
+              />
+            </div>
+
+            <div className="flex items-center justify-between p-3 border border-border rounded-lg bg-muted/30">
+              <Label htmlFor="showVideo">Vídeo Demo</Label>
+              <Switch
+                id="showVideo"
+                checked={formData.showVideo}
+                onCheckedChange={(checked) => handleChange("showVideo", checked)}
+              />
+            </div>
+
+            <div className="flex items-center justify-between p-3 border border-border rounded-lg bg-muted/30">
+              <Label htmlFor="showPricing">Preços</Label>
+              <Switch
+                id="showPricing"
+                checked={formData.showPricing}
+                onCheckedChange={(checked) => handleChange("showPricing", checked)}
+              />
+            </div>
+
+            <div className="flex items-center justify-between p-3 border border-border rounded-lg bg-muted/30">
+              <Label htmlFor="showFAQ">FAQ</Label>
+              <Switch
+                id="showFAQ"
+                checked={formData.showFAQ}
+                onCheckedChange={(checked) => handleChange("showFAQ", checked)}
+              />
+            </div>
+          </div>
         </div>
 
         <div className="space-y-2">
