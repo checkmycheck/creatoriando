@@ -1,48 +1,27 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
-const CACHE_KEY = 'generators-enabled';
-
 export function useGeneratorsEnabled() {
-  // SEMPRE TRUE por padrão - melhor mostrar menu e esconder depois
-  // do que não mostrar e usuário não conseguir acessar
+  // SEMPRE TRUE por padrão - NUNCA esconder menu se não conseguir ler do banco
   const [isEnabled, setIsEnabled] = useState<boolean>(true);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false); // Começa false para não bloquear
 
   useEffect(() => {
     const loadSetting = async () => {
       try {
-        const { data, error } = await supabase
+        const { data } = await supabase
           .from("theme_settings")
           .select("setting_value")
           .eq("setting_key", "generators_enabled")
           .maybeSingle();
 
-        // Se houver QUALQUER erro (incluindo RLS), manter habilitado
-        if (error) {
-          console.warn("[Generators] Erro ao carregar (usando padrão true):", error.message);
-          setIsEnabled(true);
-          localStorage.setItem(CACHE_KEY, 'true');
-          setLoading(false);
-          return;
+        // ÚNICO caso que desabilita: se explicitamente "false"
+        if (data?.setting_value === "false") {
+          setIsEnabled(false);
         }
-
-        if (data?.setting_value) {
-          const enabled = data.setting_value === "true";
-          setIsEnabled(enabled);
-          localStorage.setItem(CACHE_KEY, enabled ? 'true' : 'false');
-        } else {
-          // Se não existe no banco, usar true como padrão
-          setIsEnabled(true);
-          localStorage.setItem(CACHE_KEY, 'true');
-        }
-      } catch (err) {
-        // Qualquer exceção = manter habilitado
-        console.warn("[Generators] Exceção (usando padrão true):", err);
-        setIsEnabled(true);
-        localStorage.setItem(CACHE_KEY, 'true');
-      } finally {
-        setLoading(false);
+        // Qualquer outro caso (true, null, erro, undefined) = manter TRUE
+      } catch {
+        // Silenciosamente manter TRUE
       }
     };
 
@@ -60,9 +39,8 @@ export function useGeneratorsEnabled() {
           filter: "setting_key=eq.generators_enabled",
         },
         (payload) => {
-          const enabled = payload.new.setting_value === "true";
+          const enabled = payload.new.setting_value !== "false";
           setIsEnabled(enabled);
-          localStorage.setItem(CACHE_KEY, enabled ? 'true' : 'false');
         }
       )
       .subscribe();
@@ -81,7 +59,6 @@ export function useGeneratorsEnabled() {
 
       if (error) throw error;
       setIsEnabled(enabled);
-      localStorage.setItem(CACHE_KEY, enabled ? 'true' : 'false');
     } catch (error) {
       console.error("Error updating generators setting:", error);
       throw error;
