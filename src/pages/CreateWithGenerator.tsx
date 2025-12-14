@@ -5,6 +5,7 @@ import { ChevronLeft, ChevronRight, Sparkles, HelpCircle, Image, User } from "lu
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useSubscription } from "@/hooks/useSubscription";
+import { useGeneratorsEnabled } from "@/hooks/useGeneratorsEnabled";
 import { StepProgress } from "@/components/character/StepProgress";
 import { CharacterSummary } from "@/components/character/CharacterSummary";
 import { PostureStep } from "@/components/character/steps/PostureStep";
@@ -40,12 +41,19 @@ const CreateWithGenerator = () => {
   const navigate = useNavigate();
   const { generatorId } = useParams<{ generatorId: string }>();
   const { toast } = useToast();
+  const { isEnabled, loading: loadingEnabled } = useGeneratorsEnabled();
   const [currentStep, setCurrentStep] = useState(0);
   const [characterData, setCharacterData] = useState<CharacterData>({});
   const [userId, setUserId] = useState<string | null>(null);
   const [generator, setGenerator] = useState<Generator | null>(null);
   const [loading, setLoading] = useState(true);
   const { canCreateMore, refresh: refreshSubscription } = useSubscription();
+
+  useEffect(() => {
+    if (!loadingEnabled && !isEnabled) {
+      navigate("/create");
+    }
+  }, [isEnabled, loadingEnabled, navigate]);
 
   useEffect(() => {
     loadData();

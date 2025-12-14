@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -9,6 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { ChevronLeft, ChevronRight, Upload, Loader2, Image, User, Sparkles, Check } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useSubscription } from "@/hooks/useSubscription";
+import { useGeneratorsEnabled } from "@/hooks/useGeneratorsEnabled";
 import { StepProgress } from "@/components/character/StepProgress";
 
 const TOTAL_STEPS = 3;
@@ -17,6 +18,7 @@ const CreateGenerator = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { credits, canCreateMore, refresh: refreshSubscription } = useSubscription();
+  const { isEnabled, loading: loadingEnabled } = useGeneratorsEnabled();
   
   const [currentStep, setCurrentStep] = useState(0);
   const [name, setName] = useState("");
@@ -30,6 +32,12 @@ const CreateGenerator = () => {
   const [analyzingScenario, setAnalyzingScenario] = useState(false);
   const [analyzingCharacter, setAnalyzingCharacter] = useState(false);
   const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    if (!loadingEnabled && !isEnabled) {
+      navigate("/create");
+    }
+  }, [isEnabled, loadingEnabled, navigate]);
 
   const handleImageSelect = async (
     e: React.ChangeEvent<HTMLInputElement>,
