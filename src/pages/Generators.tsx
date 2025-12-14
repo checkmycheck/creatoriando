@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Plus, Trash2, Wand2, Image, User, Calendar } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
+import { useGeneratorsEnabled } from "@/hooks/useGeneratorsEnabled";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -29,13 +30,22 @@ interface Generator {
 const Generators = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { isEnabled, loading: loadingEnabled } = useGeneratorsEnabled();
   const [generators, setGenerators] = useState<Generator[]>([]);
   const [loading, setLoading] = useState(true);
   const [deleteId, setDeleteId] = useState<string | null>(null);
 
   useEffect(() => {
-    loadGenerators();
-  }, []);
+    if (!loadingEnabled && !isEnabled) {
+      navigate("/create");
+    }
+  }, [isEnabled, loadingEnabled, navigate]);
+
+  useEffect(() => {
+    if (isEnabled) {
+      loadGenerators();
+    }
+  }, [isEnabled]);
 
   const loadGenerators = async () => {
     const { data, error } = await supabase
