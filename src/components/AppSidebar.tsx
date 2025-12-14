@@ -38,13 +38,9 @@ export function AppSidebar() {
   const { toast } = useToast();
   const { isAdmin } = useAdmin();
   const { credits } = useSubscription();
-  const { isEnabled: generatorsEnabled, loading: generatorsLoading } = useGeneratorsEnabled();
+  const { isEnabled: generatorsEnabled } = useGeneratorsEnabled();
   const [isCreditsModalOpen, setIsCreditsModalOpen] = useState(false);
   const currentPath = location.pathname;
-  
-  // Log para debug
-  console.log('[AppSidebar] Generators:', { generatorsEnabled, generatorsLoading });
-  
   const menuItems = getMenuItems(generatorsEnabled);
 
   const isActive = (path: string) => currentPath === path;

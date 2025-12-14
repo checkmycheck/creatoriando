@@ -4,41 +4,34 @@ import { supabase } from "@/integrations/supabase/client";
 const CACHE_KEY = 'generators-enabled';
 
 export function useGeneratorsEnabled() {
-  // Inicializar do cache para evitar flash
-  const [isEnabled, setIsEnabled] = useState<boolean>(() => {
-    const cached = localStorage.getItem(CACHE_KEY);
-    console.log('[Generators] Cache inicial:', cached);
-    return cached !== null ? cached === 'true' : true;
-  });
+  // IMPORTANTE: Default TRUE para garantir que menu apareça imediatamente
+  // enquanto carrega do banco (melhor UX do que esconder e mostrar depois)
+  const [isEnabled, setIsEnabled] = useState<boolean>(true);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const loadSetting = async () => {
       try {
-        console.log('[Generators] Carregando configuração do banco...');
-        
         const { data, error } = await supabase
           .from("theme_settings")
           .select("setting_value")
           .eq("setting_key", "generators_enabled")
           .maybeSingle();
 
-        console.log('[Generators] Resposta do banco:', { data, error });
-
         if (error) {
           console.error("[Generators] Erro ao carregar:", error);
+          // Em caso de erro, manter habilitado
+          setIsEnabled(true);
           setLoading(false);
           return;
         }
 
         if (data) {
           const enabled = data.setting_value === "true";
-          console.log('[Generators] Valor do banco:', enabled);
           setIsEnabled(enabled);
           localStorage.setItem(CACHE_KEY, enabled ? 'true' : 'false');
         } else {
-          // Setting doesn't exist, create it with default value true
-          console.log('[Generators] Criando configuração padrão...');
+          // Se não existe, criar com valor padrão true
           await supabase
             .from("theme_settings")
             .insert({ setting_key: "generators_enabled", setting_value: "true" });
@@ -47,6 +40,8 @@ export function useGeneratorsEnabled() {
         }
       } catch (error) {
         console.error("[Generators] Erro:", error);
+        // Em caso de exceção, manter habilitado para não bloquear
+        setIsEnabled(true);
       } finally {
         setLoading(false);
       }
@@ -66,7 +61,6 @@ export function useGeneratorsEnabled() {
           filter: "setting_key=eq.generators_enabled",
         },
         (payload) => {
-          console.log('[Generators] Realtime update:', payload);
           const enabled = payload.new.setting_value === "true";
           setIsEnabled(enabled);
           localStorage.setItem(CACHE_KEY, enabled ? 'true' : 'false');
