@@ -1,4 +1,4 @@
-import { LayoutDashboard, Plus, User, LogOut, Shield, Coins, CreditCard, Gift } from "lucide-react";
+import { LayoutDashboard, Plus, User, LogOut, Shield, Coins, CreditCard, Gift, Wand2 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -24,6 +24,7 @@ import {
 
 const menuItems = [
   { title: "Criar Novo", url: "/create", icon: Plus },
+  { title: "Geradores", url: "/generators", icon: Wand2 },
   { title: "Personagens", url: "/characters", icon: LayoutDashboard },
   { title: "Pacotes", url: "/subscription", icon: CreditCard },
   { title: "Indicações", url: "/referrals", icon: Gift },
