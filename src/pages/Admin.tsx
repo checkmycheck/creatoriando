@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Users, Video, Activity, TrendingUp, Palette, Home, BarChart3, Search, Package, Layout, Receipt, Settings, History, UserPlus, Wand2 } from "lucide-react";
+import { Users, Video, Activity, TrendingUp, Palette, Home, BarChart3, Search, Package, Layout, Receipt, Settings, History, UserPlus, Wand2, RefreshCw, Trash2 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
@@ -694,6 +694,116 @@ export default function Admin() {
                     }}
                   />
                 </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <RefreshCw className="w-5 h-5" />
+                  Gerenciamento de Cache
+                </CardTitle>
+                <CardDescription>
+                  Limpe o cache local para forçar a atualização de todas as configurações em todos os dispositivos.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex items-center justify-between p-4 border rounded-lg">
+                  <div className="space-y-1">
+                    <Label className="font-medium">Limpar Cache Local</Label>
+                    <p className="text-sm text-muted-foreground">
+                      Remove dados salvos no navegador (tema, créditos, favicon). O usuário será redirecionado para recarregar.
+                    </p>
+                  </div>
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      // List of all localStorage keys used by the app
+                      const cacheKeys = [
+                        'theme-colors',
+                        'theme-colors-timestamp',
+                        'user-credits',
+                        'favicon-url',
+                        'onboarding-completed',
+                        'sidebar-state'
+                      ];
+                      
+                      cacheKeys.forEach(key => {
+                        localStorage.removeItem(key);
+                      });
+                      
+                      toast.success("Cache local limpo! Recarregando...");
+                      setTimeout(() => {
+                        window.location.reload();
+                      }, 1000);
+                    }}
+                  >
+                    <Trash2 className="w-4 h-4 mr-2" />
+                    Limpar Meu Cache
+                  </Button>
+                </div>
+
+                <div className="flex items-center justify-between p-4 border rounded-lg bg-destructive/10 border-destructive/20">
+                  <div className="space-y-1">
+                    <Label className="font-medium">Forçar Atualização Global</Label>
+                    <p className="text-sm text-muted-foreground">
+                      Incrementa a versão do cache, forçando todos os usuários a recarregar dados do servidor na próxima visita.
+                    </p>
+                  </div>
+                  <Button
+                    variant="destructive"
+                    onClick={async () => {
+                      try {
+                        // Update a cache version in the database that all clients check
+                        const newVersion = Date.now().toString();
+                        
+                        // Check if cache_version exists
+                        const { data: existing } = await supabase
+                          .from("theme_settings")
+                          .select("id")
+                          .eq("setting_key", "cache_version")
+                          .maybeSingle();
+                        
+                        if (existing) {
+                          await supabase
+                            .from("theme_settings")
+                            .update({ setting_value: newVersion })
+                            .eq("setting_key", "cache_version");
+                        } else {
+                          await supabase
+                            .from("theme_settings")
+                            .insert({ setting_key: "cache_version", setting_value: newVersion });
+                        }
+                        
+                        // Also clear local cache
+                        const cacheKeys = [
+                          'theme-colors',
+                          'theme-colors-timestamp',
+                          'user-credits',
+                          'favicon-url',
+                          'cache-version'
+                        ];
+                        cacheKeys.forEach(key => localStorage.removeItem(key));
+                        
+                        toast.success("Cache global invalidado! Todos os usuários carregarão dados frescos.");
+                        setTimeout(() => {
+                          window.location.reload();
+                        }, 1500);
+                      } catch (error) {
+                        console.error("Error invalidating cache:", error);
+                        toast.error("Erro ao invalidar cache global");
+                      }
+                    }}
+                  >
+                    <RefreshCw className="w-4 h-4 mr-2" />
+                    Invalidar Cache Global
+                  </Button>
+                </div>
+
+                <p className="text-xs text-muted-foreground mt-2">
+                  <strong>Dica:</strong> Use "Limpar Meu Cache" para testar alterações localmente. 
+                  Use "Invalidar Cache Global" quando fizer mudanças que precisam afetar todos os usuários imediatamente.
+                </p>
               </CardContent>
             </Card>
           </TabsContent>

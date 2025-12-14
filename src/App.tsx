@@ -9,6 +9,7 @@ import { ScrollToTop } from "./components/ScrollToTop";
 import { RouteTransition } from "./components/RouteTransition";
 import { useTheme } from "./hooks/useTheme";
 import { useFavicon } from "./hooks/useFavicon";
+import { useCacheVersion } from "./hooks/useCacheVersion";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import CreateCharacter from "./pages/CreateCharacter";
@@ -31,6 +32,7 @@ const queryClient = new QueryClient();
 const App = () => {
   useTheme();
   useFavicon();
+  useCacheVersion();
 
   return (
     <QueryClientProvider client={queryClient}>
