@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useAdmin } from "@/hooks/useAdmin";
 import { useSubscription } from "@/hooks/useSubscription";
+import { useGeneratorsEnabled } from "@/hooks/useGeneratorsEnabled";
 import { useState } from "react";
 import { AddCreditsModal } from "./credits/AddCreditsModal";
 import { Button } from "./ui/button";
@@ -22,9 +23,9 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 
-const menuItems = [
+const getMenuItems = (generatorsEnabled: boolean) => [
   { title: "Criar Novo", url: "/create", icon: Plus },
-  { title: "Geradores", url: "/generators", icon: Wand2 },
+  ...(generatorsEnabled ? [{ title: "Geradores", url: "/generators", icon: Wand2 }] : []),
   { title: "Personagens", url: "/characters", icon: LayoutDashboard },
   { title: "Pacotes", url: "/subscription", icon: CreditCard },
   { title: "Indicações", url: "/referrals", icon: Gift },
@@ -37,8 +38,10 @@ export function AppSidebar() {
   const { toast } = useToast();
   const { isAdmin } = useAdmin();
   const { credits } = useSubscription();
+  const { isEnabled: generatorsEnabled } = useGeneratorsEnabled();
   const [isCreditsModalOpen, setIsCreditsModalOpen] = useState(false);
   const currentPath = location.pathname;
+  const menuItems = getMenuItems(generatorsEnabled);
 
   const isActive = (path: string) => currentPath === path;
   const isCollapsed = state === "collapsed";
