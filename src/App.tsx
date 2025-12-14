@@ -20,6 +20,9 @@ import BuyCredits from "./pages/BuyCredits";
 import Subscription from "./pages/Subscription";
 import Referrals from "./pages/Referrals";
 import CreditHistory from "./pages/CreditHistory";
+import Generators from "./pages/Generators";
+import CreateGenerator from "./pages/CreateGenerator";
+import CreateWithGenerator from "./pages/CreateWithGenerator";
 import Terms from "./pages/Terms";
 import NotFound from "./pages/NotFound";
 
@@ -61,6 +64,9 @@ const App = () => {
               <Route path="/subscription" element={<Subscription />} />
               <Route path="/referrals" element={<Referrals />} />
               <Route path="/credit-history" element={<CreditHistory />} />
+              <Route path="/generators" element={<Generators />} />
+              <Route path="/create-generator" element={<CreateGenerator />} />
+              <Route path="/create-with-generator/:generatorId" element={<CreateWithGenerator />} />
               <Route path="/admin" element={<Admin />} />
             </Route>
 

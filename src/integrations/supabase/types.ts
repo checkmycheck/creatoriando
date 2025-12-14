@@ -23,6 +23,7 @@ export type Database = {
           created_at: string | null
           environment: string | null
           gender: string | null
+          generator_id: string | null
           id: string
           is_favorite: boolean
           lighting: string | null
@@ -44,6 +45,7 @@ export type Database = {
           created_at?: string | null
           environment?: string | null
           gender?: string | null
+          generator_id?: string | null
           id?: string
           is_favorite?: boolean
           lighting?: string | null
@@ -65,6 +67,7 @@ export type Database = {
           created_at?: string | null
           environment?: string | null
           gender?: string | null
+          generator_id?: string | null
           id?: string
           is_favorite?: boolean
           lighting?: string | null
@@ -79,6 +82,13 @@ export type Database = {
           voice_tone?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "characters_generator_id_fkey"
+            columns: ["generator_id"]
+            isOneToOne: false
+            referencedRelation: "custom_generators"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "characters_user_id_fkey"
             columns: ["user_id"]
@@ -165,6 +175,53 @@ export type Database = {
           },
           {
             foreignKeyName: "credit_transactions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      custom_generators: {
+        Row: {
+          character_description: string | null
+          character_image_url: string | null
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          scenario_description: string | null
+          scenario_image_url: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          character_description?: string | null
+          character_image_url?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          scenario_description?: string | null
+          scenario_image_url?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          character_description?: string | null
+          character_image_url?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          scenario_description?: string | null
+          scenario_image_url?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "custom_generators_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
