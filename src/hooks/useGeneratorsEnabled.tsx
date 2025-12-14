@@ -14,8 +14,20 @@ export function useGeneratorsEnabled() {
           .eq("setting_key", "generators_enabled")
           .maybeSingle();
 
-        if (!error && data) {
+        if (error) {
+          console.error("Error loading generators setting:", error);
+          setLoading(false);
+          return;
+        }
+
+        if (data) {
           setIsEnabled(data.setting_value === "true");
+        } else {
+          // Setting doesn't exist, create it with default value true
+          await supabase
+            .from("theme_settings")
+            .insert({ setting_key: "generators_enabled", setting_value: "true" });
+          setIsEnabled(true);
         }
       } catch (error) {
         console.error("Error loading generators setting:", error);
