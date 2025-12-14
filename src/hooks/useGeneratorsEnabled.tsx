@@ -4,8 +4,8 @@ import { supabase } from "@/integrations/supabase/client";
 const CACHE_KEY = 'generators-enabled';
 
 export function useGeneratorsEnabled() {
-  // IMPORTANTE: Default TRUE para garantir que menu apareça imediatamente
-  // enquanto carrega do banco (melhor UX do que esconder e mostrar depois)
+  // SEMPRE TRUE por padrão - melhor mostrar menu e esconder depois
+  // do que não mostrar e usuário não conseguir acessar
   const [isEnabled, setIsEnabled] = useState<boolean>(true);
   const [loading, setLoading] = useState(true);
 
@@ -18,30 +18,29 @@ export function useGeneratorsEnabled() {
           .eq("setting_key", "generators_enabled")
           .maybeSingle();
 
+        // Se houver QUALQUER erro (incluindo RLS), manter habilitado
         if (error) {
-          console.error("[Generators] Erro ao carregar:", error);
-          // Em caso de erro, manter habilitado
+          console.warn("[Generators] Erro ao carregar (usando padrão true):", error.message);
           setIsEnabled(true);
+          localStorage.setItem(CACHE_KEY, 'true');
           setLoading(false);
           return;
         }
 
-        if (data) {
+        if (data?.setting_value) {
           const enabled = data.setting_value === "true";
           setIsEnabled(enabled);
           localStorage.setItem(CACHE_KEY, enabled ? 'true' : 'false');
         } else {
-          // Se não existe, criar com valor padrão true
-          await supabase
-            .from("theme_settings")
-            .insert({ setting_key: "generators_enabled", setting_value: "true" });
+          // Se não existe no banco, usar true como padrão
           setIsEnabled(true);
           localStorage.setItem(CACHE_KEY, 'true');
         }
-      } catch (error) {
-        console.error("[Generators] Erro:", error);
-        // Em caso de exceção, manter habilitado para não bloquear
+      } catch (err) {
+        // Qualquer exceção = manter habilitado
+        console.warn("[Generators] Exceção (usando padrão true):", err);
         setIsEnabled(true);
+        localStorage.setItem(CACHE_KEY, 'true');
       } finally {
         setLoading(false);
       }
