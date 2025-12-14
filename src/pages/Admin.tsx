@@ -2,15 +2,17 @@ import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAdmin } from "@/hooks/useAdmin";
+import { useGeneratorsEnabled } from "@/hooks/useGeneratorsEnabled";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Users, Video, Activity, TrendingUp, Palette, Home, BarChart3, Search, Package, Layout, Receipt, Settings, History, UserPlus } from "lucide-react";
+import { Users, Video, Activity, TrendingUp, Palette, Home, BarChart3, Search, Package, Layout, Receipt, Settings, History, UserPlus, Wand2 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
+import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
 import { AnalyticsDashboard } from "@/components/admin/AnalyticsDashboard";
@@ -46,6 +48,7 @@ interface ThemeColor {
 export default function Admin() {
   const navigate = useNavigate();
   const { isAdmin, loading: adminLoading } = useAdmin();
+  const { isEnabled: generatorsEnabled, setEnabled: setGeneratorsEnabled } = useGeneratorsEnabled();
   const [stats, setStats] = useState<Stats>({ totalUsers: 0, totalCharacters: 0, activeUsers: 0 });
   const [chartData, setChartData] = useState<ChartData[]>([]);
   const [themeColors, setThemeColors] = useState<ThemeColor[]>([]);
@@ -432,7 +435,7 @@ export default function Admin() {
         </div>
 
         <Tabs defaultValue="metrics" className="w-full">
-          <TabsList className="grid w-full max-w-7xl grid-cols-9 gap-1">
+          <TabsList className="grid w-full max-w-7xl grid-cols-10 gap-1">
             <TabsTrigger value="metrics">
               <Activity className="w-4 h-4 mr-2" />
               Métricas
@@ -464,6 +467,10 @@ export default function Admin() {
             <TabsTrigger value="landing">
               <Layout className="w-4 h-4 mr-2" />
               Landing Page
+            </TabsTrigger>
+            <TabsTrigger value="features">
+              <Wand2 className="w-4 h-4 mr-2" />
+              Recursos
             </TabsTrigger>
             <TabsTrigger value="theme">
               <Palette className="w-4 h-4 mr-2" />
@@ -651,6 +658,44 @@ export default function Admin() {
 
           <TabsContent value="landing" className="space-y-6 mt-6">
             <LandingPageCMS />
+          </TabsContent>
+
+          <TabsContent value="features" className="space-y-6 mt-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Wand2 className="w-5 h-5" />
+                  Geradores Personalizados
+                </CardTitle>
+                <CardDescription>
+                  Ative ou desative a funcionalidade de Geradores Personalizados para todos os usuários.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center justify-between">
+                  <div className="space-y-1">
+                    <Label htmlFor="generators-toggle" className="font-medium">
+                      Funcionalidade de Geradores
+                    </Label>
+                    <p className="text-sm text-muted-foreground">
+                      Quando ativado, os usuários podem criar templates com imagens de referência.
+                    </p>
+                  </div>
+                  <Switch
+                    id="generators-toggle"
+                    checked={generatorsEnabled}
+                    onCheckedChange={async (checked) => {
+                      try {
+                        await setGeneratorsEnabled(checked);
+                        toast.success(checked ? "Geradores ativados" : "Geradores desativados");
+                      } catch (error) {
+                        toast.error("Erro ao atualizar configuração");
+                      }
+                    }}
+                  />
+                </div>
+              </CardContent>
+            </Card>
           </TabsContent>
 
           <TabsContent value="theme" className="space-y-6 mt-6">
